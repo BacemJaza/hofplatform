@@ -25,8 +25,19 @@ export const Route = createFileRoute("/product/$slug")({
     };
   },
   errorComponent: ({ error }) => (
-    <div className="flex min-h-screen items-center justify-center px-6">
-      <p className="text-sm text-muted-foreground">{error.message}</p>
+    <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-6 text-center">
+      <p className="font-display text-4xl">SOMETHING BROKE</p>
+      <p className="text-sm text-muted-foreground">
+        We couldn't load this piece. Please try again in a moment.
+      </p>
+      {import.meta.env.DEV && error?.message && (
+        <pre className="mt-2 max-h-40 max-w-lg overflow-auto rounded-md bg-muted p-3 text-left font-mono text-xs text-destructive">
+          {error.message}
+        </pre>
+      )}
+      <Link to="/" className="mt-2 text-xs uppercase tracking-[0.3em] underline-offset-8 hover:underline">
+        Back to drop
+      </Link>
     </div>
   ),
   notFoundComponent: () => (
