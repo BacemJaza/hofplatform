@@ -124,9 +124,9 @@ function Index() {
         </p>
         <div className="mx-auto mt-16 h-px w-24 bg-foreground/20" />
         <p className="mt-12 mx-auto max-w-md text-sm leading-relaxed text-muted-foreground">
-          KHALTA was built for the ones who never wanted matching frames. Each flag is
-          a piece of fabric that means something — to you, to whoever walks into your
-          room, to the version of you that hung it.
+          KHALTA — خلطة — was built in Tunis for the ones who never wanted matching frames.
+          Each flag is a piece of fabric that means something — to you, to whoever walks
+          into your room, to the version of you that hung it.
         </p>
         <div className="mt-12">
           <Link
