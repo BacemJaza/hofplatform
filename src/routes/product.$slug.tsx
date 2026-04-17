@@ -86,7 +86,7 @@ function ProductPage() {
           </div>
 
           <div className="mt-10 flex flex-wrap gap-2">
-            {product.tags.map((t) => (
+            {product.tags.map((t: string) => (
               <span
                 key={t}
                 className="border hairline px-3 py-1.5 text-[10px] uppercase tracking-[0.3em] text-muted-foreground"
