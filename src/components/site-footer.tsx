@@ -6,7 +6,7 @@ export function SiteFooter() {
           <div>
             <p className="font-display text-3xl tracking-tight">KHALTA</p>
             <p className="mt-4 max-w-xs text-sm text-muted-foreground">
-              Fabric art for identity. Limited drops. No restocks.
+              خلطة — Fabric art from Tunis. Limited drops. No restocks.
             </p>
           </div>
           <div className="text-xs uppercase tracking-[0.25em] text-muted-foreground">
@@ -28,8 +28,8 @@ export function SiteFooter() {
           </div>
         </div>
         <div className="mt-16 flex flex-col items-start justify-between gap-4 border-t hairline pt-8 text-[10px] uppercase tracking-[0.3em] text-muted-foreground md:flex-row md:items-center">
-          <p>© KHALTA — All flags reserved.</p>
-          <p>Made for the ones who hang their identity.</p>
+          <p>© KHALTA — Tunis. All flags reserved.</p>
+          <p>Made for the ones who hang their identity. خلطة.</p>
         </div>
       </div>
     </footer>

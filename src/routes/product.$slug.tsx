@@ -1,6 +1,8 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState } from "react";
 import { getProduct, products } from "@/data/products";
+import { useCart } from "@/stores/cart-store";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/product/$slug")({
   loader: ({ params }) => {
@@ -42,7 +44,15 @@ export const Route = createFileRoute("/product/$slug")({
 function ProductPage() {
   const { product } = Route.useLoaderData();
   const [zoom, setZoom] = useState(false);
+  const add = useCart((s) => s.add);
   const others = products.filter((p) => p.slug !== product.slug).slice(0, 3);
+
+  const onAdd = () => {
+    add(product);
+    toast(`${product.name} — added to your bag`, {
+      description: "From the studio in Tunis to your wall.",
+    });
+  };
 
   return (
     <article className="pt-24">
@@ -102,6 +112,7 @@ function ProductPage() {
 
           <button
             type="button"
+            onClick={onAdd}
             className="mt-12 w-full border hairline py-5 text-xs uppercase tracking-[0.4em] transition-colors hover:bg-foreground hover:text-background md:w-auto md:px-16"
           >
             Add to cart — {product.price}
@@ -117,7 +128,7 @@ function ProductPage() {
               <li>— 100% cotton flag fabric, 220 gsm</li>
               <li>— Hand-trimmed, brass grommets, hanging cord included</li>
               <li>— Each flag numbered & signed</li>
-              <li>— Ships in 5–7 days from Berlin</li>
+              <li>— Ships in 5–7 days from Tunis</li>
             </ul>
           </div>
         </div>

@@ -7,12 +7,12 @@ export const Route = createFileRoute("/philosophy")({
       {
         name: "description",
         content:
-          "KHALTA philosophy — fabric art as identity. Not posters. Not decoration. Statements you hang on your wall.",
+          "KHALTA — fabric art born in Tunis. Statements stitched in cotton, carried from the medina to your wall.",
       },
       { property: "og:title", content: "Philosophy — KHALTA" },
       {
         property: "og:description",
-        content: "Fabric art as identity. Statements you hang on your wall.",
+        content: "From Tunis. Fabric, identity, and noise turned quiet.",
       },
     ],
   }),
@@ -24,43 +24,68 @@ function Philosophy() {
     <div className="pt-32">
       <section className="mx-auto max-w-[900px] px-6 py-24 text-center md:px-10">
         <p className="text-[10px] uppercase tracking-[0.5em] text-muted-foreground">
-          Philosophy
+          Philosophy / من تونس
         </p>
         <h1 className="mt-8 font-display text-6xl leading-[0.95] text-balance md:text-8xl">
           We don't make
           <br />
           <span className="ember-text">decoration.</span>
         </h1>
+        <p className="mt-10 text-sm uppercase tracking-[0.35em] text-muted-foreground">
+          KHALTA — خلطة — the mix
+        </p>
       </section>
 
       <section className="mx-auto max-w-[700px] px-6 pb-24 md:px-10">
         <div className="space-y-10 text-base leading-relaxed text-muted-foreground">
           <p>
-            KHALTA started in a warehouse in Berlin with one idea: most things on most
-            walls don't mean anything. They were chosen by an algorithm, framed by a
-            stranger, and they say nothing about the person who lives there.
+            KHALTA started in a small studio in Tunis. <span className="text-foreground">Khalta</span>{" "}
+            means <em>the mix</em> — what happens when the medina meets the street, when the
+            spice market meets the spray can, when an old word in Derja sits next to a quiet
+            English statement. That tension is the whole brand.
           </p>
           <p className="text-foreground text-lg leading-relaxed">
-            We make fabric flags. Heavyweight cotton, raw edges, big quiet typography.
-            One word. Sometimes two. Always something you'd think about before
-            tattooing on yourself.
+            We make fabric flags. Heavyweight cotton, raw edges, big quiet typography. One word.
+            Sometimes two. Always something you'd think about before tattooing on yourself.
           </p>
           <p>
-            Each piece is made for a specific kind of person — the ones who built their
-            identity off the grid, who never asked anyone what's in season, who hang
-            things on their wall not to fill space but to mark it.
+            Tunisia is loud. Markets shouting, cafés arguing, the call to prayer cutting through
+            traffic. KHALTA is what you hang on your wall when you go home and want the noise
+            to mean something. <span className="text-foreground">El 7eyt yetkellem.</span> The
+            wall speaks.
           </p>
           <p>
-            Drops are intentionally small. We don't restock. We don't re-release. If
-            you have one, no one else can have the next one. That's the entire point.
+            Each piece is made for a specific kind of person — the Tunisian who never asked
+            anyone what's in season, the diaspora kid building identity from two cities at
+            once, the outsider anywhere who hangs things on their wall not to fill space but
+            to mark it.
+          </p>
+          <p>
+            Drops are intentionally small. We don't restock. We don't re-release. If you have
+            one, no one else can have the next one. <span className="text-foreground">Yezzi
+            tkhammem</span> — stop overthinking. The flag finds the right wall.
           </p>
         </div>
 
-        <div className="mt-16 border-t hairline pt-12">
-          <p className="text-[10px] uppercase tracking-[0.4em] text-muted-foreground">
-            Built in
-          </p>
-          <p className="mt-4 font-display text-2xl">Berlin / Cotton / Cinematic</p>
+        <div className="mt-16 grid grid-cols-1 gap-8 border-t hairline pt-12 md:grid-cols-3">
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.4em] text-muted-foreground">
+              Made in
+            </p>
+            <p className="mt-3 font-display text-2xl">Tunis</p>
+          </div>
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.4em] text-muted-foreground">
+              Material
+            </p>
+            <p className="mt-3 font-display text-2xl">Cotton, 220 gsm</p>
+          </div>
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.4em] text-muted-foreground">
+              Spirit
+            </p>
+            <p className="mt-3 font-display text-2xl">خلطة</p>
+          </div>
         </div>
 
         <div className="mt-16">
