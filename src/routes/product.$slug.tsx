@@ -128,7 +128,7 @@ function ProductPage() {
               <li>— 100% cotton flag fabric, 220 gsm</li>
               <li>— Hand-trimmed, brass grommets, hanging cord included</li>
               <li>— Each flag numbered & signed</li>
-              <li>— Ships in 5–7 days from Berlin</li>
+              <li>— Ships in 5–7 days from Tunis</li>
             </ul>
           </div>
         </div>
