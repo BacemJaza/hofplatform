@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as PhilosophyRouteImport } from './routes/philosophy'
 import { Route as DropsRouteImport } from './routes/drops'
+import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProductSlugRouteImport } from './routes/product.$slug'
 
@@ -22,6 +23,11 @@ const PhilosophyRoute = PhilosophyRouteImport.update({
 const DropsRoute = DropsRouteImport.update({
   id: '/drops',
   path: '/drops',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CheckoutRoute = CheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -37,12 +43,14 @@ const ProductSlugRoute = ProductSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/checkout': typeof CheckoutRoute
   '/drops': typeof DropsRoute
   '/philosophy': typeof PhilosophyRoute
   '/product/$slug': typeof ProductSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/checkout': typeof CheckoutRoute
   '/drops': typeof DropsRoute
   '/philosophy': typeof PhilosophyRoute
   '/product/$slug': typeof ProductSlugRoute
@@ -50,20 +58,28 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/checkout': typeof CheckoutRoute
   '/drops': typeof DropsRoute
   '/philosophy': typeof PhilosophyRoute
   '/product/$slug': typeof ProductSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/drops' | '/philosophy' | '/product/$slug'
+  fullPaths: '/' | '/checkout' | '/drops' | '/philosophy' | '/product/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/drops' | '/philosophy' | '/product/$slug'
-  id: '__root__' | '/' | '/drops' | '/philosophy' | '/product/$slug'
+  to: '/' | '/checkout' | '/drops' | '/philosophy' | '/product/$slug'
+  id:
+    | '__root__'
+    | '/'
+    | '/checkout'
+    | '/drops'
+    | '/philosophy'
+    | '/product/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CheckoutRoute: typeof CheckoutRoute
   DropsRoute: typeof DropsRoute
   PhilosophyRoute: typeof PhilosophyRoute
   ProductSlugRoute: typeof ProductSlugRoute
@@ -85,6 +101,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DropsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/checkout': {
+      id: '/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof CheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -104,6 +127,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CheckoutRoute: CheckoutRoute,
   DropsRoute: DropsRoute,
   PhilosophyRoute: PhilosophyRoute,
   ProductSlugRoute: ProductSlugRoute,
@@ -111,3 +135,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
