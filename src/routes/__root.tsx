@@ -47,6 +47,10 @@ export const Route = createRootRoute({
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "KHALTA — Fabric art for identity" },
+      { name: "description", content: "KHALTA is a dark, cinematic e-commerce site selling collectible fabric art statements." },
+      { property: "og:description", content: "KHALTA is a dark, cinematic e-commerce site selling collectible fabric art statements." },
+      { name: "twitter:description", content: "KHALTA is a dark, cinematic e-commerce site selling collectible fabric art statements." },
     ],
     links: [
       {
