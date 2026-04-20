@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
 import { useCart } from "@/stores/cart-store";
 import { useTheme } from "@/hooks/use-theme";
+import khaltaLogo from "@/assets/khalta-logo.png";
 
 export function SiteHeader() {
   const [scrolled, setScrolled] = useState(false);
