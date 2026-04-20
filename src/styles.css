@@ -2,7 +2,7 @@
 @source "../src";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
@@ -30,6 +30,7 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
   --color-ember: var(--ember);
+  --color-indigo: var(--indigo);
 
   --font-display: "Archivo Black", "Inter", system-ui, sans-serif;
   --font-sans: "Inter", system-ui, sans-serif;
@@ -65,36 +66,71 @@
 :root {
   --radius: 0.25rem;
 
-  /* KHALTA — dark cinematic urban */
-  --background: oklch(0.13 0.005 240);
-  --foreground: oklch(0.96 0.005 60);
+  /* KHALTA — LIGHT (default): raw linen, sun-bleached canvas, Tunis medina daylight */
+  --background: oklch(0.96 0.012 75);     /* unbleached linen */
+  --foreground: oklch(0.18 0.012 35);     /* deep ink / charcoal */
 
-  --card: oklch(0.16 0.006 240);
-  --card-foreground: oklch(0.96 0.005 60);
-  --popover: oklch(0.13 0.005 240);
-  --popover-foreground: oklch(0.96 0.005 60);
+  --card: oklch(0.98 0.008 75);
+  --card-foreground: oklch(0.18 0.012 35);
+  --popover: oklch(0.96 0.012 75);
+  --popover-foreground: oklch(0.18 0.012 35);
 
-  --primary: oklch(0.96 0.005 60);
-  --primary-foreground: oklch(0.13 0.005 240);
+  --primary: oklch(0.18 0.012 35);
+  --primary-foreground: oklch(0.96 0.012 75);
 
-  --secondary: oklch(0.2 0.006 240);
-  --secondary-foreground: oklch(0.96 0.005 60);
+  --secondary: oklch(0.92 0.018 70);      /* warm sand */
+  --secondary-foreground: oklch(0.18 0.012 35);
 
-  --muted: oklch(0.2 0.006 240);
-  --muted-foreground: oklch(0.62 0.01 60);
+  --muted: oklch(0.9 0.015 70);
+  --muted-foreground: oklch(0.42 0.018 40);
 
-  --accent: oklch(0.22 0.008 240);
-  --accent-foreground: oklch(0.96 0.005 60);
+  --accent: oklch(0.88 0.025 65);         /* clay */
+  --accent-foreground: oklch(0.18 0.012 35);
 
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.984 0.003 247.858);
+  --destructive: oklch(0.55 0.23 27);
+  --destructive-foreground: oklch(0.98 0.005 60);
 
-  --border: oklch(0.96 0.005 60 / 0.1);
-  --input: oklch(0.96 0.005 60 / 0.15);
-  --ring: oklch(0.96 0.005 60 / 0.4);
+  --border: oklch(0.18 0.012 35 / 0.14);
+  --input: oklch(0.18 0.012 35 / 0.18);
+  --ring: oklch(0.18 0.012 35 / 0.4);
 
-  /* Rare accent — ember red */
-  --ember: oklch(0.62 0.22 27);
+  /* Signature accents — terracotta (clay roof) + indigo (Sidi Bou Said) */
+  --ember: oklch(0.58 0.18 38);           /* terracotta / brique tunisienne */
+  --indigo: oklch(0.45 0.13 240);         /* Sidi Bou Said indigo */
+}
+
+.dark {
+  /* KHALTA — DARK: cinematic medina at night, ember lantern */
+  --background: oklch(0.13 0.008 35);     /* warm near-black, not blue */
+  --foreground: oklch(0.96 0.012 75);     /* linen */
+
+  --card: oklch(0.17 0.01 35);
+  --card-foreground: oklch(0.96 0.012 75);
+  --popover: oklch(0.13 0.008 35);
+  --popover-foreground: oklch(0.96 0.012 75);
+
+  --primary: oklch(0.96 0.012 75);
+  --primary-foreground: oklch(0.13 0.008 35);
+
+  --secondary: oklch(0.21 0.012 35);
+  --secondary-foreground: oklch(0.96 0.012 75);
+
+  --muted: oklch(0.21 0.012 35);
+  --muted-foreground: oklch(0.66 0.015 65);
+
+  --accent: oklch(0.24 0.015 40);
+  --accent-foreground: oklch(0.96 0.012 75);
+
+  --destructive: oklch(0.62 0.24 27);
+  --destructive-foreground: oklch(0.98 0.005 60);
+
+  --border: oklch(0.96 0.012 75 / 0.1);
+  --input: oklch(0.96 0.012 75 / 0.15);
+  --ring: oklch(0.96 0.012 75 / 0.4);
+
+  /* Ember glows brighter at night */
+  --ember: oklch(0.7 0.21 35);            /* lantern terracotta */
+  --indigo: oklch(0.62 0.16 245);
 }
 
 @layer base {
@@ -144,7 +180,11 @@
     position: absolute;
     inset: 0;
     pointer-events: none;
-    background: radial-gradient(ellipse at center, transparent 50%, oklch(0.08 0.005 240 / 0.7) 100%);
+    background: radial-gradient(ellipse at center, transparent 50%, color-mix(in oklab, var(--color-background) 80%, transparent) 100%);
+  }
+
+  .indigo-text {
+    color: var(--color-indigo);
   }
 
   .text-balance {
@@ -156,6 +196,6 @@
   }
 
   .hairline {
-    border-color: oklch(0.96 0.005 60 / 0.12);
+    border-color: var(--color-border);
   }
 }
