@@ -28,8 +28,14 @@ export function SiteHeader() {
       }`}
     >
       <div className="mx-auto flex h-16 max-w-[1600px] items-center justify-between px-6 md:px-10">
-        <Link to="/" className="font-display text-lg tracking-[0.2em]">
-          KHALTA
+        <Link to="/" aria-label="KHALTA — home" className="flex items-center">
+          <img
+            src={khaltaLogo}
+            alt="KHALTA"
+            className="h-8 w-auto md:h-9 dark:invert-0 invert"
+            loading="eager"
+            decoding="async"
+          />
         </Link>
         <nav className="hidden items-center gap-10 text-xs uppercase tracking-[0.25em] text-muted-foreground md:flex">
           <Link to="/" activeOptions={{ exact: true }} activeProps={{ className: "text-foreground" }} className="transition-colors hover:text-foreground">
