@@ -1,12 +1,15 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { Moon, Sun } from "lucide-react";
 import { useCart } from "@/stores/cart-store";
+import { useTheme } from "@/hooks/use-theme";
 
 export function SiteHeader() {
   const [scrolled, setScrolled] = useState(false);
   const items = useCart((s) => s.items);
   const setOpen = useCart((s) => s.setOpen);
   const count = items.reduce((n, i) => n + i.qty, 0);
+  const { theme, toggle } = useTheme();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 16);
@@ -38,7 +41,15 @@ export function SiteHeader() {
             Drops
           </Link>
         </nav>
-        <div className="flex items-center gap-6 text-xs uppercase tracking-[0.25em] text-muted-foreground">
+        <div className="flex items-center gap-5 text-xs uppercase tracking-[0.25em] text-muted-foreground md:gap-6">
+          <button
+            type="button"
+            onClick={toggle}
+            aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+            className="inline-flex h-8 w-8 items-center justify-center border hairline transition-colors hover:text-foreground hover:bg-foreground/5"
+          >
+            {theme === "dark" ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
+          </button>
           <button
             type="button"
             onClick={() => setOpen(true)}
