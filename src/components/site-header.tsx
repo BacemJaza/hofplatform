@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
 import { useCart } from "@/stores/cart-store";
 import { useTheme } from "@/hooks/use-theme";
+import { useLanguage, useT, type Lang } from "@/hooks/use-language";
 import khaltaLogo from "@/assets/khalta-logo.png";
 
 export function SiteHeader() {
@@ -11,6 +12,8 @@ export function SiteHeader() {
   const setOpen = useCart((s) => s.setOpen);
   const count = items.reduce((n, i) => n + i.qty, 0);
   const { theme, toggle } = useTheme();
+  const { lang, setLang } = useLanguage();
+  const t = useT();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 16);
@@ -18,6 +21,8 @@ export function SiteHeader() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  const langs: Lang[] = ["en", "fr", "ar"];
 
   return (
     <header
@@ -42,16 +47,36 @@ export function SiteHeader() {
         </Link>
         <nav className="hidden items-center gap-10 text-xs uppercase tracking-[0.25em] text-muted-foreground md:flex">
           <Link to="/" activeOptions={{ exact: true }} activeProps={{ className: "text-foreground" }} className="transition-colors hover:text-foreground">
-            Drop 001
+            {t("nav.drop")}
           </Link>
           <Link to="/philosophy" activeProps={{ className: "text-foreground" }} className="transition-colors hover:text-foreground">
-            Philosophy
+            {t("nav.philosophy")}
           </Link>
           <Link to="/drops" activeProps={{ className: "text-foreground" }} className="transition-colors hover:text-foreground">
-            Drops
+            {t("nav.drops")}
           </Link>
         </nav>
-        <div className="flex items-center gap-5 text-xs uppercase tracking-[0.25em] text-muted-foreground md:gap-6">
+        <div className="flex items-center gap-3 text-xs uppercase tracking-[0.25em] text-muted-foreground md:gap-5">
+          {/* Language switcher */}
+          <div className="flex items-center border hairline text-[10px]">
+            {langs.map((l) => (
+              <button
+                key={l}
+                type="button"
+                onClick={() => setLang(l)}
+                aria-label={`Switch language to ${l}`}
+                aria-pressed={lang === l}
+                className={`px-2 py-1.5 uppercase tracking-[0.25em] transition-colors ${
+                  lang === l
+                    ? "bg-foreground text-background"
+                    : "hover:text-foreground"
+                }`}
+              >
+                {l}
+              </button>
+            ))}
+          </div>
+
           <button
             type="button"
             onClick={toggle}
@@ -66,7 +91,7 @@ export function SiteHeader() {
             className="group flex items-center gap-2 transition-colors hover:text-foreground"
             aria-label={`Open cart, ${count} items`}
           >
-            <span>Cart</span>
+            <span className="hidden sm:inline">{t("nav.cart")}</span>
             <span
               className={`inline-flex h-5 min-w-5 items-center justify-center border hairline px-1.5 text-[10px] transition-colors ${
                 count > 0 ? "ember-text border-current" : ""
@@ -75,7 +100,6 @@ export function SiteHeader() {
               {count}
             </span>
           </button>
-          <span className="ember-text">●</span>
         </div>
       </div>
     </header>
