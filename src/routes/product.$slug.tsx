@@ -3,6 +3,8 @@ import { useState } from "react";
 import { getProduct, products } from "@/data/products";
 import { useCart } from "@/stores/cart-store";
 import { toast } from "sonner";
+import { formatTND } from "@/lib/price";
+import { useT } from "@/hooks/use-language";
 
 export const Route = createFileRoute("/product/$slug")({
   loader: ({ params }) => {
@@ -56,6 +58,8 @@ function ProductPage() {
   const { product } = Route.useLoaderData();
   const [zoom, setZoom] = useState(false);
   const add = useCart((s) => s.add);
+  const t = useT();
+  const priceTND = formatTND(product.price);
   const others = products.filter((p) => p.slug !== product.slug).slice(0, 3);
 
   const onAdd = () => {
@@ -84,11 +88,11 @@ function ProductPage() {
               }`}
             />
             <div className="absolute bottom-4 right-4 text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
-              Tap to {zoom ? "shrink" : "zoom fabric"}
+              {zoom ? t("product.tapShrink") : t("product.tapZoom")}
             </div>
           </div>
           <p className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
-            Heavyweight cotton — 90 × 140 cm — printed in studio
+            {t("product.spec")}
           </p>
         </div>
 
@@ -100,9 +104,9 @@ function ProductPage() {
           <h1 className="mt-6 font-display text-7xl md:text-8xl">{product.name}</h1>
 
           <div className="mt-8 flex items-baseline gap-4">
-            <span className="font-display text-3xl">{product.price}</span>
+            <span className="font-display text-3xl">{priceTND}</span>
             <span className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
-              Shipping included
+              {t("cart.shipping")}
             </span>
           </div>
 
@@ -126,15 +130,15 @@ function ProductPage() {
             onClick={onAdd}
             className="mt-12 w-full border hairline py-5 text-xs uppercase tracking-[0.4em] transition-colors hover:bg-foreground hover:text-background md:w-auto md:px-16"
           >
-            Add to cart — {product.price}
+            {t("cart.add")} — {priceTND}
           </button>
 
           <p className="mt-6 text-[10px] uppercase tracking-[0.4em] ember-text">
-            ● No restocks. Once it's gone, it's gone.
+            {t("cart.noRestock")}
           </p>
 
           <div className="mt-12 border-t hairline pt-8 text-xs leading-relaxed text-muted-foreground">
-            <p className="uppercase tracking-[0.3em] text-foreground">Details</p>
+            <p className="uppercase tracking-[0.3em] text-foreground">{t("product.details")}</p>
             <ul className="mt-4 space-y-2">
               <li>— 100% cotton flag fabric, 220 gsm</li>
               <li>— Hand-trimmed, brass grommets, hanging cord included</li>
@@ -149,10 +153,10 @@ function ProductPage() {
       <section className="mx-auto max-w-[1600px] px-6 py-24 md:px-10">
         <div className="mb-12 flex items-end justify-between">
           <p className="text-[10px] uppercase tracking-[0.5em] text-muted-foreground">
-            More from Drop 001
+            {t("product.more")}
           </p>
           <Link to="/" className="text-[10px] uppercase tracking-[0.3em] hover:text-foreground">
-            View all →
+            {t("product.viewAll")}
           </Link>
         </div>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
