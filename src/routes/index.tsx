@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import heroFlag from "@/assets/hero-flag.jpg";
 import { products } from "@/data/products";
 import { ProductCard } from "@/components/product-card";
+import { useT } from "@/hooks/use-language";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -25,6 +26,20 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
+  const t = useT();
+  const marquee = [
+    t("marquee.1"),
+    "★",
+    t("marquee.2"),
+    "★",
+    t("marquee.3"),
+    "★",
+    t("marquee.4"),
+    "★",
+    t("marquee.5"),
+    "★",
+  ];
+
   return (
     <>
       {/* HERO */}
@@ -42,7 +57,7 @@ function Index() {
 
         <div className="relative z-10 flex h-full flex-col items-center justify-center px-6 text-center">
           <p className="animate-fade-in text-[10px] uppercase tracking-[0.5em] text-muted-foreground" style={{ animationDelay: "200ms" }}>
-            KHALTA — Drop 001 / Live now
+            {t("hero.tag")}
           </p>
           <h1
             className="mt-8 animate-fade-up font-display text-[18vw] leading-[0.85] md:text-[10rem]"
@@ -54,7 +69,7 @@ function Index() {
             className="mt-8 max-w-md animate-fade-up text-sm uppercase tracking-[0.35em] text-muted-foreground"
             style={{ animationDelay: "700ms" }}
           >
-            Fabric art for identity
+            {t("hero.sub")}
           </p>
 
           <div className="mt-12 animate-fade-up" style={{ animationDelay: "950ms" }}>
@@ -62,14 +77,14 @@ function Index() {
               href="#drop-001"
               className="group inline-flex items-center gap-4 border hairline px-8 py-4 text-xs uppercase tracking-[0.35em] transition-all hover:bg-foreground hover:text-background"
             >
-              <span>Explore Drop 001</span>
+              <span>{t("hero.cta")}</span>
               <span className="transition-transform group-hover:translate-x-1">→</span>
             </a>
           </div>
         </div>
 
         <div className="absolute bottom-8 left-1/2 z-10 -translate-x-1/2 text-[10px] uppercase tracking-[0.4em] text-muted-foreground animate-fade-in" style={{ animationDelay: "1400ms" }}>
-          Scroll
+          {t("hero.scroll")}
         </div>
       </section>
 
@@ -78,8 +93,8 @@ function Index() {
         <div className="flex w-max animate-marquee gap-16 whitespace-nowrap font-display text-2xl tracking-[0.05em] text-muted-foreground/60">
           {Array.from({ length: 2 }).map((_, i) => (
             <div key={i} className="flex gap-16">
-              {["NO RESTOCKS", "★", "LIMITED EDITION", "★", "DROP 001 — LIVE", "★", "FABRIC NOT PAPER", "★", "STATEMENTS NOT DECORATION", "★"].map((t, j) => (
-                <span key={j}>{t}</span>
+              {marquee.map((tx, j) => (
+                <span key={j}>{tx}</span>
               ))}
             </div>
           ))}
@@ -91,19 +106,18 @@ function Index() {
         <div className="mb-20 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
           <div>
             <p className="text-[10px] uppercase tracking-[0.5em] text-muted-foreground">
-              Collection / 001
+              {t("drop.tag")}
             </p>
-            <h2 className="mt-6 font-display text-6xl md:text-8xl">DROP 001</h2>
+            <h2 className="mt-6 font-display text-6xl md:text-8xl">{t("drop.title")}</h2>
           </div>
           <p className="max-w-sm text-sm leading-relaxed text-muted-foreground">
-            Seven pieces. Each printed on heavyweight cotton flag fabric. Made in limited
-            quantity. When the count hits zero, it stays zero.
+            {t("drop.intro")}
           </p>
         </div>
 
         <div className="grid grid-cols-1 gap-x-6 gap-y-16 sm:grid-cols-2 lg:grid-cols-3">
           {products.map((p, i) => (
-            <ProductCard key={p.slug} product={p} index={i} />
+            <ProductCard key={p.slug} product={p} index={i} comingSoon={i !== 0} />
           ))}
         </div>
       </section>
@@ -111,29 +125,27 @@ function Index() {
       {/* PHILOSOPHY */}
       <section className="relative mx-auto max-w-[900px] px-6 py-40 text-center md:px-10">
         <p className="text-[10px] uppercase tracking-[0.5em] text-muted-foreground">
-          Philosophy
+          {t("philosophy.tag")}
         </p>
         <p className="mt-12 font-display text-4xl leading-[1.15] text-balance md:text-6xl">
-          Not posters.
+          {t("philosophy.h1a")}
           <br />
-          Not decoration.
+          {t("philosophy.h1b")}
           <br />
-          <span className="ember-text">Statements.</span>
+          <span className="ember-text">{t("philosophy.h1c")}</span>
           <br />
-          Identity you hang on your wall.
+          {t("philosophy.h1d")}
         </p>
         <div className="mx-auto mt-16 h-px w-24 bg-foreground/20" />
         <p className="mt-12 mx-auto max-w-md text-sm leading-relaxed text-muted-foreground">
-          KHALTA — خلطة — was built in Tunis for the ones who never wanted matching frames.
-          Each flag is a piece of fabric that means something — to you, to whoever walks
-          into your room, to the version of you that hung it.
+          {t("philosophy.body")}
         </p>
         <div className="mt-12">
           <Link
             to="/philosophy"
             className="text-xs uppercase tracking-[0.35em] text-muted-foreground underline-offset-8 transition-colors hover:text-foreground hover:underline"
           >
-            Read more
+            {t("philosophy.readMore")}
           </Link>
         </div>
       </section>
@@ -143,36 +155,29 @@ function Index() {
         <div className="mx-auto grid max-w-[1600px] grid-cols-1 gap-12 px-6 py-32 md:grid-cols-2 md:px-10">
           <div>
             <p className="text-[10px] uppercase tracking-[0.5em] text-muted-foreground">
-              The drop system
+              {t("system.tag")}
             </p>
             <h2 className="mt-6 font-display text-5xl leading-[0.95] md:text-7xl">
-              Once it's gone,
+              {t("system.titleA")}
               <br />
-              <span className="ember-text">it's gone.</span>
+              <span className="ember-text">{t("system.titleB")}</span>
             </h2>
           </div>
           <div className="flex flex-col justify-center gap-8 text-sm leading-relaxed text-muted-foreground">
-            <p>
-              Each piece is produced in limited quantity. We do not restock. We do not
-              re-release. When a flag sells out, it disappears from this site and it
-              stays disappeared.
-            </p>
-            <p>
-              That's the deal. The piece on your wall is one of a few that exist in
-              the world. That's what makes it yours.
-            </p>
+            <p>{t("system.p1")}</p>
+            <p>{t("system.p2")}</p>
             <div className="grid grid-cols-3 gap-6 pt-6">
               <div>
                 <p className="font-display text-3xl text-foreground">7</p>
-                <p className="mt-2 text-[10px] uppercase tracking-[0.3em]">Pieces</p>
+                <p className="mt-2 text-[10px] uppercase tracking-[0.3em]">{t("system.pieces")}</p>
               </div>
               <div>
                 <p className="font-display text-3xl text-foreground">265</p>
-                <p className="mt-2 text-[10px] uppercase tracking-[0.3em]">Flags total</p>
+                <p className="mt-2 text-[10px] uppercase tracking-[0.3em]">{t("system.flags")}</p>
               </div>
               <div>
                 <p className="font-display text-3xl ember-text">0</p>
-                <p className="mt-2 text-[10px] uppercase tracking-[0.3em]">Restocks</p>
+                <p className="mt-2 text-[10px] uppercase tracking-[0.3em]">{t("system.restocks")}</p>
               </div>
             </div>
           </div>

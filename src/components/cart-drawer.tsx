@@ -1,9 +1,12 @@
 import { Link } from "@tanstack/react-router";
 import { useCart } from "@/stores/cart-store";
 import { useEffect } from "react";
+import { formatTND, formatTotalTND } from "@/lib/price";
+import { useT } from "@/hooks/use-language";
 
 export function CartDrawer() {
   const { items, open, setOpen, setQty, remove, total } = useCart();
+  const t = useT();
 
   useEffect(() => {
     if (open) {
@@ -36,29 +39,29 @@ export function CartDrawer() {
       >
         <div className="flex items-center justify-between border-b hairline px-6 py-5">
           <p className="text-[10px] uppercase tracking-[0.4em] text-muted-foreground">
-            Your bag — {items.length} {items.length === 1 ? "piece" : "pieces"}
+            {t("bag.label")} — {items.length} {items.length === 1 ? t("bag.piece") : t("bag.pieces")}
           </p>
           <button
             type="button"
             onClick={() => setOpen(false)}
             className="text-xs uppercase tracking-[0.3em] text-muted-foreground transition-colors hover:text-foreground"
           >
-            Close ✕
+            {t("bag.close")}
           </button>
         </div>
 
         {items.length === 0 ? (
           <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 text-center">
-            <p className="font-display text-5xl">EMPTY</p>
+            <p className="font-display text-5xl">{t("bag.empty")}</p>
             <p className="max-w-xs text-sm text-muted-foreground">
-              Nothing on the wall yet. Pick a flag — they don't come back.
+              {t("bag.emptyText")}
             </p>
             <Link
               to="/"
               onClick={() => setOpen(false)}
               className="mt-6 border hairline px-6 py-3 text-xs uppercase tracking-[0.3em] transition-colors hover:bg-foreground hover:text-background"
             >
-              Explore Drop 001
+              {t("hero.cta")}
             </Link>
           </div>
         ) : (
@@ -83,7 +86,7 @@ export function CartDrawer() {
                       <div>
                         <p className="font-display text-lg">{it.name}</p>
                         <p className="mt-1 text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
-                          {it.price}
+                          {formatTND(it.price)}
                         </p>
                       </div>
                       <div className="flex items-center justify-between">
@@ -111,7 +114,7 @@ export function CartDrawer() {
                           onClick={() => remove(it.slug)}
                           className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground hover:ember-text"
                         >
-                          Remove
+                          {t("bag.remove")}
                         </button>
                       </div>
                     </div>
@@ -123,22 +126,22 @@ export function CartDrawer() {
             <div className="border-t hairline px-6 py-6">
               <div className="flex items-baseline justify-between">
                 <p className="text-[10px] uppercase tracking-[0.4em] text-muted-foreground">
-                  Subtotal
+                  {t("checkout.subtotal")}
                 </p>
-                <p className="font-display text-2xl">€{total().toFixed(0)}</p>
+                <p className="font-display text-2xl">{formatTotalTND(total())}</p>
               </div>
               <p className="mt-2 text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
-                Shipping from Tunis included
+                {t("checkout.shippedFrom")}
               </p>
               <Link
                 to="/checkout"
                 onClick={() => setOpen(false)}
                 className="mt-6 block w-full border hairline py-4 text-center text-xs uppercase tracking-[0.4em] transition-colors hover:bg-foreground hover:text-background"
               >
-                Checkout →
+                {t("bag.checkout")}
               </Link>
               <p className="mt-4 text-center text-[10px] uppercase tracking-[0.4em] ember-text">
-                ● No restocks. Move quick.
+                {t("bag.noRestocks")}
               </p>
             </div>
           </>
