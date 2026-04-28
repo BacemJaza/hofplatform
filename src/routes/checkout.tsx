@@ -214,9 +214,10 @@ function Checkout() {
 
             <button
               type="submit"
-              className="mt-4 w-full border hairline py-5 text-xs uppercase tracking-[0.4em] transition-colors hover:bg-foreground hover:text-background"
+              disabled={submitting}
+              className="mt-4 w-full border hairline py-5 text-xs uppercase tracking-[0.4em] transition-colors hover:bg-foreground hover:text-background disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {t("checkout.place")} — {formatTotalTND(total())}
+              {submitting ? "Sending…" : `${t("checkout.place")} — ${formatTotalTND(total())}`}
             </button>
             <p className="text-center text-[10px] uppercase tracking-[0.4em] ember-text">
               {t("checkout.soon")}
