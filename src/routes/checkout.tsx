@@ -38,6 +38,7 @@ function Checkout() {
   const { items, total, clear } = useCart();
   const t = useT();
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [orderRef, setOrderRef] = useState("");
   const [phrase, setPhrase] = useState(PHRASES[0]);
   const [form, setForm] = useState({
@@ -49,12 +50,44 @@ function Checkout() {
     notes: "",
   });
 
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (submitting) return;
+    setSubmitting(true);
+
     const ref = `KH-${Date.now().toString(36).toUpperCase().slice(-6)}`;
+    const orderTotal = total();
+    const orderItems = items.map((i) => ({
+      slug: i.slug,
+      name: i.name,
+      price: i.price,
+      qty: i.qty,
+    }));
+
+    const { error } = await supabase.from("orders").insert({
+      order_ref: ref,
+      customer_name: form.name.trim(),
+      email: form.email.trim(),
+      phone: form.phone.trim(),
+      city: form.city.trim(),
+      address: form.address.trim(),
+      notes: form.notes.trim() || null,
+      items: orderItems,
+      total: orderTotal,
+      currency: "TND",
+    });
+
+    if (error) {
+      console.error("Order submission failed:", error);
+      toast.error("Couldn't place your order. Try again in a sec.");
+      setSubmitting(false);
+      return;
+    }
+
     setOrderRef(ref);
     setPhrase(PHRASES[Math.floor(Math.random() * PHRASES.length)]);
     setSubmitted(true);
+    setSubmitting(false);
     clear();
     if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
   };
