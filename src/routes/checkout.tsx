@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useCart } from "@/stores/cart-store";
 import { formatTND, formatTotalTND } from "@/lib/price";
 import { useT } from "@/hooks/use-language";
-import { supabase } from "@/integrations/supabase/client";
+import { placeOrder } from "@/server/orders.functions";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/checkout")({
@@ -55,41 +55,36 @@ function Checkout() {
     if (submitting) return;
     setSubmitting(true);
 
-    const ref = `KH-${Date.now().toString(36).toUpperCase().slice(-6)}`;
-    const orderTotal = total();
-    const orderItems = items.map((i) => ({
-      slug: i.slug,
-      name: i.name,
-      price: i.price,
-      qty: i.qty,
-    }));
+    try {
+      const result = await placeOrder({
+        data: {
+          name: form.name.trim(),
+          email: form.email.trim(),
+          phone: form.phone.trim(),
+          city: form.city.trim(),
+          address: form.address.trim(),
+          notes: form.notes.trim(),
+          items: items.map((i) => ({ slug: i.slug, qty: i.qty })),
+        },
+      });
 
-    const { error } = await supabase.from("orders").insert({
-      order_ref: ref,
-      customer_name: form.name.trim(),
-      email: form.email.trim(),
-      phone: form.phone.trim(),
-      city: form.city.trim(),
-      address: form.address.trim(),
-      notes: form.notes.trim() || null,
-      items: orderItems,
-      total: orderTotal,
-      currency: "TND",
-    });
+      if (!result.ok) {
+        toast.error(result.error || "Couldn't place your order. Try again in a sec.");
+        setSubmitting(false);
+        return;
+      }
 
-    if (error) {
-      console.error("Order submission failed:", error);
+      setOrderRef(result.orderRef);
+      setPhrase(PHRASES[Math.floor(Math.random() * PHRASES.length)]);
+      setSubmitted(true);
+      clear();
+      if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (err) {
+      console.error("Order submission failed:", err);
       toast.error("Couldn't place your order. Try again in a sec.");
+    } finally {
       setSubmitting(false);
-      return;
     }
-
-    setOrderRef(ref);
-    setPhrase(PHRASES[Math.floor(Math.random() * PHRASES.length)]);
-    setSubmitted(true);
-    setSubmitting(false);
-    clear();
-    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   if (submitted) {
