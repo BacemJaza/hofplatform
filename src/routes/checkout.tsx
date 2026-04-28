@@ -3,6 +3,8 @@ import { useState } from "react";
 import { useCart } from "@/stores/cart-store";
 import { formatTND, formatTotalTND } from "@/lib/price";
 import { useT } from "@/hooks/use-language";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({
@@ -36,6 +38,7 @@ function Checkout() {
   const { items, total, clear } = useCart();
   const t = useT();
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [orderRef, setOrderRef] = useState("");
   const [phrase, setPhrase] = useState(PHRASES[0]);
   const [form, setForm] = useState({
@@ -47,12 +50,44 @@ function Checkout() {
     notes: "",
   });
 
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (submitting) return;
+    setSubmitting(true);
+
     const ref = `KH-${Date.now().toString(36).toUpperCase().slice(-6)}`;
+    const orderTotal = total();
+    const orderItems = items.map((i) => ({
+      slug: i.slug,
+      name: i.name,
+      price: i.price,
+      qty: i.qty,
+    }));
+
+    const { error } = await supabase.from("orders").insert({
+      order_ref: ref,
+      customer_name: form.name.trim(),
+      email: form.email.trim(),
+      phone: form.phone.trim(),
+      city: form.city.trim(),
+      address: form.address.trim(),
+      notes: form.notes.trim() || null,
+      items: orderItems,
+      total: orderTotal,
+      currency: "TND",
+    });
+
+    if (error) {
+      console.error("Order submission failed:", error);
+      toast.error("Couldn't place your order. Try again in a sec.");
+      setSubmitting(false);
+      return;
+    }
+
     setOrderRef(ref);
     setPhrase(PHRASES[Math.floor(Math.random() * PHRASES.length)]);
     setSubmitted(true);
+    setSubmitting(false);
     clear();
     if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -179,9 +214,10 @@ function Checkout() {
 
             <button
               type="submit"
-              className="mt-4 w-full border hairline py-5 text-xs uppercase tracking-[0.4em] transition-colors hover:bg-foreground hover:text-background"
+              disabled={submitting}
+              className="mt-4 w-full border hairline py-5 text-xs uppercase tracking-[0.4em] transition-colors hover:bg-foreground hover:text-background disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {t("checkout.place")} — {formatTotalTND(total())}
+              {submitting ? "Sending…" : `${t("checkout.place")} — ${formatTotalTND(total())}`}
             </button>
             <p className="text-center text-[10px] uppercase tracking-[0.4em] ember-text">
               {t("checkout.soon")}
