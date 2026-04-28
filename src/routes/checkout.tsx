@@ -3,6 +3,8 @@ import { useState } from "react";
 import { useCart } from "@/stores/cart-store";
 import { formatTND, formatTotalTND } from "@/lib/price";
 import { useT } from "@/hooks/use-language";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({
