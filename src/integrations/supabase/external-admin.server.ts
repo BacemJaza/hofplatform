@@ -2,11 +2,11 @@
 // Uses EXTERNAL_SUPABASE_URL + EXTERNAL_SUPABASE_SERVICE_ROLE_KEY.
 // NEVER import this file from client/component code.
 
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
-let cached: ReturnType<typeof createClient> | null = null;
+let cached: SupabaseClient | null = null;
 
-export function getExternalSupabaseAdmin() {
+export function getExternalSupabaseAdmin(): SupabaseClient {
   if (cached) return cached;
 
   const url = process.env.EXTERNAL_SUPABASE_URL;
