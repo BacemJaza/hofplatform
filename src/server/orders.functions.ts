@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { getExternalSupabaseAdmin } from "@/integrations/supabase/external-admin.server";
 import { getCanonicalPriceTND, generateOrderRef } from "./orders.server";
 
 const orderSchema = z.object({
@@ -51,7 +51,7 @@ export const placeOrder = createServerFn({ method: "POST" })
 
     const orderRef = generateOrderRef();
 
-    const { error } = await supabaseAdmin.from("orders").insert({
+    const { error } = await getExternalSupabaseAdmin().from("orders").insert({
       order_ref: orderRef,
       customer_name: data.name,
       email: data.email,
