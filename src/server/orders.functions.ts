@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { getExternalSupabaseAdmin } from "@/integrations/supabase/external-admin.server";
 import { getCanonicalPriceTND, generateOrderRef } from "./orders.server";
+import { sendOrderEmails } from "./notifications.server";
 
 const orderSchema = z.object({
   name: z.string().trim().min(1).max(120),
@@ -68,6 +69,24 @@ export const placeOrder = createServerFn({ method: "POST" })
     if (error) {
       console.error("placeOrder insert failed:", error.message);
       return { ok: false as const, error: "Could not save order." };
+    }
+
+    // Fire-and-handle notifications. sendOrderEmails swallows its own errors
+    // so a mail hiccup never breaks the customer's checkout.
+    try {
+      await sendOrderEmails({
+        orderRef,
+        customerName: data.name,
+        email: data.email,
+        phone: data.phone,
+        city: data.city,
+        address: data.address,
+        notes: data.notes ? data.notes : null,
+        items: validatedItems,
+        total,
+      });
+    } catch (mailErr) {
+      console.error("sendOrderEmails threw unexpectedly:", mailErr);
     }
 
     return { ok: true as const, orderRef, total };
