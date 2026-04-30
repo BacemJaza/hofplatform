@@ -4,7 +4,7 @@ import { Moon, Sun } from "lucide-react";
 import { useCart } from "@/stores/cart-store";
 import { useTheme } from "@/hooks/use-theme";
 import { useLanguage, useT, type Lang } from "@/hooks/use-language";
-import khaltaLogo from "@/assets/khalta-logo.png";
+import houseOfFlagsLogo from "@/assets/house-of-flags-logo.png";
 
 export function SiteHeader() {
   const [scrolled, setScrolled] = useState(false);
@@ -33,11 +33,11 @@ export function SiteHeader() {
       }`}
     >
       <div className="mx-auto flex h-16 max-w-[1600px] items-center justify-between px-6 md:px-10">
-        <Link to="/" aria-label="KHALTA — home" className="flex items-center">
+        <Link to="/" aria-label="HOUSE OF FLAGS — home" className="flex items-center">
           <span className="inline-flex h-9 items-center overflow-hidden bg-black px-2 md:h-10 md:px-3">
             <img
-              src={khaltaLogo}
-              alt="KHALTA"
+              src={houseOfFlagsLogo}
+              alt="HOUSE OF FLAGS"
               className="h-16 w-auto select-none md:h-20"
               loading="eager"
               decoding="async"

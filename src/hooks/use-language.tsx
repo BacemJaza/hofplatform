@@ -2,7 +2,7 @@ import { useSyncExternalStore } from "react";
 
 export type Lang = "en" | "fr" | "ar";
 
-const KEY = "khalta-lang";
+const KEY = "house-of-flags-lang";
 const listeners = new Set<() => void>();
 
 function getInitial(): Lang {
@@ -61,7 +61,7 @@ const dicts: Record<Lang, Dict> = {
     "nav.philosophy": "Philosophy",
     "nav.drops": "Drops",
     "nav.cart": "Cart",
-    "hero.tag": "KHALTA — Drop 001 / Live now",
+    "hero.tag": "HOUSE OF FLAGS — Drop 001 / Live now",
     "hero.sub": "Fabric art for identity",
     "hero.cta": "Explore Drop 001",
     "hero.scroll": "Scroll",
@@ -81,7 +81,7 @@ const dicts: Record<Lang, Dict> = {
     "philosophy.h1c": "Statements.",
     "philosophy.h1d": "Identity you hang on your wall.",
     "philosophy.body":
-      "KHALTA — خلطة — was built in Tunis for the ones who never wanted matching frames. Each flag is a piece of fabric that means something — to you, to whoever walks into your room, to the version of you that hung it.",
+      "HOUSE OF FLAGS — خلطة — was built in Tunis for the ones who never wanted matching frames. Each flag is a piece of fabric that means something — to you, to whoever walks into your room, to the version of you that hung it.",
     "philosophy.readMore": "Read more",
     "system.tag": "The drop system",
     "system.titleA": "Once it's gone,",
@@ -141,7 +141,7 @@ const dicts: Record<Lang, Dict> = {
     "footer.tag": "خلطة — Fabric art from Tunis. Limited drops. No restocks.",
     "footer.index": "Index",
     "footer.follow": "Follow",
-    "footer.rights": "© KHALTA — Tunis. All flags reserved.",
+    "footer.rights": "© HOUSE OF FLAGS — Tunis. All flags reserved.",
     "footer.made": "Made for the ones who hang their identity. خلطة.",
   },
   fr: {
@@ -149,7 +149,7 @@ const dicts: Record<Lang, Dict> = {
     "nav.philosophy": "Philosophie",
     "nav.drops": "Drops",
     "nav.cart": "Panier",
-    "hero.tag": "KHALTA — Drop 001 / En direct",
+    "hero.tag": "HOUSE OF FLAGS — Drop 001 / En direct",
     "hero.sub": "L'art textile de l'identité",
     "hero.cta": "Explorer Drop 001",
     "hero.scroll": "Défiler",
@@ -169,7 +169,7 @@ const dicts: Record<Lang, Dict> = {
     "philosophy.h1c": "Des déclarations.",
     "philosophy.h1d": "L'identité que tu accroches au mur.",
     "philosophy.body":
-      "KHALTA — خلطة — né à Tunis pour ceux qui n'ont jamais voulu de cadres assortis. Chaque drapeau est un morceau de tissu qui veut dire quelque chose — à toi, à celui qui entre dans ta chambre, à la version de toi qui l'a accroché.",
+      "HOUSE OF FLAGS — خلطة — né à Tunis pour ceux qui n'ont jamais voulu de cadres assortis. Chaque drapeau est un morceau de tissu qui veut dire quelque chose — à toi, à celui qui entre dans ta chambre, à la version de toi qui l'a accroché.",
     "philosophy.readMore": "Lire plus",
     "system.tag": "Le système des drops",
     "system.titleA": "Une fois parti,",
@@ -229,7 +229,7 @@ const dicts: Record<Lang, Dict> = {
     "footer.tag": "خلطة — Art textile de Tunis. Drops limités. Pas de réappro.",
     "footer.index": "Index",
     "footer.follow": "Suivre",
-    "footer.rights": "© KHALTA — Tunis. Tous drapeaux réservés.",
+    "footer.rights": "© HOUSE OF FLAGS — Tunis. Tous drapeaux réservés.",
     "footer.made": "Fait pour ceux qui accrochent leur identité. خلطة.",
   },
   ar: {

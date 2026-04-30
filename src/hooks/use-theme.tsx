@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 type Theme = "light" | "dark";
-const STORAGE_KEY = "khalta-theme";
+const STORAGE_KEY = "house-of-flags-theme";
 
 function applyTheme(theme: Theme) {
   if (typeof document === "undefined") return;

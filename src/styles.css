@@ -66,7 +66,7 @@
 :root {
   --radius: 0.25rem;
 
-  /* KHALTA — LIGHT (default): raw linen, sun-bleached canvas, Tunis medina daylight */
+  /* HOUSE OF FLAGS — LIGHT (default): raw linen, sun-bleached canvas, Tunis medina daylight */
   --background: oklch(0.96 0.012 75);     /* unbleached linen */
   --foreground: oklch(0.18 0.012 35);     /* deep ink / charcoal */
 
@@ -100,7 +100,7 @@
 }
 
 .dark {
-  /* KHALTA — DARK: cinematic medina at night, ember lantern */
+  /* HOUSE OF FLAGS — DARK: cinematic medina at night, ember lantern */
   --background: oklch(0.13 0.008 35);     /* warm near-black, not blue */
   --foreground: oklch(0.96 0.012 75);     /* linen */
 

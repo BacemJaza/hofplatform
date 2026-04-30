@@ -9,13 +9,13 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/checkout")({
   head: () => ({
     meta: [
-      { title: "Checkout — KHALTA" },
+      { title: "Checkout — HOUSE OF FLAGS" },
       {
         name: "description",
         content:
-          "Complete your KHALTA order. Limited fabric flags shipped from Tunis. No restocks.",
+          "Complete your HOUSE OF FLAGS order. Limited fabric flags shipped from Tunis. No restocks.",
       },
-      { property: "og:title", content: "Checkout — KHALTA" },
+      { property: "og:title", content: "Checkout — HOUSE OF FLAGS" },
       {
         property: "og:description",
         content: "Claim your flag before it disappears.",

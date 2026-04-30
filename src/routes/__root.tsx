@@ -33,24 +33,24 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "KHALTA — Fabric art for identity" },
+      { title: "HOUSE OF FLAGS — Fabric art for identity" },
       {
         name: "description",
         content:
-          "KHALTA — premium fabric wall flags. Limited drops. Statements you hang on your wall. No restocks.",
+          "HOUSE OF FLAGS — premium fabric wall flags. Limited drops. Statements you hang on your wall. No restocks.",
       },
-      { name: "author", content: "KHALTA" },
-      { property: "og:title", content: "KHALTA — Fabric art for identity" },
+      { name: "author", content: "HOUSE OF FLAGS" },
+      { property: "og:title", content: "HOUSE OF FLAGS — Fabric art for identity" },
       {
         property: "og:description",
         content: "Limited fabric wall flags. Drop 001 out now. No restocks.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "KHALTA — Fabric art for identity" },
-      { name: "description", content: "KHALTA is a dark, cinematic e-commerce site selling collectible fabric art statements." },
-      { property: "og:description", content: "KHALTA is a dark, cinematic e-commerce site selling collectible fabric art statements." },
-      { name: "twitter:description", content: "KHALTA is a dark, cinematic e-commerce site selling collectible fabric art statements." },
+      { name: "twitter:title", content: "HOUSE OF FLAGS — Fabric art for identity" },
+      { name: "description", content: "HOUSE OF FLAGS is a dark, cinematic e-commerce site selling collectible fabric art statements." },
+      { property: "og:description", content: "HOUSE OF FLAGS is a dark, cinematic e-commerce site selling collectible fabric art statements." },
+      { name: "twitter:description", content: "HOUSE OF FLAGS is a dark, cinematic e-commerce site selling collectible fabric art statements." },
       { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/e1fd6657-7a32-4884-826d-ccc9cdbf3a90/id-preview-d9b20260--db8732d6-ef8b-4dac-9bad-ae1f2ca28349.lovable.app-1777540798037.png" },
       { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/e1fd6657-7a32-4884-826d-ccc9cdbf3a90/id-preview-d9b20260--db8732d6-ef8b-4dac-9bad-ae1f2ca28349.lovable.app-1777540798037.png" },
     ],
@@ -80,7 +80,7 @@ export const Route = createRootRoute({
 });
 
 function RootShell({ children }: { children: React.ReactNode }) {
-  const themeInit = `(function(){try{var t=localStorage.getItem('khalta-theme');var d=t==='dark';var r=document.documentElement;if(d){r.classList.add('dark');}r.style.colorScheme=d?'dark':'light';}catch(e){}})();`;
+  const themeInit = `(function(){try{var t=localStorage.getItem('house-of-flags-theme');var d=t==='dark';var r=document.documentElement;if(d){r.classList.add('dark');}r.style.colorScheme=d?'dark':'light';}catch(e){}})();`;
   return (
     <html lang="en">
       <head>
