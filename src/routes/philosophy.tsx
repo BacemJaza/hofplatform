@@ -32,17 +32,18 @@ function Philosophy() {
           <span className="ember-text">decoration.</span>
         </h1>
         <p className="mt-10 text-sm uppercase tracking-[0.35em] text-muted-foreground">
-          HOUSE OF FLAGS — خلطة — the mix
+          HOUSE OF FLAGS — fabric statements
         </p>
       </section>
 
       <section className="mx-auto max-w-[700px] px-6 pb-24 md:px-10">
         <div className="space-y-10 text-base leading-relaxed text-muted-foreground">
           <p>
-            HOUSE OF FLAGS started in a small studio in Tunis. <span className="text-foreground">House of Flags</span>{" "}
-            means <em>the mix</em> — what happens when the medina meets the street, when the
-            spice market meets the spray can, when an old word in Derja sits next to a quiet
-            English statement. That tension is the whole brand.
+            HOUSE OF FLAGS started in a small studio in Tunis. The name says it
+            plainly — a house, and the flags it raises. What happens when the medina
+            meets the street, when the spice market meets the spray can, when an old
+            word in Derja sits next to a quiet English statement. That tension is the
+            whole brand.
           </p>
           <p className="text-foreground text-lg leading-relaxed">
             We make fabric flags. Heavyweight cotton, raw edges, big quiet typography. One word.
