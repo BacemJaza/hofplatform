@@ -51,6 +51,8 @@ export const Route = createRootRoute({
       { name: "description", content: "KHALTA is a dark, cinematic e-commerce site selling collectible fabric art statements." },
       { property: "og:description", content: "KHALTA is a dark, cinematic e-commerce site selling collectible fabric art statements." },
       { name: "twitter:description", content: "KHALTA is a dark, cinematic e-commerce site selling collectible fabric art statements." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/e1fd6657-7a32-4884-826d-ccc9cdbf3a90/id-preview-d9b20260--db8732d6-ef8b-4dac-9bad-ae1f2ca28349.lovable.app-1777540798037.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/e1fd6657-7a32-4884-826d-ccc9cdbf3a90/id-preview-d9b20260--db8732d6-ef8b-4dac-9bad-ae1f2ca28349.lovable.app-1777540798037.png" },
     ],
     links: [
       {
