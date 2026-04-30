@@ -5,7 +5,7 @@ import { customerOrderEmail, ownerOrderEmail } from "./email-templates";
 
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/resend";
 // Resend's onboarding sender works without domain verification.
-const FROM = "KHALTA <onboarding@resend.dev>";
+const FROM = "HOUSE OF FLAGS <onboarding@resend.dev>";
 
 type OrderItem = {
   slug: string;

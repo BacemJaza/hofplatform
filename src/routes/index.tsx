@@ -7,13 +7,13 @@ import { useT } from "@/hooks/use-language";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "KHALTA — Drop 001 / Fabric art for identity" },
+      { title: "HOUSE OF FLAGS — Drop 001 / Fabric art for identity" },
       {
         name: "description",
         content:
-          "KHALTA Drop 001 — limited fabric wall flags. Statements, not decoration. Once sold out, never returns.",
+          "HOUSE OF FLAGS Drop 001 — limited fabric wall flags. Statements, not decoration. Once sold out, never returns.",
       },
-      { property: "og:title", content: "KHALTA — Drop 001" },
+      { property: "og:title", content: "HOUSE OF FLAGS — Drop 001" },
       {
         property: "og:description",
         content: "Limited fabric wall flags. Statements you hang on your wall.",

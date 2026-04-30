@@ -1,4 +1,4 @@
-// Pure HTML email templates themed to match KHALTA's editorial look:
+// Pure HTML email templates themed to match HOUSE OF FLAGS's editorial look:
 // dark bg, hairline borders, uppercase tracking, ember accent.
 
 type OrderItem = {
@@ -72,7 +72,7 @@ function shell(inner: string): string {
           <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;border:1px solid ${HAIRLINE};">
             <tr>
               <td style="padding:32px 32px 24px 32px;border-bottom:1px solid ${HAIRLINE};">
-                <div style="font-size:10px;letter-spacing:0.5em;text-transform:uppercase;color:${EMBER};font-family:Helvetica,Arial,sans-serif;">KHALTA</div>
+                <div style="font-size:10px;letter-spacing:0.5em;text-transform:uppercase;color:${EMBER};font-family:Helvetica,Arial,sans-serif;">HOUSE OF FLAGS</div>
               </td>
             </tr>
             ${inner}
@@ -115,7 +115,7 @@ export function customerOrderEmail(data: OrderEmailData): { subject: string; htm
       </td>
     </tr>`;
   return {
-    subject: `KHALTA — Order ${data.orderRef} received`,
+    subject: `HOUSE OF FLAGS — Order ${data.orderRef} received`,
     html: shell(inner),
   };
 }
@@ -156,7 +156,7 @@ export function ownerOrderEmail(data: OrderEmailData): { subject: string; html: 
       </td>
     </tr>`;
   return {
-    subject: `KHALTA — New order ${data.orderRef} (${formatTND(data.total)})`,
+    subject: `HOUSE OF FLAGS — New order ${data.orderRef} (${formatTND(data.total)})`,
     html: shell(inner),
   };
 }

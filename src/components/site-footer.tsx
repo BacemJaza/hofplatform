@@ -7,7 +7,7 @@ export function SiteFooter() {
       <div className="mx-auto max-w-[1600px] px-6 py-16 md:px-10">
         <div className="grid grid-cols-1 gap-12 md:grid-cols-3">
           <div>
-            <p className="font-display text-3xl tracking-tight">KHALTA</p>
+            <p className="font-display text-3xl tracking-tight">HOUSE OF FLAGS</p>
             <p className="mt-4 max-w-xs text-sm text-muted-foreground">
               {t("footer.tag")}
             </p>

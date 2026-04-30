@@ -62,6 +62,6 @@ export const useCart = create<CartState>()(
       total: () =>
         get().items.reduce((n, i) => n + parsePrice(i.price) * i.qty, 0),
     }),
-    { name: "khalta-cart" },
+    { name: "house-of-flags-cart" },
   ),
 );

@@ -14,12 +14,12 @@ export const Route = createFileRoute("/product/$slug")({
   },
   head: ({ loaderData }) => {
     const p = loaderData?.product;
-    if (!p) return { meta: [{ title: "Not found — KHALTA" }] };
+    if (!p) return { meta: [{ title: "Not found — HOUSE OF FLAGS" }] };
     return {
       meta: [
-        { title: `${p.name} — KHALTA Drop 001` },
+        { title: `${p.name} — HOUSE OF FLAGS Drop 001` },
         { name: "description", content: p.story.slice(0, 155) },
-        { property: "og:title", content: `${p.name} — KHALTA` },
+        { property: "og:title", content: `${p.name} — HOUSE OF FLAGS` },
         { property: "og:description", content: p.story.slice(0, 155) },
         { property: "og:image", content: p.image },
         { property: "twitter:image", content: p.image },
@@ -99,7 +99,7 @@ function ProductPage() {
         {/* Info */}
         <div className="md:sticky md:top-28 md:self-start">
           <p className="text-[10px] uppercase tracking-[0.4em] text-muted-foreground">
-            KHALTA / Drop 001 / {product.label}
+            HOUSE OF FLAGS / Drop 001 / {product.label}
           </p>
           <h1 className="mt-6 font-display text-7xl md:text-8xl">{product.name}</h1>
 

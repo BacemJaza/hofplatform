@@ -3,13 +3,13 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 export const Route = createFileRoute("/drops")({
   head: () => ({
     meta: [
-      { title: "Drops — KHALTA" },
+      { title: "Drops — HOUSE OF FLAGS" },
       {
         name: "description",
         content:
-          "Every KHALTA drop is limited. Once a piece sells out, it never returns. View past and upcoming drops.",
+          "Every HOUSE OF FLAGS drop is limited. Once a piece sells out, it never returns. View past and upcoming drops.",
       },
-      { property: "og:title", content: "Drops — KHALTA" },
+      { property: "og:title", content: "Drops — HOUSE OF FLAGS" },
       {
         property: "og:description",
         content: "Limited drops. No restocks. View the archive.",
