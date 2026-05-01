@@ -5,7 +5,7 @@ export function SiteFooter() {
   return (
     <footer className="border-t hairline mt-32">
       <div className="mx-auto max-w-[1600px] px-6 py-16 md:px-10">
-        <div className="grid grid-cols-1 gap-12 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-12 md:grid-cols-4">
           <div>
             <p className="font-display text-3xl tracking-tight">HOUSE OF FLAGS</p>
             <p className="mt-4 max-w-xs text-sm text-muted-foreground">
@@ -26,6 +26,22 @@ export function SiteFooter() {
               <li className="transition-colors hover:text-foreground">Instagram</li>
               <li className="transition-colors hover:text-foreground">TikTok</li>
               <li className="transition-colors hover:text-foreground">Newsletter</li>
+            </ul>
+          </div>
+          <div className="text-xs uppercase tracking-[0.25em] text-muted-foreground">
+            <p className="text-foreground">{t("footer.contact")}</p>
+            <ul className="mt-4 space-y-3">
+              <li>
+                <a
+                  href="mailto:houseofflagstn@gmail.com"
+                  className="normal-case tracking-normal text-sm text-foreground transition-colors hover:text-[hsl(var(--ember,15_70%_55%))]"
+                >
+                  houseofflagstn@gmail.com
+                </a>
+              </li>
+              <li className="normal-case tracking-normal text-[11px] leading-relaxed text-muted-foreground">
+                {t("footer.contactNote")}
+              </li>
             </ul>
           </div>
         </div>
