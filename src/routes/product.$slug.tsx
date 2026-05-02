@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState } from "react";
-import { getProduct, products } from "@/data/products";
+import { activeProducts, getProduct, isActiveProduct } from "@/data/products";
 import { useCart } from "@/stores/cart-store";
 import { toast } from "sonner";
 import { formatTND } from "@/lib/price";
@@ -9,7 +9,7 @@ import { useT } from "@/hooks/use-language";
 export const Route = createFileRoute("/product/$slug")({
   loader: ({ params }) => {
     const product = getProduct(params.slug);
-    if (!product) throw notFound();
+    if (!product || !isActiveProduct(params.slug)) throw notFound();
     return { product };
   },
   head: ({ loaderData }) => {
