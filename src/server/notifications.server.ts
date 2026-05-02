@@ -4,8 +4,12 @@
 import { customerOrderEmail, ownerOrderEmail } from "./email-templates";
 
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/resend";
-// Resend's onboarding sender works without domain verification.
-const FROM = "HOUSE OF FLAGS <onboarding@resend.dev>";
+// Sender comes from a secret so the owner can rotate the alias / domain
+// without a code change. Falls back to the verified updates.houseofflags.com
+// alias if the secret hasn't been set yet.
+const FROM =
+  process.env.RESEND_FROM_EMAIL ||
+  "HOUSE OF FLAGS <orders@updates.houseofflags.com>";
 
 type OrderItem = {
   slug: string;

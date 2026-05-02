@@ -16,6 +16,7 @@ export type Product = {
   tags: string[];
 };
 
+// Full historical catalog — kept so future drops are easy to re-enable.
 export const products: Product[] = [
   {
     slug: "no-rules",
@@ -89,4 +90,15 @@ export const products: Product[] = [
   },
 ];
 
+// The only piece currently for sale. Front-end and server use this list to
+// decide what's purchasable. To re-enable a piece, add its slug here AND in
+// the server-side CATALOG_EUR map in src/server/orders.server.ts.
+export const ACTIVE_SLUGS = new Set<string>(["no-rules"]);
+
+export const activeProducts: Product[] = products.filter((p) =>
+  ACTIVE_SLUGS.has(p.slug),
+);
+
 export const getProduct = (slug: string) => products.find((p) => p.slug === slug);
+
+export const isActiveProduct = (slug: string) => ACTIVE_SLUGS.has(slug);
