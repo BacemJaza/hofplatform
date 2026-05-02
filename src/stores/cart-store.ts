@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { Product } from "@/data/products";
+import { ACTIVE_SLUGS } from "@/data/products";
 
 export type CartItem = {
   slug: string;
