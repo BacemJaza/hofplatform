@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      clients_feedback: {
+        Row: {
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          notes: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          notes: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          notes?: string
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           address: string

@@ -3,14 +3,10 @@
 
 const EUR_TO_TND = 3.4;
 
+// Only currently-purchasable pieces. Anything not listed here is rejected
+// server-side regardless of what the client cart claims.
 const CATALOG_EUR: Record<string, number> = {
   "no-rules": 89,
-  lost: 89,
-  void: 99,
-  rising: 95,
-  silence: 89,
-  ronin: 109,
-  echo: 89,
 };
 
 export function getCanonicalPriceTND(slug: string): number | null {

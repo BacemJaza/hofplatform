@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { Product } from "@/data/products";
+import { ACTIVE_SLUGS } from "@/data/products";
 
 export type CartItem = {
   slug: string;
@@ -62,6 +63,14 @@ export const useCart = create<CartState>()(
       total: () =>
         get().items.reduce((n, i) => n + parsePrice(i.price) * i.qty, 0),
     }),
-    { name: "house-of-flags-cart" },
+    {
+      name: "house-of-flags-cart",
+      // Drop any stale items (e.g. older drops that are no longer for sale)
+      // when the persisted cart is restored on app load.
+      onRehydrateStorage: () => (state) => {
+        if (!state) return;
+        state.items = state.items.filter((i) => ACTIVE_SLUGS.has(i.slug));
+      },
+    },
   ),
 );

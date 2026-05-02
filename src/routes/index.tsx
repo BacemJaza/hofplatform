@@ -1,7 +1,7 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import heroFlag from "@/assets/hero-flag.jpg";
-import { products } from "@/data/products";
-import { ProductCard } from "@/components/product-card";
+import { activeProducts } from "@/data/products";
+import { ProductBuyCard } from "@/components/product-buy-card";
 import { useT } from "@/hooks/use-language";
 
 export const Route = createFileRoute("/")({
@@ -11,7 +11,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "HOUSE OF FLAGS Drop 001 — limited fabric wall flags. Statements, not decoration. Once sold out, never returns.",
+          "HOUSE OF FLAGS Drop 001 — limited fabric wall flags from Tunis. Statements, not decoration. Once sold out, never returns.",
       },
       { property: "og:title", content: "HOUSE OF FLAGS — Drop 001" },
       {
@@ -27,6 +27,7 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const t = useT();
+  const product = activeProducts[0];
   const marquee = [
     t("marquee.1"),
     "★",
@@ -101,8 +102,24 @@ function Index() {
         </div>
       </div>
 
-      {/* DROP 001 */}
-      <section id="drop-001" className="mx-auto max-w-[1600px] px-6 py-32 md:px-10">
+      {/* PHILOSOPHY BANNER — punchy intro */}
+      <section className="border-b hairline">
+        <div className="mx-auto max-w-[1200px] px-6 py-20 text-center md:px-10 md:py-28">
+          <p className="text-[10px] uppercase tracking-[0.5em] ember-text">
+            {t("banner.tag")}
+          </p>
+          <p className="mt-8 font-display text-3xl leading-[1.15] text-balance md:text-5xl">
+            {t("banner.line1")}
+            <br />
+            <span className="text-foreground">{t("banner.line2")}</span>
+            <br />
+            <span className="ember-text">{t("banner.line3")}</span>
+          </p>
+        </div>
+      </section>
+
+      {/* DROP 001 — single piece with inline buy */}
+      <section id="drop-001" className="mx-auto max-w-[1200px] px-6 py-32 md:px-10">
         <div className="mb-20 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
           <div>
             <p className="text-[10px] uppercase tracking-[0.5em] text-muted-foreground">
@@ -115,15 +132,11 @@ function Index() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-x-6 gap-y-16 sm:grid-cols-2 lg:grid-cols-3">
-          {products.map((p, i) => (
-            <ProductCard key={p.slug} product={p} index={i} comingSoon={i !== 0} />
-          ))}
-        </div>
+        {product && <ProductBuyCard product={product} />}
       </section>
 
       {/* PHILOSOPHY */}
-      <section className="relative mx-auto max-w-[900px] px-6 py-40 text-center md:px-10">
+      <section className="relative mx-auto max-w-[900px] px-6 py-32 text-center md:px-10">
         <p className="text-[10px] uppercase tracking-[0.5em] text-muted-foreground">
           {t("philosophy.tag")}
         </p>
@@ -140,14 +153,6 @@ function Index() {
         <p className="mt-12 mx-auto max-w-md text-sm leading-relaxed text-muted-foreground">
           {t("philosophy.body")}
         </p>
-        <div className="mt-12">
-          <Link
-            to="/philosophy"
-            className="text-xs uppercase tracking-[0.35em] text-muted-foreground underline-offset-8 transition-colors hover:text-foreground hover:underline"
-          >
-            {t("philosophy.readMore")}
-          </Link>
-        </div>
       </section>
 
       {/* DROP SYSTEM */}
@@ -168,11 +173,11 @@ function Index() {
             <p>{t("system.p2")}</p>
             <div className="grid grid-cols-3 gap-6 pt-6">
               <div>
-                <p className="font-display text-3xl text-foreground">7</p>
+                <p className="font-display text-3xl text-foreground">1</p>
                 <p className="mt-2 text-[10px] uppercase tracking-[0.3em]">{t("system.pieces")}</p>
               </div>
               <div>
-                <p className="font-display text-3xl text-foreground">265</p>
+                <p className="font-display text-3xl text-foreground">50</p>
                 <p className="mt-2 text-[10px] uppercase tracking-[0.3em]">{t("system.flags")}</p>
               </div>
               <div>

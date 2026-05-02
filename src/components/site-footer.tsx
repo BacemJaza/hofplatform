@@ -1,4 +1,11 @@
+import { Link } from "@tanstack/react-router";
 import { useT } from "@/hooks/use-language";
+
+const TIKTOK_URL = "https://www.tiktok.com/@houseofflagstn";
+const INSTAGRAM_URL = "https://www.instagram.com/houseofflagstn";
+const EMAIL = "houseofflagstn@gmail.com";
+const PHONE_DISPLAY = "+216 53 069 199";
+const PHONE_HREF = "+21653069199";
 
 export function SiteFooter() {
   const t = useT();
@@ -15,17 +22,46 @@ export function SiteFooter() {
           <div className="text-xs uppercase tracking-[0.25em] text-muted-foreground">
             <p className="text-foreground">{t("footer.index")}</p>
             <ul className="mt-4 space-y-3">
-              <li>{t("nav.drop")}</li>
-              <li>{t("nav.philosophy")}</li>
-              <li>{t("nav.drops")}</li>
+              <li>
+                <Link to="/" className="transition-colors hover:text-foreground">
+                  {t("nav.drop")}
+                </Link>
+              </li>
+              <li>
+                <Link to="/drops" className="transition-colors hover:text-foreground">
+                  {t("nav.drops")}
+                </Link>
+              </li>
+              <li>
+                <Link to="/contact" className="transition-colors hover:text-foreground">
+                  {t("nav.contact")}
+                </Link>
+              </li>
             </ul>
           </div>
           <div className="text-xs uppercase tracking-[0.25em] text-muted-foreground">
             <p className="text-foreground">{t("footer.follow")}</p>
             <ul className="mt-4 space-y-3">
-              <li className="transition-colors hover:text-foreground">Instagram</li>
-              <li className="transition-colors hover:text-foreground">TikTok</li>
-              <li className="transition-colors hover:text-foreground">Newsletter</li>
+              <li>
+                <a
+                  href={INSTAGRAM_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="transition-colors hover:text-foreground"
+                >
+                  Instagram
+                </a>
+              </li>
+              <li>
+                <a
+                  href={TIKTOK_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="transition-colors hover:text-foreground"
+                >
+                  TikTok
+                </a>
+              </li>
             </ul>
           </div>
           <div className="text-xs uppercase tracking-[0.25em] text-muted-foreground">
@@ -33,10 +69,18 @@ export function SiteFooter() {
             <ul className="mt-4 space-y-3">
               <li>
                 <a
-                  href="mailto:houseofflagstn@gmail.com"
+                  href={`mailto:${EMAIL}`}
                   className="normal-case tracking-normal text-sm text-foreground transition-colors hover:text-[hsl(var(--ember,15_70%_55%))]"
                 >
-                  houseofflagstn@gmail.com
+                  {EMAIL}
+                </a>
+              </li>
+              <li>
+                <a
+                  href={`tel:${PHONE_HREF}`}
+                  className="normal-case tracking-normal text-sm text-foreground transition-colors hover:text-[hsl(var(--ember,15_70%_55%))]"
+                >
+                  {PHONE_DISPLAY}
                 </a>
               </li>
               <li className="normal-case tracking-normal text-[11px] leading-relaxed text-muted-foreground">
