@@ -149,39 +149,41 @@ function ProductPage() {
         </div>
       </div>
 
-      {/* Related */}
-      <section className="mx-auto max-w-[1600px] px-6 py-24 md:px-10">
-        <div className="mb-12 flex items-end justify-between">
-          <p className="text-[10px] uppercase tracking-[0.5em] text-muted-foreground">
-            {t("product.more")}
-          </p>
-          <Link to="/" className="text-[10px] uppercase tracking-[0.3em] hover:text-foreground">
-            {t("product.viewAll")}
-          </Link>
-        </div>
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-          {others.map((p) => (
-            <Link
-              key={p.slug}
-              to="/product/$slug"
-              params={{ slug: p.slug }}
-              className="group block"
-            >
-              <div className="relative aspect-[4/5] overflow-hidden bg-card vignette">
-                <img
-                  src={p.image}
-                  alt={p.name}
-                  width={1024}
-                  height={1280}
-                  loading="lazy"
-                  className="h-full w-full object-cover transition-transform duration-[1200ms] group-hover:scale-110"
-                />
-              </div>
-              <p className="mt-3 font-display text-lg">{p.name}</p>
+      {/* Related — only when there are other active pieces */}
+      {others.length > 0 && (
+        <section className="mx-auto max-w-[1600px] px-6 py-24 md:px-10">
+          <div className="mb-12 flex items-end justify-between">
+            <p className="text-[10px] uppercase tracking-[0.5em] text-muted-foreground">
+              {t("product.more")}
+            </p>
+            <Link to="/" className="text-[10px] uppercase tracking-[0.3em] hover:text-foreground">
+              {t("product.viewAll")}
             </Link>
-          ))}
-        </div>
-      </section>
+          </div>
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+            {others.map((p) => (
+              <Link
+                key={p.slug}
+                to="/product/$slug"
+                params={{ slug: p.slug }}
+                className="group block"
+              >
+                <div className="relative aspect-[4/5] overflow-hidden bg-card vignette">
+                  <img
+                    src={p.image}
+                    alt={p.name}
+                    width={1024}
+                    height={1280}
+                    loading="lazy"
+                    className="h-full w-full object-cover transition-transform duration-[1200ms] group-hover:scale-110"
+                  />
+                </div>
+                <p className="mt-3 font-display text-lg">{p.name}</p>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
     </article>
   );
 }
