@@ -60,7 +60,7 @@ function ProductPage() {
   const add = useCart((s) => s.add);
   const t = useT();
   const priceTND = formatTND(product.price);
-  const others = products.filter((p) => p.slug !== product.slug).slice(0, 3);
+  const others = activeProducts.filter((p) => p.slug !== product.slug).slice(0, 3);
 
   const onAdd = () => {
     add(product);
