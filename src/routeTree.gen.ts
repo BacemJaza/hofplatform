@@ -9,20 +9,20 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as PhilosophyRouteImport } from './routes/philosophy'
 import { Route as DropsRouteImport } from './routes/drops'
+import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProductSlugRouteImport } from './routes/product.$slug'
 
-const PhilosophyRoute = PhilosophyRouteImport.update({
-  id: '/philosophy',
-  path: '/philosophy',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const DropsRoute = DropsRouteImport.update({
   id: '/drops',
   path: '/drops',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CheckoutRoute = CheckoutRouteImport.update({
@@ -44,61 +44,55 @@ const ProductSlugRoute = ProductSlugRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/checkout': typeof CheckoutRoute
+  '/contact': typeof ContactRoute
   '/drops': typeof DropsRoute
-  '/philosophy': typeof PhilosophyRoute
   '/product/$slug': typeof ProductSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/checkout': typeof CheckoutRoute
+  '/contact': typeof ContactRoute
   '/drops': typeof DropsRoute
-  '/philosophy': typeof PhilosophyRoute
   '/product/$slug': typeof ProductSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/checkout': typeof CheckoutRoute
+  '/contact': typeof ContactRoute
   '/drops': typeof DropsRoute
-  '/philosophy': typeof PhilosophyRoute
   '/product/$slug': typeof ProductSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/checkout' | '/drops' | '/philosophy' | '/product/$slug'
+  fullPaths: '/' | '/checkout' | '/contact' | '/drops' | '/product/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/checkout' | '/drops' | '/philosophy' | '/product/$slug'
-  id:
-    | '__root__'
-    | '/'
-    | '/checkout'
-    | '/drops'
-    | '/philosophy'
-    | '/product/$slug'
+  to: '/' | '/checkout' | '/contact' | '/drops' | '/product/$slug'
+  id: '__root__' | '/' | '/checkout' | '/contact' | '/drops' | '/product/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CheckoutRoute: typeof CheckoutRoute
+  ContactRoute: typeof ContactRoute
   DropsRoute: typeof DropsRoute
-  PhilosophyRoute: typeof PhilosophyRoute
   ProductSlugRoute: typeof ProductSlugRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/philosophy': {
-      id: '/philosophy'
-      path: '/philosophy'
-      fullPath: '/philosophy'
-      preLoaderRoute: typeof PhilosophyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/drops': {
       id: '/drops'
       path: '/drops'
       fullPath: '/drops'
       preLoaderRoute: typeof DropsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/checkout': {
@@ -128,8 +122,8 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CheckoutRoute: CheckoutRoute,
+  ContactRoute: ContactRoute,
   DropsRoute: DropsRoute,
-  PhilosophyRoute: PhilosophyRoute,
   ProductSlugRoute: ProductSlugRoute,
 }
 export const routeTree = rootRouteImport
