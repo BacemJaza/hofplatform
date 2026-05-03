@@ -38,8 +38,14 @@ async function sendEmail(opts: {
   const LOVABLE_API_KEY = process.env.LOVABLE_API_KEY;
   if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-  const RESEND_API_KEY = process.env.RESEND_API_KEY;
+  // Prefer the connector-managed key (RESEND_API_KEY_1) when present, fall
+  // back to a manually-set RESEND_API_KEY. This way rotating the key via the
+  // Resend connector "just works" without a code change.
+  const RESEND_API_KEY = process.env.RESEND_API_KEY_1 || process.env.RESEND_API_KEY;
   if (!RESEND_API_KEY) throw new Error("RESEND_API_KEY is not configured");
+  console.log(
+    `[email] sending from=${FROM} to=${opts.to} subject="${opts.subject}" via key=${process.env.RESEND_API_KEY_1 ? "connector" : "manual"}`,
+  );
 
   const res = await fetch(`${GATEWAY_URL}/emails`, {
     method: "POST",
