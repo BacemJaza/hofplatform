@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { getExternalSupabaseAdmin } from "@/integrations/supabase/external-admin.server";
+import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 const feedbackSchema = z.object({
   full_name: z.string().trim().min(1).max(120),
@@ -11,7 +11,7 @@ const feedbackSchema = z.object({
 export const submitFeedback = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => feedbackSchema.parse(input))
   .handler(async ({ data }) => {
-    const { error } = await getExternalSupabaseAdmin()
+    const { error } = await supabaseAdmin
       .from("clients_feedback")
       .insert({
         full_name: data.full_name,
