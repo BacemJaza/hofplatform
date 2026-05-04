@@ -11,7 +11,7 @@ const feedbackSchema = z.object({
 export const submitFeedback = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => feedbackSchema.parse(input))
   .handler(async ({ data }) => {
-    const { error } = await getExternalSupabaseAdmin()
+    const { error } = await supabaseAdmin
       .from("clients_feedback")
       .insert({
         full_name: data.full_name,
