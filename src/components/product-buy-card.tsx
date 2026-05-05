@@ -111,7 +111,7 @@ export function ProductBuyCard({ product }: { product: Product }) {
         <button
           type="button"
           onClick={onBuy}
-          className="flex-1 border hairline px-8 py-4 text-xs uppercase tracking-[0.4em] transition-colors hover:bg-foreground hover:text-background"
+          className="flex-1 whitespace-nowrap border hairline px-4 py-4 text-[11px] uppercase tracking-[0.3em] transition-colors hover:bg-foreground hover:text-background sm:px-8 sm:text-xs sm:tracking-[0.4em]"
         >
           {t("buy.cta")} — {lineTotal} TND
         </button>

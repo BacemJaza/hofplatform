@@ -62,20 +62,20 @@ function Contact() {
   };
 
   return (
-    <article className="pt-32">
-      <section className="mx-auto max-w-[1100px] px-6 py-16 md:px-10">
+    <article className="pt-24 md:pt-32">
+      <section className="mx-auto max-w-[1100px] px-6 py-10 md:py-16 md:px-10">
         <p className="text-[10px] uppercase tracking-[0.5em] text-muted-foreground">
           {t("contact.tag")}
         </p>
-        <h1 className="mt-8 font-display text-6xl leading-[0.95] md:text-8xl">
+        <h1 className="mt-6 font-display text-5xl leading-[0.95] break-words sm:text-6xl md:mt-8 md:text-8xl">
           {t("contact.title")}
         </h1>
-        <p className="mt-8 max-w-md text-sm leading-relaxed text-muted-foreground">
+        <p className="mt-6 max-w-md text-sm leading-relaxed text-muted-foreground md:mt-8">
           {t("contact.intro")}
         </p>
       </section>
 
-      <section className="mx-auto grid max-w-[1100px] grid-cols-1 gap-16 px-6 pb-24 md:grid-cols-[1fr_1.2fr] md:px-10">
+      <section className="mx-auto grid max-w-[1100px] grid-cols-1 gap-12 px-6 pb-24 md:gap-16 md:grid-cols-[1fr_1.2fr] md:px-10">
         {/* Channels */}
         <div className="space-y-8">
           <p className="text-[10px] uppercase tracking-[0.5em] text-muted-foreground">
@@ -140,7 +140,7 @@ function Contact() {
                   onChange={(e) => setForm({ ...form, notes: e.target.value })}
                   rows={5}
                   maxLength={2000}
-                  className="mt-3 w-full resize-none border hairline bg-transparent p-3 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/50 focus:border-foreground"
+                  className="mt-3 w-full resize-none border hairline bg-transparent p-3 text-base text-foreground outline-none transition-colors placeholder:text-muted-foreground/50 focus:border-foreground sm:text-sm"
                 />
               </label>
               <button
@@ -170,7 +170,7 @@ function ChannelRow({
   external?: boolean;
 }) {
   return (
-    <li className="flex items-baseline justify-between gap-4 border-b hairline pb-6">
+    <li className="flex flex-col items-start gap-2 border-b hairline pb-6 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
       <span className="text-[10px] uppercase tracking-[0.4em] text-muted-foreground">
         {label}
       </span>
@@ -178,7 +178,7 @@ function ChannelRow({
         href={href}
         target={external ? "_blank" : undefined}
         rel={external ? "noopener noreferrer" : undefined}
-        className="text-sm text-foreground transition-colors hover:ember-text"
+        className="break-all text-sm text-foreground transition-colors hover:ember-text sm:break-normal"
       >
         {value}
       </a>
@@ -210,7 +210,7 @@ function Field({
         required={required}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="mt-3 w-full border-b hairline bg-transparent py-3 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/50 focus:border-foreground"
+        className="mt-3 w-full border-b hairline bg-transparent py-3 text-base text-foreground outline-none transition-colors placeholder:text-muted-foreground/50 focus:border-foreground sm:text-sm"
       />
     </label>
   );
