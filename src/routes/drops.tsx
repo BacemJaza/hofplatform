@@ -28,22 +28,6 @@ const drops = [
     desc: "Seven pieces on heavyweight cotton. Statements you hang on your wall.",
     href: "/" as const,
   },
-  {
-    code: "002",
-    name: "Untitled",
-    status: "Coming",
-    date: "Summer 2026",
-    desc: "Sign up to the list. We don't tell anyone twice.",
-    href: null,
-  },
-  {
-    code: "003",
-    name: "Untitled",
-    status: "Locked",
-    date: "—",
-    desc: "Drops we haven't named yet. They name themselves when they're ready.",
-    href: null,
-  },
 ];
 
 function Drops() {
