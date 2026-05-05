@@ -61,7 +61,7 @@ function Index() {
             {t("hero.tag")}
           </p>
           <h1
-            className="mt-8 animate-fade-up font-display text-[18vw] leading-[0.85] md:text-[10rem]"
+            className="mt-8 animate-fade-up px-2 font-display text-[16vw] leading-[0.85] md:text-[10rem]"
             style={{ animationDelay: "400ms" }}
           >
             NO RULES

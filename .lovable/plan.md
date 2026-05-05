@@ -1,43 +1,53 @@
-## What's going on
+## Problem
 
-You deleted the old Resend key and re-added one with the same name, but two things are now in the way of emails actually sending:
+On mobile, the main navigation links (Drop / Drops / Contact) are hidden — the header only shows them at `md:` and above. That means **the Contact page is unreachable from mobile** unless a user knows the URL or scrolls all the way to the footer. The site also has a few small mobile polish issues (hero CTA crowded next to language switcher + theme + cart icons, contact page padding).
 
-1. **Two Resend keys exist side-by-side.** The Resend connector ("Flags Resen") was just linked to the project, which exposes the key as `RESEND_API_KEY_1` (suffix `_1` because a manual secret named `RESEND_API_KEY` already occupies the primary slot). The notification code only reads `RESEND_API_KEY`, so right now it's still using the old/manual secret — not the freshly connected one.
-2. **No `OWNER_NOTIFICATION_EMAIL` is set.** Customer confirmation emails will go out, but the owner copy is silently skipped (you'll see "OWNER_NOTIFICATION_EMAIL not set — skipping owner notification" in logs). That's likely why you feel like "nothing arrived" on past tries.
+## Goals
 
-## Plan
+- Keep every existing feature: language switcher, theme toggle, cart count, all routes.
+- Make Contact (and Drops) reachable on mobile.
+- Tighten the mobile header so controls don't crowd.
+- Improve contact page legibility on small screens.
 
-### 1. Consolidate to a single Resend key (the connector one)
+## Changes
 
-- Delete the manual `RESEND_API_KEY` secret in Cloud → Secrets (it's the leftover from before the connector existed).
-- Re-link the Resend connector so its key takes the primary `RESEND_API_KEY` slot (no `_1` suffix). No code change needed if we do this.
+### 1. `src/components/site-header.tsx` — add mobile menu
 
-Alternative if you'd rather keep both: update `src/server/notifications.server.ts` to prefer `RESEND_API_KEY_1` and fall back to `RESEND_API_KEY`. Cleaner to just delete the manual one — recommended.
+- Add a hamburger button visible only `< md` (next to the cart icon).
+- Tapping opens a full-width slide-down panel (or a `Sheet` from existing UI) listing:
+  - Drop (`/`)
+  - Drops (`/drops`)
+  - Contact (`/contact`)
+- Panel auto-closes on link tap and on route change.
+- Keep the desktop `md:flex` nav exactly as-is.
+- On mobile, slightly reduce gaps and hide the "CART" word (icon + count only, already partially done) so language + theme + cart + menu all fit on a 360px screen without wrapping.
 
-### 2. Set the owner notification address
+### 2. `src/routes/contact.tsx` — mobile polish
 
-- Add a runtime secret `OWNER_NOTIFICATION_EMAIL` = `houseofflagstn@gmail.com` (or whichever inbox you want order/contact alerts in).
-- Confirm `RESEND_FROM_EMAIL` is set to `HOUSE OF FLAGS <orders@updates.houseofflags.com>` (it's listed in secrets — we'll verify the value is correct).
+- Reduce top padding (`pt-32` → `pt-24 md:pt-32`) so the title isn't pushed below the fold.
+- Scale down the hero heading on mobile (`text-6xl` is fine; ensure no horizontal overflow with long translations — add `break-words`).
+- Make channel rows stack label-above-value on very small screens (`flex-col items-start sm:flex-row sm:items-baseline sm:justify-between`) so long emails/handles don't get cramped.
+- Ensure form inputs have `text-base` (≥16px) to prevent iOS auto-zoom on focus while keeping the visual label small.
+- Submit button: keep full-width, already good.
 
-### 3. Verify the domain is actually verified in Resend
+### 3. `src/routes/index.tsx` — hero mobile fix
 
-Quick sanity check that `updates.houseofflags.com` shows as **Verified** in your Resend dashboard. If DNS isn't fully propagated, every send will 403 and the logs will say so. (Workspace email-domains tool reports nothing configured here, so verification lives entirely on the Resend side — that's expected for connector-based setups.)
+- `text-[18vw]` for "NO RULES" can overflow on narrow screens with safe-area; clamp to `text-[16vw]` and add `px-2` on the heading container so it never touches edges.
+- Marquee row already responsive — leave alone.
 
-### 4. Send a real test and read the logs
+### 4. `src/components/product-buy-card.tsx` — minor
 
-- Submit the contact form on `/contact` with your own email — fastest end-to-end check (hits `submitFeedback` → `sendFeedbackEmail` → Resend).
-- Pull `server-function-logs` filtered on `Resend` / `email` / `feedback` to confirm a 200 from the gateway. If we see a non-200, the body returned by Resend tells us exactly what's wrong (unverified sender, bad key, domain not allowed, etc.) and we fix from there.
+- Already stacks qty + buy on mobile (`flex-col sm:flex-row`). Verify the buy button label "BUY — {price} TND" doesn't wrap awkwardly; add `whitespace-nowrap text-[11px] sm:text-xs`.
 
-### 5. (Optional) Tiny resilience tweak
+## Out of scope
 
-Add a one-line log of the chosen `from` address and target `to` (no body) at the top of `sendEmail` so future "did it send?" debugging takes seconds instead of guesses.
+- No backend / database / auth changes.
+- No copy or translation changes.
+- No removal of any existing feature, page, or link.
 
-## Technical details
+## Acceptance
 
-- Files touched: `src/server/notifications.server.ts` only if we go with the alternative key-fallback path or add the debug log.
-- Secrets touched: delete `RESEND_API_KEY` (manual), add `OWNER_NOTIFICATION_EMAIL`, leave connector-managed `RESEND_API_KEY_1` alone (it'll auto-rename to `RESEND_API_KEY` once the manual one is gone and the connector relinks).
-- No DB migration, no route changes, no UI changes.
-
-## Open question
-
-Want owner alerts going to `houseofflagstn@gmail.com`, or a different inbox?
+- On a 375px viewport: header shows logo, lang switcher, theme, cart, and a hamburger; tapping hamburger reveals Drop / Drops / Contact and Contact navigates correctly.
+- Contact page renders without horizontal scroll; form is usable, inputs don't trigger iOS zoom.
+- Home hero "NO RULES" fits on screen on 320px width.
+- Desktop layout is unchanged.
