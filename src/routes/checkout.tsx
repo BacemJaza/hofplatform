@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useCart } from "@/stores/cart-store";
 import { formatTND, formatTotalTND } from "@/lib/price";
 import { useT } from "@/hooks/use-language";
-import { placeOrder } from "@/server/orders.functions";
+import { placeOrder } from "@/lib/orders.functions.server";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/checkout")({
@@ -27,9 +27,9 @@ export const Route = createFileRoute("/checkout")({
 
 const PHRASES = [
   "Stay loud. Stay quiet. Stay yours.",
-  "From the medina to your wall.",
+  "No restocks. No regrets.",
   "We move slow. We move sure.",
-  "El 7aja t9ouwa. The thing carries weight.",
+  "The thing carries weight.",
   "No restocks. No regrets.",
 ];
 

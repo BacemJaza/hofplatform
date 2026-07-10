@@ -5,13 +5,13 @@ export function parseEuro(s: string): number {
   return Number(s.replace(/[^0-9.]/g, "")) || 0;
 }
 
-export function toTND(eurString: string): number {
-  const eur = parseEuro(eurString);
-  return Math.round(eur * 3.4);
+export function toTND(eur: string | number): number {
+  const value = typeof eur === "number" ? eur : parseEuro(eur);
+  return Math.round(value * 3.4);
 }
 
-export function formatTND(eurString: string): string {
-  return `${toTND(eurString)} TND`;
+export function formatTND(eur: string | number): string {
+  return `${toTND(eur)} TND`;
 }
 
 export function formatTotalTND(eurTotal: number): string {

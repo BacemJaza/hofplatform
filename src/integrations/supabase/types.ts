@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      contact_messages: {
+        Row: {
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          notes: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          notes: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          notes?: string
+        }
+        Relationships: []
+      }
       clients_feedback: {
         Row: {
           created_at: string
@@ -35,6 +59,48 @@ export type Database = {
           full_name?: string
           id?: string
           notes?: string
+        }
+        Relationships: []
+      }
+      products: {
+        Row: {
+          created_at: string
+          id: string
+          image_url: string
+          is_active: boolean
+          label: string
+          name: string
+          price_eur: number
+          slug: string
+          story: string
+          tags: string[]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_url: string
+          is_active?: boolean
+          label: string
+          name: string
+          price_eur: number
+          slug: string
+          story: string
+          tags?: string[]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_url?: string
+          is_active?: boolean
+          label?: string
+          name?: string
+          price_eur?: number
+          slug?: string
+          story?: string
+          tags?: string[]
+          updated_at?: string
         }
         Relationships: []
       }

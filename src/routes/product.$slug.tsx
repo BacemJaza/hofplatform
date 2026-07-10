@@ -1,17 +1,27 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState } from "react";
-import { activeProducts, getProduct, isActiveProduct } from "@/data/products";
 import { useCart } from "@/stores/cart-store";
 import { toast } from "sonner";
 import { formatTND } from "@/lib/price";
 import { useT } from "@/hooks/use-language";
+import { ProductsLoading } from "@/components/products-loading";
+import { getActiveProducts, getProductBySlug } from "@/lib/products.server";
 
 export const Route = createFileRoute("/product/$slug")({
-  loader: ({ params }) => {
-    const product = getProduct(params.slug);
-    if (!product || !isActiveProduct(params.slug)) throw notFound();
-    return { product };
+  loader: async ({ params }) => {
+    const [product, products] = await Promise.all([
+      getProductBySlug(params.slug),
+      getActiveProducts(),
+    ]);
+
+    if (!product || !product.is_active) throw notFound();
+
+    return {
+      product,
+      others: products.filter((p) => p.slug !== product.slug).slice(0, 3),
+    };
   },
+  pendingComponent: ProductsLoading,
   head: ({ loaderData }) => {
     const p = loaderData?.product;
     if (!p) return { meta: [{ title: "Not found — HOUSE OF FLAGS" }] };
@@ -55,12 +65,11 @@ export const Route = createFileRoute("/product/$slug")({
 });
 
 function ProductPage() {
-  const { product } = Route.useLoaderData();
+  const { product, others } = Route.useLoaderData();
   const [zoom, setZoom] = useState(false);
   const add = useCart((s) => s.add);
   const t = useT();
   const priceTND = formatTND(product.price);
-  const others = activeProducts.filter((p) => p.slug !== product.slug).slice(0, 3);
 
   const onAdd = () => {
     add(product);

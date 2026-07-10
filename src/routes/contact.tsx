@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useT } from "@/hooks/use-language";
-import { submitFeedback } from "@/server/feedback.functions";
+import { submitFeedback } from "@/lib/feedback.server";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -62,8 +62,8 @@ function Contact() {
   };
 
   return (
-    <article className="pt-24 md:pt-32">
-      <section className="mx-auto max-w-[1100px] px-6 py-10 md:py-16 md:px-10">
+    <article className="pt-24 md:pt-32 mt-3.5">
+      <section className="mx-auto px-6 py-10 md:py-16 md:px-10">
         <p className="text-[10px] uppercase tracking-[0.5em] text-muted-foreground">
           {t("contact.tag")}
         </p>

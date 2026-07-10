@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import type { Product } from "@/data/products";
+import type { Product } from "@/lib/products";
 import { formatTND } from "@/lib/price";
 import { useT } from "@/hooks/use-language";
 

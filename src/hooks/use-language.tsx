@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from "react";
 
-export type Lang = "en" | "fr" | "ar";
+export type Lang = "en" | "fr";
 
 const KEY = "house-of-flags-lang";
 const listeners = new Set<() => void>();
@@ -9,7 +9,7 @@ function getInitial(): Lang {
   if (typeof window === "undefined") return "en";
   try {
     const v = localStorage.getItem(KEY) as Lang | null;
-    if (v === "en" || v === "fr" || v === "ar") return v;
+    if (v === "en" || v === "fr") return v;
   } catch {}
   return "en";
 }
@@ -19,7 +19,7 @@ let current: Lang = getInitial();
 function applyToDOM(l: Lang) {
   if (typeof document === "undefined") return;
   document.documentElement.setAttribute("lang", l);
-  document.documentElement.setAttribute("dir", l === "ar" ? "rtl" : "ltr");
+  document.documentElement.setAttribute("dir", "ltr");
 }
 
 if (typeof document !== "undefined") applyToDOM(current);
@@ -283,120 +283,6 @@ const dicts: Record<Lang, Dict> = {
     "footer.contactNote": "Pour commandes, retours et questions.",
     "footer.rights": "© HOUSE OF FLAGS — Tunis. Tous drapeaux réservés.",
     "footer.made": "Fait pour ceux qui accrochent leur identité. دار الرايات.",
-  },
-  ar: {
-    "nav.drop": "الإصدار 001",
-    "nav.philosophy": "الفلسفة",
-    "nav.drops": "الإصدارات",
-    "nav.contact": "تواصل",
-    "nav.cart": "السلة",
-    "hero.tag": "دار الرايات — الإصدار 001 / متوفر الآن",
-    "hero.sub": "فن القماش للهوية",
-    "hero.cta": "اكتشف الإصدار 001",
-    "hero.scroll": "انزل",
-    "buy.cta": "اشريها",
-    "banner.tag": "من تونس · للحيط",
-    "banner.line1": "ما نبيعوش زينة.",
-    "banner.line2": "رايات قطن ثقيل. كلمة وحدة، تصريح وحد.",
-    "banner.line3": "لا إعادة تزويد. لا ندم.",
-    "contact.tag": "تواصل / استوديو تونس",
-    "contact.title": "كلّم الاستوديو.",
-    "contact.intro":
-      "أسئلة، طلبات خاصة، إعلام، ولا كان سلام — اختار القناة ولا خلّي ملاحظة. نجاوبوك بأنفسنا.",
-    "contact.channels": "القنوات",
-    "contact.email": "البريد الإلكتروني",
-    "contact.phone": "الهاتف",
-    "contact.formTag": "خلّي ملاحظة",
-    "contact.formTitle": "ابعثلنا حاجة",
-    "contact.fullName": "الاسم الكامل",
-    "contact.notes": "ملاحظات / رأي",
-    "contact.send": "ابعث الرسالة",
-    "contact.sending": "جاري الإرسال…",
-    "contact.successTag": "وصلت الرسالة",
-    "contact.successTitle": "وصلتنا.",
-    "contact.successBody":
-      "باش نرجعولك من الاستوديو في تونس. صبر شوية.",
-    "contact.sendAnother": "ابعث وحدة أخرى",
-    "marquee.1": "لا إعادة تزويد",
-    "marquee.2": "إصدار محدود",
-    "marquee.3": "الإصدار 001 — متوفر",
-    "marquee.4": "قماش مش ورق",
-    "marquee.5": "تصريحات مش زينة",
-    "drop.tag": "مجموعة / 001",
-    "drop.title": "الإصدار 001",
-    "drop.intro":
-      "قطعة وحدة متوفرة. مطبوعة على قماش قطن ثقيل. مصنوعة بكمية محدودة. كي يوصل العداد للصفر، يبقى صفر.",
-    "drop.comingSoon": "قريباً",
-    "philosophy.tag": "الفلسفة",
-    "philosophy.h1a": "ماهيش ملصقات.",
-    "philosophy.h1b": "ماهيش زينة.",
-    "philosophy.h1c": "تصريحات.",
-    "philosophy.h1d": "الهوية اللي تعلّقها على الحيط.",
-    "philosophy.body":
-      "دار الرايات — تبنات في تونس للي ما حبّوش براويز متشابهة. كل راية هي قطعة قماش تعني حاجة — ليك، للي يدخل بيتك، وللنسخة منك اللي علّقتها.",
-    "philosophy.readMore": "اقرأ أكثر",
-    "system.tag": "نظام الإصدارات",
-    "system.titleA": "كي يمشي،",
-    "system.titleB": "يمشي.",
-    "system.p1":
-      "كل قطعة تُنتج بكمية محدودة. ما نعيدوش التزويد. ما نعيدوش الإصدار. كي تنفد راية، تختفي من الموقع وتبقى مختفية.",
-    "system.p2":
-      "هاذا الاتفاق. القطعة اللي على حيطك وحدة من قليلات موجودات في العالم. هاذا اللي يخلّيها ليك.",
-    "system.pieces": "قطع",
-    "system.flags": "راية إجمالاً",
-    "system.restocks": "إعادة تزويد",
-    "cart.add": "أضف للسلة",
-    "cart.shipping": "الشحن مشمول",
-    "cart.noRestock": "● لا إعادة تزويد. كي تمشي، تمشي.",
-    "product.details": "تفاصيل",
-    "product.tapZoom": "المس لتكبير القماش",
-    "product.tapShrink": "المس للتصغير",
-    "product.spec": "قطن ثقيل — 90 × 140 سم — مطبوع في الاستوديو",
-    "product.more": "أكثر من الإصدار 001",
-    "product.viewAll": "← عرض الكل",
-    "checkout.tag": "الدفع / الإصدار 001",
-    "checkout.title": "خذها.",
-    "checkout.intro":
-      "خلّي تفاصيلك. باش نوصلولك من الاستوديو في تونس باش نأكّدو الدفع والتوصيل. لا روبوتات. لا إزعاج. موش كان حنا.",
-    "checkout.name": "الاسم الكامل",
-    "checkout.email": "البريد الإلكتروني",
-    "checkout.phone": "الهاتف",
-    "checkout.city": "المدينة / البلد",
-    "checkout.address": "العنوان",
-    "checkout.notes": "ملاحظات (اختياري)",
-    "checkout.place": "تأكيد الطلب",
-    "checkout.soon": "● باش نكلّموك قريب. 7كاية بـ7كاية.",
-    "checkout.bag": "سلّتك",
-    "checkout.subtotal": "المجموع الفرعي",
-    "checkout.total": "الإجمالي",
-    "checkout.shipping": "مشمول",
-    "checkout.shippedFrom": "يُشحن من تونس · مصنوع في الاستوديو · لا إعادة تزويد",
-    "checkout.received": "● تم استلام الطلب",
-    "checkout.inA": "إنت",
-    "checkout.inB": "داخل.",
-    "checkout.confirm":
-      "وصلنا طلبك. واحد منّا باش يكلّمك قريب باش نأكّدو ونرتّبو التوصيل — مباشرة من الاستوديو في تونس.",
-    "checkout.ref": "مرجع الطلب",
-    "checkout.yezzi": "يزّي تخمّم · بطّل كثرة التفكير",
-    "checkout.back": "رجوع للإصدار",
-    "checkout.emptyTitle": "سلة فارغة",
-    "checkout.emptyText": "ما فمّاش شي للدفع. روح اختار قطعة — يمشيو بسرعة.",
-    "bag.label": "سلّتك",
-    "bag.piece": "قطعة",
-    "bag.pieces": "قطع",
-    "bag.close": "إغلاق ✕",
-    "bag.empty": "فارغة",
-    "bag.emptyText": "ما فمّاش شي على الحيط لتوّا. اختار راية — ما يرجعوش.",
-    "bag.checkout": "الدفع ←",
-    "bag.noRestocks": "● لا إعادة تزويد. تحرّك بسرعة.",
-    "bag.remove": "حذف",
-    "footer.tag": "دار الرايات — فن القماش من تونس. إصدارات محدودة. لا إعادة تزويد.",
-    "footer.index": "الفهرس",
-    "footer.follow": "تابعنا",
-    "footer.contact": "خدمة الزبائن",
-    "footer.contactNote": "للطلبات، الإرجاع والاستفسارات.",
-    "footer.rights": "© دار الرايات — تونس. كل الرايات محفوظة.",
-    "footer.made": "مصنوعة للي يعلّقو هويّتهم. دار الرايات.",
   },
 };
 

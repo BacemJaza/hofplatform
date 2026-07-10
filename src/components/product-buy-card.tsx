@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import type { Product } from "@/data/products";
+import type { Product } from "@/lib/products";
 import { formatTND, toTND } from "@/lib/price";
 import { useCart } from "@/stores/cart-store";
 import { useT } from "@/hooks/use-language";

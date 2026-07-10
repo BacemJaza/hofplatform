@@ -40,10 +40,11 @@ export function SiteHeader() {
     }
   }, [menuOpen]);
 
-  const langs: Lang[] = ["en", "fr", "ar"];
+  const langs: Lang[] = ["en", "fr"];
 
   return (
     <header
+      style={{ top: "var(--topbar-height, 0px)" }}
       className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
         scrolled || menuOpen
           ? "bg-background/90 backdrop-blur-md border-b hairline"

@@ -82,7 +82,7 @@ export const Route = createRootRoute({
 function RootShell({ children }: { children: React.ReactNode }) {
   const themeInit = `(function(){try{var t=localStorage.getItem('house-of-flags-theme');var d=t==='dark';var r=document.documentElement;if(d){r.classList.add('dark');}r.style.colorScheme=d?'dark':'light';}catch(e){}})();`;
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <HeadContent />
         <script dangerouslySetInnerHTML={{ __html: themeInit }} />

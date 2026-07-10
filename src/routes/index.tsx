@@ -1,10 +1,24 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import heroFlag from "@/assets/hero-flag.jpg";
-import { activeProducts } from "@/data/products";
 import { ProductBuyCard } from "@/components/product-buy-card";
+import { ProductCard } from "@/components/product-card";
+import { ProductsLoading } from "@/components/products-loading";
 import { useT } from "@/hooks/use-language";
+import { TopBar } from "@/components/top-bar";
+import { getProducts } from "@/lib/products.server";
 
 export const Route = createFileRoute("/")({
+  loader: async () => {
+    const products = await getProducts();
+    const activeProducts = products.filter((product) => product.is_active);
+    const featured = activeProducts.length === 1 ? activeProducts[0] : null;
+
+    return {
+      products,
+      featured,
+      heroProduct: activeProducts[0] ?? products[0] ?? null,
+    };
+  },
   head: () => ({
     meta: [
       { title: "HOUSE OF FLAGS — Drop 001 / Fabric art for identity" },
@@ -22,12 +36,35 @@ export const Route = createFileRoute("/")({
       { property: "twitter:image", content: heroFlag },
     ],
   }),
+  pendingComponent: ProductsLoading,
+  errorComponent: ({ error }) => (
+    <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-6 pt-24 text-center">
+      <p className="font-display text-4xl">COULDN&apos;T LOAD DROP</p>
+      <p className="max-w-md text-sm text-muted-foreground">
+        We couldn&apos;t reach the catalog right now. Please refresh and try again.
+      </p>
+      {import.meta.env.DEV && error?.message && (
+        <pre className="mt-2 max-h-40 max-w-lg overflow-auto rounded-md bg-muted p-3 text-left font-mono text-xs text-destructive">
+          {error.message}
+        </pre>
+      )}
+      <Link
+        to="/"
+        className="mt-2 text-xs uppercase tracking-[0.3em] underline-offset-8 hover:underline"
+      >
+        Retry
+      </Link>
+    </div>
+  ),
   component: Index,
 });
 
 function Index() {
   const t = useT();
-  const product = activeProducts[0];
+  const { products, featured, heroProduct } = Route.useLoaderData();
+  const gridProducts = featured
+    ? products.filter((product) => product.slug !== featured.slug)
+    : products;
   const marquee = [
     t("marquee.1"),
     "★",
@@ -43,6 +80,20 @@ function Index() {
 
   return (
     <>
+      {/* MARQUEE */}
+      <div className="relative overflow-hidden border-y hairline py-6 mx-auto mt-25">
+        <div className="flex w-max animate-marquee gap-16 whitespace-nowrap font-display text-2xl tracking-[0.05em] text-muted-foreground/60">
+          {Array.from({ length: 2 }).map((_, i) => (
+            <div key={i} className="flex gap-16">
+              {marquee.map((tx, j) => (
+                <span key={j}>{tx}</span>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+      <TopBar />
+
       {/* HERO */}
       <section className="relative h-[100svh] min-h-[640px] w-full overflow-hidden">
         <div className="absolute inset-0 animate-slow-zoom">
@@ -51,7 +102,7 @@ function Index() {
             alt="Hanging fabric flag with the words NO RULES in a dark concrete room"
             width={1920}
             height={1080}
-            className="h-full w-full object-cover animate-flag-sway"
+            className="h-full w-full object-cover"
           />
         </div>
         <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/30 to-background" />
@@ -64,7 +115,7 @@ function Index() {
             className="mt-8 animate-fade-up px-2 font-display text-[16vw] leading-[0.85] md:text-[10rem]"
             style={{ animationDelay: "400ms" }}
           >
-            NO RULES
+            {heroProduct?.name ?? "HOUSE OF FLAGS"}
           </h1>
           <p
             className="mt-8 max-w-md animate-fade-up text-sm uppercase tracking-[0.35em] text-muted-foreground"
@@ -83,24 +134,7 @@ function Index() {
             </a>
           </div>
         </div>
-
-        <div className="absolute bottom-8 left-1/2 z-10 -translate-x-1/2 text-[10px] uppercase tracking-[0.4em] text-muted-foreground animate-fade-in" style={{ animationDelay: "1400ms" }}>
-          {t("hero.scroll")}
-        </div>
       </section>
-
-      {/* MARQUEE */}
-      <div className="relative overflow-hidden border-y hairline py-6">
-        <div className="flex w-max animate-marquee gap-16 whitespace-nowrap font-display text-2xl tracking-[0.05em] text-muted-foreground/60">
-          {Array.from({ length: 2 }).map((_, i) => (
-            <div key={i} className="flex gap-16">
-              {marquee.map((tx, j) => (
-                <span key={j}>{tx}</span>
-              ))}
-            </div>
-          ))}
-        </div>
-      </div>
 
       {/* PHILOSOPHY BANNER — punchy intro */}
       <section className="border-b hairline">
@@ -118,8 +152,8 @@ function Index() {
         </div>
       </section>
 
-      {/* DROP 001 — single piece with inline buy */}
-      <section id="drop-001" className="mx-auto max-w-[1200px] px-6 py-32 md:px-10">
+      {/* DROP 001 — live catalog from Supabase */}
+      <section id="drop-001" className="mx-auto max-w-[1600px] px-6 py-32 md:px-10">
         <div className="mb-20 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
           <div>
             <p className="text-[10px] uppercase tracking-[0.5em] text-muted-foreground">
@@ -132,7 +166,28 @@ function Index() {
           </p>
         </div>
 
-        {product && <ProductBuyCard product={product} />}
+        {products.length === 0 ? (
+          <p className="text-sm text-muted-foreground">
+            The drop is being prepared. Check back soon.
+          </p>
+        ) : (
+          <div className="space-y-20">
+            {featured && <ProductBuyCard product={featured} />}
+
+            {gridProducts.length > 0 && (
+              <div className="grid grid-cols-1 gap-x-6 gap-y-16 sm:grid-cols-2 lg:grid-cols-3">
+                {gridProducts.map((product, index) => (
+                  <ProductCard
+                    key={product.slug}
+                    product={product}
+                    index={index}
+                    comingSoon={!product.is_active}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </section>
 
       {/* PHILOSOPHY */}

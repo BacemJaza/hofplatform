@@ -32,11 +32,11 @@ export function SiteFooter() {
                   {t("nav.drops")}
                 </Link>
               </li>
-              <li>
+              {/*<li>
                 <Link to="/contact" className="transition-colors hover:text-foreground">
                   {t("nav.contact")}
                 </Link>
-              </li>
+              </li>*/}
             </ul>
           </div>
           <div className="text-xs uppercase tracking-[0.25em] text-muted-foreground">

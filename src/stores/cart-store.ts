@@ -1,7 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { Product } from "@/data/products";
-import { ACTIVE_SLUGS } from "@/data/products";
+import type { Product } from "@/lib/products";
 
 export type CartItem = {
   slug: string;
@@ -65,12 +64,6 @@ export const useCart = create<CartState>()(
     }),
     {
       name: "house-of-flags-cart",
-      // Drop any stale items (e.g. older drops that are no longer for sale)
-      // when the persisted cart is restored on app load.
-      onRehydrateStorage: () => (state) => {
-        if (!state) return;
-        state.items = state.items.filter((i) => ACTIVE_SLUGS.has(i.slug));
-      },
     },
   ),
 );
