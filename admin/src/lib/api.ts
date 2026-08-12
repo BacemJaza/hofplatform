@@ -9,6 +9,19 @@ class ApiError extends Error {
   }
 }
 
+function formatFieldErrors(error: unknown): string {
+  if (!error || typeof error !== "object") return "Request failed";
+  const parts: string[] = [];
+  for (const [field, value] of Object.entries(error as Record<string, unknown>)) {
+    if (Array.isArray(value) && value.length > 0) {
+      parts.push(`${field}: ${value.join(", ")}`);
+    } else if (typeof value === "string" && value) {
+      parts.push(`${field}: ${value}`);
+    }
+  }
+  return parts.length > 0 ? parts.join(" · ") : "Please check the form fields.";
+}
+
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(path, {
     ...options,
@@ -25,9 +38,11 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
     const message =
       typeof body.error === "string"
         ? body.error
-        : res.status === 401
-          ? "Unauthorized"
-          : "Request failed";
+        : body.error && typeof body.error === "object"
+          ? formatFieldErrors(body.error)
+          : res.status === 401
+            ? "Unauthorized"
+            : "Request failed";
     throw new ApiError(message, res.status, body.error);
   }
 
@@ -50,12 +65,39 @@ export const api = {
     list: () => request<{ products: import("./types").Product[] }>("/api/products"),
     get: (id: string) =>
       request<{ product: import("./types").Product }>(`/api/products/${id}`),
-    create: (data: Omit<import("./types").Product, "id" | "created_at" | "updated_at">) =>
+    create: (data: {
+      slug: string;
+      name: string;
+      label: string;
+      price_eur: number;
+      image_urls: string[];
+      story: string;
+      tags: string[];
+      is_active: boolean;
+      support_enabled: boolean;
+      support_name: string | null;
+      support_price_eur: number | null;
+    }) =>
       request<{ product: import("./types").Product }>("/api/products", {
         method: "POST",
         body: JSON.stringify(data),
       }),
-    update: (id: string, data: Partial<import("./types").Product>) =>
+    update: (
+      id: string,
+      data: Partial<{
+        slug: string;
+        name: string;
+        label: string;
+        price_eur: number;
+        image_urls: string[];
+        story: string;
+        tags: string[];
+        is_active: boolean;
+        support_enabled: boolean;
+        support_name: string | null;
+        support_price_eur: number | null;
+      }>,
+    ) =>
       request<{ product: import("./types").Product }>(`/api/products/${id}`, {
         method: "PUT",
         body: JSON.stringify(data),
@@ -73,7 +115,11 @@ export const api = {
     list: () => request<{ orders: import("./types").Order[] }>("/api/orders"),
     get: (id: string) =>
       request<{ order: import("./types").Order }>(`/api/orders/${id}`),
-    create: (data: Omit<import("./types").Order, "id" | "created_at">) =>
+    create: (
+      data: Omit<import("./types").Order, "id" | "created_at"> & {
+        delivery_fee?: number;
+      },
+    ) =>
       request<{ order: import("./types").Order }>("/api/orders", {
         method: "POST",
         body: JSON.stringify(data),
@@ -93,6 +139,15 @@ export const api = {
       request<{ message: import("./types").Message }>(`/api/messages/${id}`),
     delete: (id: string) =>
       request<{ ok: true }>(`/api/messages/${id}`, { method: "DELETE" }),
+  },
+
+  settings: {
+    get: () => request<{ settings: import("./types").SiteSettings }>("/api/settings"),
+    update: (data: { delivery_fee_tnd: number }) =>
+      request<{ settings: import("./types").SiteSettings }>("/api/settings", {
+        method: "PUT",
+        body: JSON.stringify(data),
+      }),
   },
 };
 

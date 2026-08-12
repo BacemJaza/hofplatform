@@ -1,17 +1,21 @@
-// Server-only canonical product catalog (slug -> price in TND).
-// Prices are resolved from the Supabase products table so the storefront and checkout stay aligned.
+// Server-only canonical product prices (slug -> TND).
 
-import { getProductPriceEur } from "@/lib/products.server";
-
-const EUR_TO_TND = 3.4;
+import { getProductPrice, getProductPricing } from "@/lib/products.server";
 
 export async function getCanonicalPriceTND(slug: string): Promise<number | null> {
   try {
-    const eur = await getProductPriceEur(slug);
-    if (eur == null) return null;
-    return Math.round(eur * EUR_TO_TND);
+    return await getProductPrice(slug);
   } catch (error) {
     console.error(`Failed to resolve canonical price for ${slug}`, error);
+    return null;
+  }
+}
+
+export async function getCanonicalProductPricing(slug: string) {
+  try {
+    return await getProductPricing(slug);
+  } catch (error) {
+    console.error(`Failed to resolve canonical pricing for ${slug}`, error);
     return null;
   }
 }

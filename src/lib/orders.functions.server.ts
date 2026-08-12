@@ -1,7 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { getExternalSupabaseAdmin } from "@/integrations/supabase/external-admin.server";
-import { getCanonicalPriceTND, generateOrderRef } from "../server/orders.server";
+import { getCanonicalProductPricing, generateOrderRef } from "../server/orders.server";
+import { fetchDeliveryFeeTND } from "@/lib/settings.server";
 // Resend order emails disabled for now.
 // import { sendOrderEmails } from "../server/notifications.server";
 
@@ -11,12 +12,17 @@ const recentOrderEmailRequests = new Map<
   { orderRef: string; total: number; createdAt: number }
 >();
 
-function getOrderEmailDeduplicationKey(data: {
-  email: string;
-  phone: string;
-  items: Array<{ slug: string; qty: number }>;
-}, total: number): string {
-  const itemKey = data.items.map((item) => `${item.slug}:${item.qty}`).join("|");
+function getOrderEmailDeduplicationKey(
+  data: {
+    email: string;
+    phone: string;
+    items: Array<{ slug: string; qty: number; withSupport: boolean }>;
+  },
+  total: number,
+): string {
+  const itemKey = data.items
+    .map((item) => `${item.slug}:${item.qty}:${item.withSupport ? "s" : "b"}`)
+    .join("|");
   return `${data.email.toLowerCase()}:${data.phone}:${itemKey}:${total}`;
 }
 
@@ -32,6 +38,7 @@ const orderSchema = z.object({
       z.object({
         slug: z.string().trim().min(1).max(60),
         qty: z.number().int().min(1).max(20),
+        withSupport: z.boolean().default(false),
       }),
     )
     .min(1)
@@ -41,33 +48,60 @@ const orderSchema = z.object({
 export const placeOrder = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => orderSchema.parse(input))
   .handler(async ({ data }) => {
-    // Recompute items + total server-side from the canonical catalog.
-    // Anything from the client (price, total, status) is discarded.
+    // Recompute items + total server-side from the canonical catalog + settings.
+    // Anything from the client (price, total, delivery fee, status) is discarded.
     const validatedItems: Array<{
       slug: string;
       qty: number;
       unit_price_tnd: number;
+      with_support: boolean;
+      support_name: string | null;
+      support_unit_price_tnd: number;
       line_total_tnd: number;
     }> = [];
-    let total = 0;
+    let subtotal = 0;
 
     for (const item of data.items) {
-      const unitPrice = await getCanonicalPriceTND(item.slug);
-      if (unitPrice == null) {
+      const pricing = await getCanonicalProductPricing(item.slug);
+      if (pricing == null) {
         return { ok: false as const, error: "Unknown product in cart." };
       }
-      const lineTotal = unitPrice * item.qty;
-      total += lineTotal;
+
+      const wantsSupport = Boolean(item.withSupport);
+      if (wantsSupport && !pricing.supportEnabled) {
+        return { ok: false as const, error: "Support is not available for one of the products." };
+      }
+
+      const withSupport = wantsSupport && pricing.supportEnabled;
+      const supportUnit = withSupport ? pricing.supportPrice : 0;
+      const unitWithSupport = pricing.unitPrice + supportUnit;
+      const lineTotal = unitWithSupport * item.qty;
+      subtotal += lineTotal;
+
       validatedItems.push({
         slug: item.slug,
         qty: item.qty,
-        unit_price_tnd: unitPrice,
+        unit_price_tnd: pricing.unitPrice,
+        with_support: withSupport,
+        support_name: withSupport ? pricing.supportName : null,
+        support_unit_price_tnd: supportUnit,
         line_total_tnd: lineTotal,
       });
     }
 
+    const deliveryFee = await fetchDeliveryFeeTND();
+    const total = subtotal + deliveryFee;
+
     const emailDeduplicationKey = getOrderEmailDeduplicationKey(
-      { email: data.email, phone: data.phone, items: data.items },
+      {
+        email: data.email,
+        phone: data.phone,
+        items: data.items.map((i) => ({
+          slug: i.slug,
+          qty: i.qty,
+          withSupport: Boolean(i.withSupport),
+        })),
+      },
       total,
     );
     const now = Date.now();
@@ -108,6 +142,7 @@ export const placeOrder = createServerFn({ method: "POST" })
         notes: data.notes ? data.notes : null,
         items: validatedItems,
         total,
+        delivery_fee: deliveryFee,
         currency: "TND",
         status: "pending",
       });
@@ -120,7 +155,7 @@ export const placeOrder = createServerFn({ method: "POST" })
       tableMissing =
         insertErrorMessage.includes("Could not find the table") ||
         insertErrorMessage.includes("schema cache") ||
-        insertErrorMessage.includes("relation \"public.orders\"") ||
+        insertErrorMessage.includes('relation "public.orders"') ||
         insertErrorMessage.includes("does not exist");
 
       if (!tableMissing) {
@@ -160,5 +195,5 @@ export const placeOrder = createServerFn({ method: "POST" })
     //   console.error("sendOrderEmails threw unexpectedly:", mailErr);
     // }
 
-    return { ok: true as const, orderRef, total };
+    return { ok: true as const, orderRef, total, deliveryFee, subtotal };
   });

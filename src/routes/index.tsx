@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import heroFlag from "@/assets/hero-flag.jpg";
+import heroFlag from "@/assets/hero-flag.png";
 import { ProductBuyCard } from "@/components/product-buy-card";
 import { ProductCard } from "@/components/product-card";
 import { ProductsLoading } from "@/components/products-loading";
@@ -82,7 +82,7 @@ function Index() {
     <>
       {/* MARQUEE */}
       <div className="relative overflow-hidden border-y hairline py-6 mx-auto mt-25">
-        <div className="flex w-max animate-marquee gap-16 whitespace-nowrap font-display text-2xl tracking-[0.05em] text-muted-foreground/60">
+        <div className="flex w-max animate-marquee gap-16 whitespace-nowrap font-display text-xl tracking-[0.05em] text-muted-foreground/60">
           {Array.from({ length: 2 }).map((_, i) => (
             <div key={i} className="flex gap-16">
               {marquee.map((tx, j) => (
@@ -95,43 +95,46 @@ function Index() {
       <TopBar />
 
       {/* HERO */}
-      <section className="relative h-[100svh] min-h-[640px] w-full overflow-hidden">
+      <section className="relative flex min-h-[58svh] w-full overflow-hidden sm:min-h-[70vh] md:h-[80vh] md:min-h-[600px]">
         <div className="absolute inset-0 animate-slow-zoom">
           <img
             src={heroFlag}
             alt="Hanging fabric flag with the words NO RULES in a dark concrete room"
             width={1920}
             height={1080}
-            className="h-full w-full object-cover"
+            className="h-full w-full object-[center_35%] sm:object-center"
           />
         </div>
-        <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/30 to-background" />
+        <div className="absolute inset-0 bg-linear-to-b from-background/55 via-background/25 to-background" />
 
-        <div className="relative z-10 flex h-full flex-col items-center justify-center px-6 text-center">
-          <p className="animate-fade-in text-[10px] uppercase tracking-[0.5em] text-muted-foreground" style={{ animationDelay: "200ms" }}>
+        <div className="relative z-10 flex w-full flex-1 flex-col items-center justify-center gap-3 px-4 py-8 text-center sm:gap-5 sm:px-6 sm:py-12 md:gap-8 md:py-16">
+          <p
+            className="animate-fade-in max-w-[22rem] text-[9px] uppercase tracking-[0.28em] text-white bg-black px-2 py-0.5 sm:max-w-none sm:text-[10px] sm:tracking-[0.5em]"
+            style={{ animationDelay: "200ms" }}
+          >
             {t("hero.tag")}
           </p>
           <h1
-            className="mt-8 animate-fade-up px-2 font-display text-[16vw] leading-[0.85] md:text-[10rem]"
+            className="animate-fade-up max-w-[95vw] px-1 font-display text-[clamp(2.6rem,13vw,10rem)] leading-[0.9] wrap-break-word md:text-[10rem] md:leading-[0.85]"
             style={{ animationDelay: "400ms" }}
           >
-            {heroProduct?.name ?? "HOUSE OF FLAGS"}
+            {"HOUSE OF FLAGS"}
           </h1>
           <p
-            className="mt-8 max-w-md animate-fade-up text-sm uppercase tracking-[0.35em] text-muted-foreground"
+            className="animate-fade-up max-w-[18rem] text-[11px] uppercase tracking-[0.22em] text-white bg-black px-2 py-0.5 sm:max-w-md sm:text-sm sm:tracking-[0.35em]"
             style={{ animationDelay: "700ms" }}
           >
             {t("hero.sub")}
           </p>
 
-          <div className="mt-12 animate-fade-up" style={{ animationDelay: "950ms" }}>
-            <a
-              href="#drop-001"
-              className="group inline-flex items-center gap-4 border hairline px-8 py-4 text-xs uppercase tracking-[0.35em] transition-all hover:bg-foreground hover:text-background"
+          <div className="animate-fade-up pt-1 sm:pt-2 md:pt-4" style={{ animationDelay: "950ms" }}>
+            <Link
+              to="/drops"
+              className="group inline-flex min-h-11 items-center gap-3 border hairline px-5 py-3 text-[11px] uppercase tracking-[0.28em] transition-all hover:bg-foreground hover:text-background sm:gap-4 sm:px-8 sm:py-4 sm:text-xs sm:tracking-[0.35em]"
             >
               <span>{t("hero.cta")}</span>
               <span className="transition-transform group-hover:translate-x-1">→</span>
-            </a>
+            </Link>
           </div>
         </div>
       </section>
@@ -197,8 +200,6 @@ function Index() {
         </p>
         <p className="mt-12 font-display text-4xl leading-[1.15] text-balance md:text-6xl">
           {t("philosophy.h1a")}
-          <br />
-          {t("philosophy.h1b")}
           <br />
           <span className="ember-text">{t("philosophy.h1c")}</span>
           <br />

@@ -65,7 +65,7 @@ export function SiteHeader() {
           </span>
         </Link>
         <nav className="hidden items-center gap-10 text-xs uppercase tracking-[0.25em] text-muted-foreground md:flex">
-          <Link to="/" activeOptions={{ exact: true }} activeProps={{ className: "text-foreground" }} className="transition-colors hover:text-foreground">
+          <Link to="/drops" activeProps={{ className: "text-foreground" }} className="transition-colors hover:text-foreground">
             {t("nav.drop")}
           </Link>
           <Link to="/drops" activeProps={{ className: "text-foreground" }} className="transition-colors hover:text-foreground">
@@ -141,8 +141,7 @@ export function SiteHeader() {
       >
         <nav className="flex flex-col px-6 py-6 text-sm uppercase tracking-[0.3em]">
           <Link
-            to="/"
-            activeOptions={{ exact: true }}
+            to="/drops"
             activeProps={{ className: "text-foreground" }}
             className="border-b hairline py-4 text-muted-foreground transition-colors hover:text-foreground"
           >

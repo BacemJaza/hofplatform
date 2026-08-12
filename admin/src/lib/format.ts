@@ -8,12 +8,12 @@ export function formatDate(iso: string): string {
   });
 }
 
-export function formatEur(value: number): string {
-  return `€${value.toFixed(value % 1 === 0 ? 0 : 2)}`;
+export function formatTnd(value: number): string {
+  return `${Math.round(value)} TND`;
 }
 
 export function formatMoney(value: number, currency: string): string {
-  return `${value.toFixed(2)} ${currency}`;
+  return `${Math.round(value)} ${currency}`;
 }
 
 export function generateOrderRef(): string {

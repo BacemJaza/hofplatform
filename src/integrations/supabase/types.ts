@@ -67,12 +67,16 @@ export type Database = {
           created_at: string
           id: string
           image_url: string
+          image_urls: string[]
           is_active: boolean
           label: string
           name: string
           price_eur: number
           slug: string
           story: string
+          support_enabled: boolean
+          support_name: string | null
+          support_price_eur: number | null
           tags: string[]
           updated_at: string
         }
@@ -80,12 +84,16 @@ export type Database = {
           created_at?: string
           id?: string
           image_url: string
+          image_urls?: string[]
           is_active?: boolean
           label: string
           name: string
           price_eur: number
           slug: string
           story: string
+          support_enabled?: boolean
+          support_name?: string | null
+          support_price_eur?: number | null
           tags?: string[]
           updated_at?: string
         }
@@ -93,13 +101,35 @@ export type Database = {
           created_at?: string
           id?: string
           image_url?: string
+          image_urls?: string[]
           is_active?: boolean
           label?: string
           name?: string
           price_eur?: number
           slug?: string
           story?: string
+          support_enabled?: boolean
+          support_name?: string | null
+          support_price_eur?: number | null
           tags?: string[]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      site_settings: {
+        Row: {
+          delivery_fee_tnd: number
+          id: number
+          updated_at: string
+        }
+        Insert: {
+          delivery_fee_tnd?: number
+          id?: number
+          updated_at?: string
+        }
+        Update: {
+          delivery_fee_tnd?: number
+          id?: number
           updated_at?: string
         }
         Relationships: []
@@ -111,6 +141,7 @@ export type Database = {
           created_at: string
           currency: string
           customer_name: string
+          delivery_fee: number
           email: string
           id: string
           items: Json
@@ -126,6 +157,7 @@ export type Database = {
           created_at?: string
           currency?: string
           customer_name: string
+          delivery_fee?: number
           email: string
           id?: string
           items: Json
@@ -141,6 +173,7 @@ export type Database = {
           created_at?: string
           currency?: string
           customer_name?: string
+          delivery_fee?: number
           email?: string
           id?: string
           items?: Json

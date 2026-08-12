@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch server/index.ts",
-    "build": "vite build",
+    "build": "vite build && node scripts/build-api.mjs",
     "start": "cross-env NODE_ENV=production tsx server/index.ts",
     "typecheck": "tsc --noEmit"
   },
@@ -26,9 +26,10 @@
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "@vitejs/plugin-react": "^5.0.4",
+    "cross-env": "^7.0.3",
+    "esbuild": "^0.28.1",
     "tailwindcss": "^4.2.1",
     "tsx": "^4.20.5",
-    "cross-env": "^7.0.3",
     "typescript": "^5.8.3",
     "vite": "^7.3.1"
   }

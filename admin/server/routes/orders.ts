@@ -13,6 +13,9 @@ const orderItemSchema = z.object({
   qty: z.coerce.number().int().min(1).max(99),
   unit_price_tnd: z.coerce.number().nonnegative(),
   line_total_tnd: z.coerce.number().nonnegative(),
+  with_support: z.boolean().optional(),
+  support_name: z.string().trim().max(120).nullable().optional(),
+  support_unit_price_tnd: z.coerce.number().nonnegative().optional(),
 });
 
 const orderSchema = z.object({
@@ -25,6 +28,7 @@ const orderSchema = z.object({
   notes: z.string().trim().max(1000).nullable().optional(),
   items: z.array(orderItemSchema).min(1).max(20),
   total: z.coerce.number().nonnegative(),
+  delivery_fee: z.coerce.number().nonnegative().default(0),
   currency: z.string().trim().min(1).max(10).default("TND"),
   status: z.enum(ORDER_STATUSES).default("pending"),
 });

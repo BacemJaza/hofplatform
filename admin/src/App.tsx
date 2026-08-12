@@ -8,6 +8,7 @@ import { ProductFormPage } from "@/pages/ProductFormPage";
 import { OrdersPage } from "@/pages/OrdersPage";
 import { OrderFormPage } from "@/pages/OrderFormPage";
 import { MessagesPage } from "@/pages/MessagesPage";
+import { SettingsPage } from "@/pages/SettingsPage";
 
 export function App() {
   return (
@@ -28,6 +29,7 @@ export function App() {
               <Route path="/orders/new" element={<OrderFormPage />} />
               <Route path="/orders/:id/edit" element={<OrderFormPage />} />
               <Route path="/messages" element={<MessagesPage />} />
+              <Route path="/settings" element={<SettingsPage />} />
             </Route>
           </Route>
 

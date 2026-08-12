@@ -26,6 +26,7 @@ type FormState = {
   notes: string;
   currency: string;
   status: string;
+  delivery_fee: string;
   items: OrderItem[];
 };
 
@@ -34,6 +35,9 @@ const emptyItem = (): OrderItem => ({
   qty: 1,
   unit_price_tnd: 0,
   line_total_tnd: 0,
+  with_support: false,
+  support_name: null,
+  support_unit_price_tnd: 0,
 });
 
 const empty: FormState = {
@@ -46,11 +50,13 @@ const empty: FormState = {
   notes: "",
   currency: "TND",
   status: "pending",
+  delivery_fee: "0",
   items: [emptyItem()],
 };
 
 function recalcItem(item: OrderItem): OrderItem {
-  return { ...item, line_total_tnd: item.qty * item.unit_price_tnd };
+  const support = item.with_support ? Number(item.support_unit_price_tnd ?? 0) : 0;
+  return { ...item, line_total_tnd: item.qty * (item.unit_price_tnd + support) };
 }
 
 export function OrderFormPage() {
@@ -78,6 +84,7 @@ export function OrderFormPage() {
           notes: order.notes ?? "",
           currency: order.currency,
           status: order.status,
+          delivery_fee: String(order.delivery_fee ?? 0),
           items: order.items.length ? order.items : [emptyItem()],
         });
       } catch (err) {
@@ -107,7 +114,9 @@ export function OrderFormPage() {
       items: prev.items.length > 1 ? prev.items.filter((_, i) => i !== index) : prev.items,
     }));
 
-  const total = form.items.reduce((sum, i) => sum + i.line_total_tnd, 0);
+  const itemsTotal = form.items.reduce((sum, i) => sum + i.line_total_tnd, 0);
+  const deliveryFee = Number(form.delivery_fee) || 0;
+  const total = itemsTotal + deliveryFee;
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -123,6 +132,7 @@ export function OrderFormPage() {
       address: form.address.trim(),
       notes: form.notes.trim() || null,
       items: form.items,
+      delivery_fee: deliveryFee,
       total,
       currency: form.currency.trim(),
       status: form.status,
@@ -244,7 +254,23 @@ export function OrderFormPage() {
                 </div>
               ))}
             </div>
-            <p className="mt-3 text-sm font-medium">Total: {total.toFixed(2)} {form.currency}</p>
+            <p className="mt-3 text-sm text-muted">
+              Items: {itemsTotal.toFixed(2)} {form.currency}
+            </p>
+            <div className="mt-2 max-w-xs">
+              <Field label="Delivery fee (TND)">
+                <Input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={form.delivery_fee}
+                  onChange={(e) => set("delivery_fee", e.target.value)}
+                />
+              </Field>
+            </div>
+            <p className="mt-3 text-sm font-medium">
+              Total: {total.toFixed(2)} {form.currency}
+            </p>
           </div>
 
           <div className="flex gap-2 pt-2">

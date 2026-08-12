@@ -18,10 +18,13 @@ type FormState = {
   name: string;
   label: string;
   price_eur: string;
-  image_url: string;
+  image_urls: string[];
   story: string;
   tags: string;
   is_active: boolean;
+  support_enabled: boolean;
+  support_name: string;
+  support_price_eur: string;
 };
 
 const empty: FormState = {
@@ -29,11 +32,23 @@ const empty: FormState = {
   name: "",
   label: "",
   price_eur: "",
-  image_url: "",
+  image_urls: [""],
   story: "",
   tags: "",
   is_active: false,
+  support_enabled: false,
+  support_name: "",
+  support_price_eur: "0",
 };
+
+function normalizeLoadedUrls(product: {
+  image_urls?: string[] | null;
+  image_url: string;
+}): string[] {
+  const fromGallery = (product.image_urls ?? []).map((u) => u.trim()).filter(Boolean);
+  if (fromGallery.length > 0) return fromGallery;
+  return product.image_url ? [product.image_url] : [""];
+}
 
 export function ProductFormPage() {
   const { id } = useParams();
@@ -55,10 +70,14 @@ export function ProductFormPage() {
           name: product.name,
           label: product.label,
           price_eur: String(product.price_eur),
-          image_url: product.image_url,
+          image_urls: normalizeLoadedUrls(product),
           story: product.story,
           tags: joinTags(product.tags),
           is_active: product.is_active,
+          support_enabled: Boolean(product.support_enabled),
+          support_name: product.support_name ?? "",
+          support_price_eur:
+            product.support_price_eur != null ? String(product.support_price_eur) : "0",
         });
       } catch (err) {
         setError(err instanceof ApiError ? err.message : "Failed to load product.");
@@ -71,9 +90,47 @@ export function ProductFormPage() {
   const set = <K extends keyof FormState>(key: K, value: FormState[K]) =>
     setForm((prev) => ({ ...prev, [key]: value }));
 
+  const setImageUrl = (index: number, value: string) => {
+    setForm((prev) => {
+      const image_urls = [...prev.image_urls];
+      image_urls[index] = value;
+      return { ...prev, image_urls };
+    });
+  };
+
+  const addImage = () => setForm((prev) => ({ ...prev, image_urls: [...prev.image_urls, ""] }));
+
+  const removeImage = (index: number) =>
+    setForm((prev) => ({
+      ...prev,
+      image_urls:
+        prev.image_urls.length <= 1
+          ? prev.image_urls
+          : prev.image_urls.filter((_, i) => i !== index),
+    }));
+
+  const moveImage = (index: number, direction: -1 | 1) => {
+    setForm((prev) => {
+      const next = index + direction;
+      if (next < 0 || next >= prev.image_urls.length) return prev;
+      const image_urls = [...prev.image_urls];
+      const tmp = image_urls[index];
+      image_urls[index] = image_urls[next];
+      image_urls[next] = tmp;
+      return { ...prev, image_urls };
+    });
+  };
+
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError("");
+
+    const image_urls = form.image_urls.map((u) => u.trim()).filter(Boolean);
+    if (image_urls.length === 0) {
+      setError("Add at least one image URL.");
+      return;
+    }
+
     setSaving(true);
 
     const payload = {
@@ -81,10 +138,13 @@ export function ProductFormPage() {
       name: form.name.trim(),
       label: form.label.trim(),
       price_eur: Number(form.price_eur),
-      image_url: form.image_url.trim(),
+      image_urls,
       story: form.story.trim(),
       tags: parseTags(form.tags),
       is_active: form.is_active,
+      support_enabled: form.support_enabled,
+      support_name: form.support_enabled ? form.support_name.trim() : null,
+      support_price_eur: form.support_enabled ? Number(form.support_price_eur) : null,
     };
 
     try {
@@ -95,11 +155,7 @@ export function ProductFormPage() {
       }
       navigate("/products");
     } catch (err) {
-      if (err instanceof ApiError && err.details && typeof err.details === "object") {
-        setError("Please check the form fields.");
-      } else {
-        setError(err instanceof ApiError ? err.message : "Failed to save product.");
-      }
+      setError(err instanceof ApiError ? err.message : "Failed to save product.");
     } finally {
       setSaving(false);
     }
@@ -138,11 +194,11 @@ export function ProductFormPage() {
             <Field label="Label">
               <Input value={form.label} onChange={(e) => set("label", e.target.value)} required />
             </Field>
-            <Field label="Price (EUR)">
+            <Field label="Price (TND)">
               <Input
                 type="number"
-                min="0.01"
-                step="0.01"
+                min="1"
+                step="1"
                 value={form.price_eur}
                 onChange={(e) => set("price_eur", e.target.value)}
                 required
@@ -150,14 +206,77 @@ export function ProductFormPage() {
             </Field>
           </div>
 
-          <Field label="Image URL">
-            <Input
-              value={form.image_url}
-              onChange={(e) => set("image_url", e.target.value)}
-              placeholder="/product-no-rules.jpg"
-              required
-            />
-          </Field>
+          <div>
+            <div className="mb-2 flex items-center justify-between">
+              <p className="text-xs font-medium uppercase tracking-wide text-muted">
+                Image gallery
+              </p>
+              <Button type="button" variant="secondary" onClick={addImage}>
+                Add image
+              </Button>
+            </div>
+            <p className="mb-3 text-xs text-muted">
+              First image is the cover. Reorder with arrows. Paste image URLs only.
+            </p>
+            <div className="space-y-3">
+              {form.image_urls.map((url, index) => (
+                <div
+                  key={index}
+                  className="flex flex-col gap-2 rounded-md border border-border p-3 sm:flex-row sm:items-start"
+                >
+                  <div className="h-16 w-16 shrink-0 overflow-hidden rounded bg-background">
+                    {url.trim() ? (
+                      <img
+                        src={url.trim()}
+                        alt=""
+                        className="h-full w-full object-cover"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = "none";
+                        }}
+                      />
+                    ) : null}
+                  </div>
+                  <div className="min-w-0 flex-1 space-y-2">
+                    <Input
+                      value={url}
+                      onChange={(e) => setImageUrl(index, e.target.value)}
+                      placeholder="/product-example.jpg or https://…"
+                      required
+                    />
+                    <div className="flex flex-wrap gap-2">
+                      <span className="self-center text-[10px] uppercase tracking-wide text-muted">
+                        {index === 0 ? "Cover" : `#${index + 1}`}
+                      </span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        onClick={() => moveImage(index, -1)}
+                        disabled={index === 0}
+                      >
+                        ↑
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        onClick={() => moveImage(index, 1)}
+                        disabled={index === form.image_urls.length - 1}
+                      >
+                        ↓
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        onClick={() => removeImage(index)}
+                        disabled={form.image_urls.length <= 1}
+                      >
+                        Remove
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
 
           <Field label="Tags (comma-separated)">
             <Input
@@ -170,6 +289,40 @@ export function ProductFormPage() {
           <Field label="Story">
             <Textarea value={form.story} onChange={(e) => set("story", e.target.value)} required />
           </Field>
+
+          <div className="space-y-3 rounded-md border border-border p-4">
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={form.support_enabled}
+                onChange={(e) => set("support_enabled", e.target.checked)}
+                className="rounded border-border"
+              />
+              Optional support / stand available
+            </label>
+            {form.support_enabled && (
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Field label="Support name">
+                  <Input
+                    value={form.support_name}
+                    onChange={(e) => set("support_name", e.target.value)}
+                    placeholder="Wood stand"
+                    required
+                  />
+                </Field>
+                <Field label="Support price (TND)">
+                  <Input
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={form.support_price_eur}
+                    onChange={(e) => set("support_price_eur", e.target.value)}
+                    required
+                  />
+                </Field>
+              </div>
+            )}
+          </div>
 
           <label className="flex items-center gap-2 text-sm">
             <input

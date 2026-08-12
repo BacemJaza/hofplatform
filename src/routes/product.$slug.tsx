@@ -2,15 +2,16 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState } from "react";
 import { useCart } from "@/stores/cart-store";
 import { toast } from "sonner";
-import { formatTND } from "@/lib/price";
+import { formatTND, parsePrice } from "@/lib/price";
 import { useT } from "@/hooks/use-language";
 import { ProductsLoading } from "@/components/products-loading";
 import { getActiveProducts, getProductBySlug } from "@/lib/products.server";
+import { productImages } from "@/lib/products";
 
 export const Route = createFileRoute("/product/$slug")({
   loader: async ({ params }) => {
     const [product, products] = await Promise.all([
-      getProductBySlug(params.slug),
+      getProductBySlug({ data: params.slug }),
       getActiveProducts(),
     ]);
 
@@ -47,7 +48,7 @@ export const Route = createFileRoute("/product/$slug")({
           {error.message}
         </pre>
       )}
-      <Link to="/" className="mt-2 text-xs uppercase tracking-[0.3em] underline-offset-8 hover:underline">
+      <Link to="/drops" className="mt-2 text-xs uppercase tracking-[0.3em] underline-offset-8 hover:underline">
         Back to drop
       </Link>
     </div>
@@ -56,7 +57,7 @@ export const Route = createFileRoute("/product/$slug")({
     <div className="flex min-h-screen flex-col items-center justify-center gap-6 px-6 text-center">
       <p className="font-display text-6xl">SOLD OUT</p>
       <p className="text-sm text-muted-foreground">This piece doesn't exist or never returned.</p>
-      <Link to="/" className="text-xs uppercase tracking-[0.3em] underline-offset-8 hover:underline">
+      <Link to="/drops" className="text-xs uppercase tracking-[0.3em] underline-offset-8 hover:underline">
         Back to drop
       </Link>
     </div>
@@ -66,13 +67,21 @@ export const Route = createFileRoute("/product/$slug")({
 
 function ProductPage() {
   const { product, others } = Route.useLoaderData();
+  const images = productImages(product);
+  const [activeIndex, setActiveIndex] = useState(0);
   const [zoom, setZoom] = useState(false);
+  const [withSupport, setWithSupport] = useState(false);
   const add = useCart((s) => s.add);
   const t = useT();
-  const priceTND = formatTND(product.price);
+
+  const activeImage = images[activeIndex] ?? product.image;
+  const supportExtra =
+    product.support.enabled && withSupport ? parsePrice(product.support.price) : 0;
+  const unitTotal = parsePrice(product.price) + supportExtra;
+  const priceTND = formatTND(unitTotal);
 
   const onAdd = () => {
-    add(product);
+    add(product, { withSupport });
     toast(`${product.name} — added to your bag`, {
       description: "From the studio in Tunis to your wall.",
     });
@@ -81,14 +90,14 @@ function ProductPage() {
   return (
     <article className="pt-24">
       <div className="mx-auto grid max-w-[1600px] grid-cols-1 gap-12 px-6 py-12 md:grid-cols-2 md:gap-16 md:px-10 md:py-20">
-        {/* Image */}
-        <div className="space-y-6">
+        {/* Gallery */}
+        <div className="space-y-4">
           <div
             className="relative aspect-[4/5] overflow-hidden bg-card vignette cursor-zoom-in"
             onClick={() => setZoom((z) => !z)}
           >
             <img
-              src={product.image}
+              src={activeImage}
               alt={`${product.name} fabric wall flag`}
               width={1024}
               height={1280}
@@ -100,6 +109,36 @@ function ProductPage() {
               {zoom ? t("product.tapShrink") : t("product.tapZoom")}
             </div>
           </div>
+
+          {images.length > 1 && (
+            <div className="flex gap-2 overflow-x-auto pb-1">
+              {images.map((src, i) => (
+                <button
+                  key={`${src}-${i}`}
+                  type="button"
+                  onClick={() => {
+                    setActiveIndex(i);
+                    setZoom(false);
+                  }}
+                  className={`relative h-16 w-14 shrink-0 overflow-hidden border transition-opacity sm:h-20 sm:w-16 ${
+                    i === activeIndex
+                      ? "border-foreground opacity-100"
+                      : "hairline opacity-60 hover:opacity-100"
+                  }`}
+                  aria-label={`View image ${i + 1}`}
+                  aria-current={i === activeIndex}
+                >
+                  <img
+                    src={src}
+                    alt=""
+                    className="h-full w-full object-cover"
+                    loading="lazy"
+                  />
+                </button>
+              ))}
+            </div>
+          )}
+
           <p className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
             {t("product.spec")}
           </p>
@@ -113,19 +152,19 @@ function ProductPage() {
           <h1 className="mt-6 font-display text-7xl md:text-8xl">{product.name}</h1>
 
           <div className="mt-8 flex items-baseline gap-4">
-            <span className="font-display text-3xl">{priceTND}</span>
+            <span className="font-display text-3xl">{formatTND(product.price)}</span>
             <span className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
-              {t("cart.shipping")}
+              {t("cart.shippingNote")}
             </span>
           </div>
 
           <div className="mt-10 flex flex-wrap gap-2">
-            {product.tags.map((t: string) => (
+            {product.tags.map((tag: string) => (
               <span
-                key={t}
+                key={tag}
                 className="border hairline px-3 py-1.5 text-[10px] uppercase tracking-[0.3em] text-muted-foreground"
               >
-                {t}
+                {tag}
               </span>
             ))}
           </div>
@@ -133,6 +172,39 @@ function ProductPage() {
           <p className="mt-10 max-w-md text-sm leading-relaxed text-muted-foreground">
             {product.story}
           </p>
+
+          {product.support.enabled && (
+            <fieldset className="mt-10 max-w-md space-y-3">
+              <legend className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
+                {t("support.question")}
+              </legend>
+              <label className="flex cursor-pointer items-center gap-3 text-sm">
+                <input
+                  type="radio"
+                  name="support"
+                  checked={!withSupport}
+                  onChange={() => setWithSupport(false)}
+                  className="accent-foreground"
+                />
+                <span>{t("support.without")}</span>
+              </label>
+              <label className="flex cursor-pointer items-center gap-3 text-sm">
+                <input
+                  type="radio"
+                  name="support"
+                  checked={withSupport}
+                  onChange={() => setWithSupport(true)}
+                  className="accent-foreground"
+                />
+                <span>
+                  {t("support.with")} — {product.support.name}
+                  {parsePrice(product.support.price) > 0
+                    ? ` (+${formatTND(product.support.price)})`
+                    : ""}
+                </span>
+              </label>
+            </fieldset>
+          )}
 
           <button
             type="button"
@@ -165,7 +237,7 @@ function ProductPage() {
             <p className="text-[10px] uppercase tracking-[0.5em] text-muted-foreground">
               {t("product.more")}
             </p>
-            <Link to="/" className="text-[10px] uppercase tracking-[0.3em] hover:text-foreground">
+            <Link to="/drops" className="text-[10px] uppercase tracking-[0.3em] hover:text-foreground">
               {t("product.viewAll")}
             </Link>
           </div>

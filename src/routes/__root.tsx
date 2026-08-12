@@ -17,7 +17,7 @@ function NotFoundComponent() {
         </p>
         <div className="mt-8">
           <Link
-            to="/"
+            to="/drops"
             className="inline-flex items-center justify-center border hairline px-6 py-3 text-xs uppercase tracking-[0.3em] text-foreground transition-colors hover:bg-foreground hover:text-background"
           >
             Return to drop

@@ -1,5 +1,7 @@
+import { useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import type { Product } from "@/lib/products";
+import { pickHoverImage, productImages } from "@/lib/products";
 import { formatTND } from "@/lib/price";
 import { useT } from "@/hooks/use-language";
 
@@ -13,18 +15,37 @@ export function ProductCard({
   comingSoon?: boolean;
 }) {
   const t = useT();
+  const images = productImages(product);
+  const [displaySrc, setDisplaySrc] = useState(images[0] ?? product.image);
+  const hoverSrcRef = useRef<string | null>(null);
+
+  const onEnter = () => {
+    if (comingSoon) return;
+    const hover = pickHoverImage(images);
+    hoverSrcRef.current = hover;
+    if (hover) setDisplaySrc(hover);
+  };
+
+  const onLeave = () => {
+    hoverSrcRef.current = null;
+    setDisplaySrc(images[0] ?? product.image);
+  };
 
   const inner = (
     <>
-      <div className="relative aspect-[4/5] overflow-hidden bg-card vignette">
+      <div
+        className="relative aspect-[3/4] overflow-hidden bg-card vignette sm:aspect-[4/5]"
+        onMouseEnter={onEnter}
+        onMouseLeave={onLeave}
+      >
         <img
-          src={product.image}
+          src={displaySrc}
           alt={`${product.name} fabric flag hanging on a wall`}
           width={1024}
           height={1280}
           loading="lazy"
-          className={`h-full w-full object-cover transition-transform duration-[1400ms] ease-out ${
-            comingSoon ? "scale-105 blur-xl grayscale" : "group-hover:scale-110"
+          className={`h-full w-full object-cover transition-[transform,opacity] duration-700 ease-out ${
+            comingSoon ? "scale-105 blur-xl grayscale" : "group-hover:scale-105"
           }`}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-background/40 via-transparent to-transparent opacity-60 transition-opacity duration-700 group-hover:opacity-30" />
@@ -54,16 +75,16 @@ export function ProductCard({
           </>
         )}
       </div>
-      <div className="mt-4 flex items-start justify-between gap-4">
+      <div className="mt-4 flex items-start justify-between gap-3 sm:gap-4">
         <div>
-          <h3 className={`font-display text-xl ${comingSoon ? "text-muted-foreground" : ""}`}>
+          <h3 className={`font-display text-lg sm:text-xl ${comingSoon ? "text-muted-foreground" : ""}`}>
             {comingSoon ? "—" : product.name}
           </h3>
-          <p className="mt-1 text-[11px] uppercase tracking-[0.25em] text-muted-foreground">
+          <p className="mt-1 text-[10px] uppercase tracking-[0.25em] text-muted-foreground sm:text-[11px]">
             {comingSoon ? t("drop.comingSoon") : product.label}
           </p>
         </div>
-        <p className={`font-display text-lg transition-colors ${
+        <p className={`font-display text-base transition-colors sm:text-lg ${
           comingSoon ? "text-muted-foreground/50" : "text-muted-foreground group-hover:text-foreground"
         }`}>
           {comingSoon ? "—" : formatTND(product.price)}

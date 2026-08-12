@@ -23,7 +23,7 @@ export function SiteFooter() {
             <p className="text-foreground">{t("footer.index")}</p>
             <ul className="mt-4 space-y-3">
               <li>
-                <Link to="/" className="transition-colors hover:text-foreground">
+                <Link to="/drops" className="transition-colors hover:text-foreground">
                   {t("nav.drop")}
                 </Link>
               </li>

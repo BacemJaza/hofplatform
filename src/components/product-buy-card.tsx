@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import type { Product } from "@/lib/products";
-import { formatTND, toTND } from "@/lib/price";
+import { pickHoverImage, productImages } from "@/lib/products";
+import { formatTND, parsePrice } from "@/lib/price";
 import { useCart } from "@/stores/cart-store";
 import { useT } from "@/hooks/use-language";
 
@@ -23,11 +24,25 @@ export function ProductBuyCard({ product }: { product: Product }) {
   const existing = items.find((i) => i.slug === product.slug);
   const [qty, setLocalQty] = useState<number>(existing?.qty ?? 1);
 
+  const images = productImages(product);
+  const [displaySrc, setDisplaySrc] = useState(images[0] ?? product.image);
+  const hoverSrcRef = useRef<string | null>(null);
+
+  const onEnter = () => {
+    const hover = pickHoverImage(images);
+    hoverSrcRef.current = hover;
+    if (hover) setDisplaySrc(hover);
+  };
+
+  const onLeave = () => {
+    hoverSrcRef.current = null;
+    setDisplaySrc(images[0] ?? product.image);
+  };
+
   const dec = () => setLocalQty((q) => Math.max(1, q - 1));
   const inc = () => setLocalQty((q) => Math.min(20, q + 1));
 
-  const unitPrice = toTND(product.price);
-  const lineTotal = unitPrice * qty;
+  const lineTotal = parsePrice(product.price) * qty;
 
   const onBuy = () => {
     // Replace any prior cart state for this slug with the chosen qty.
@@ -47,17 +62,19 @@ export function ProductBuyCard({ product }: { product: Product }) {
         params={{ slug: product.slug }}
         className="group block"
         aria-label={`${product.name} — view details`}
+        onMouseEnter={onEnter}
+        onMouseLeave={onLeave}
       >
-        <div className="relative aspect-[4/5] overflow-hidden bg-card vignette">
+        <div className="relative aspect-[3/4] overflow-hidden bg-card vignette sm:aspect-[4/5]">
           <img
-            src={product.image}
+            src={displaySrc}
             alt={`${product.name} fabric flag hanging on a wall`}
             width={1024}
             height={1280}
             loading="lazy"
-            className="h-full w-full object-cover transition-transform duration-[1400ms] ease-out group-hover:scale-105"
+            className="h-full w-full object-cover transition-[transform,opacity] duration-700 ease-out group-hover:scale-105"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-background/40 via-transparent to-transparent opacity-60 transition-opacity duration-700 group-hover:opacity-30" />
+          <div className="absolute inset-0 from-background/40 via-transparent to-transparent opacity-60 transition-opacity duration-700 group-hover:opacity-30" />
           <div className="absolute left-4 top-4 text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
             /01
           </div>
@@ -67,22 +84,22 @@ export function ProductBuyCard({ product }: { product: Product }) {
         </div>
       </Link>
 
-      <div className="mt-6 flex items-start justify-between gap-4">
+      <div className="mt-5 flex items-start justify-between gap-4 sm:mt-6">
         <div>
-          <h3 className="font-display text-2xl">{product.name}</h3>
-          <p className="mt-1 text-[11px] uppercase tracking-[0.25em] text-muted-foreground">
+          <h3 className="font-display text-xl sm:text-2xl">{product.name}</h3>
+          <p className="mt-1 text-[10px] uppercase tracking-[0.25em] text-muted-foreground sm:text-[11px]">
             {product.label}
           </p>
         </div>
-        <p className="font-display text-xl text-foreground">
+        <p className="font-display text-lg text-foreground sm:text-xl">
           {formatTND(product.price)}
         </p>
       </div>
 
       {/* Qty + Buy */}
-      <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-stretch">
+      <div className="mt-5 flex flex-col gap-3 sm:mt-6 sm:flex-row sm:items-stretch sm:gap-4">
         <div
-          className="flex items-center border hairline"
+          className="flex items-center justify-between border hairline sm:justify-start"
           aria-label="Quantity selector"
         >
           <button
@@ -111,13 +128,13 @@ export function ProductBuyCard({ product }: { product: Product }) {
         <button
           type="button"
           onClick={onBuy}
-          className="flex-1 whitespace-nowrap border hairline px-4 py-4 text-[11px] uppercase tracking-[0.3em] transition-colors hover:bg-foreground hover:text-background sm:px-8 sm:text-xs sm:tracking-[0.4em]"
+          className="flex-1 whitespace-nowrap border hairline px-4 py-4 text-[10px] uppercase tracking-[0.25em] transition-colors hover:bg-foreground hover:text-background sm:px-8 sm:text-xs sm:tracking-[0.4em]"
         >
-          {t("buy.cta")} — {lineTotal} TND
+          {t("buy.cta")} — {formatTND(lineTotal)}
         </button>
       </div>
 
-      <p className="mt-4 text-[10px] uppercase tracking-[0.4em] ember-text">
+      <p className="mt-4 text-[9px] uppercase tracking-[0.35em] ember-text sm:text-[10px] sm:tracking-[0.4em]">
         {t("cart.noRestock")}
       </p>
     </article>

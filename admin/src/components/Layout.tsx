@@ -6,6 +6,7 @@ const nav = [
   { to: "/products", label: "Products" },
   { to: "/orders", label: "Orders" },
   { to: "/messages", label: "Messages" },
+  { to: "/settings", label: "Settings" },
 ];
 
 export function Layout() {

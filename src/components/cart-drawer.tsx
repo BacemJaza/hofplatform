@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useCart } from "@/stores/cart-store";
 import { useEffect } from "react";
-import { formatTND, formatTotalTND } from "@/lib/price";
+import { formatTND } from "@/lib/price";
 import { useT } from "@/hooks/use-language";
 
 export function CartDrawer() {
@@ -57,7 +57,7 @@ export function CartDrawer() {
               {t("bag.emptyText")}
             </p>
             <Link
-              to="/"
+              to="/drops"
               onClick={() => setOpen(false)}
               className="mt-6 border hairline px-6 py-3 text-xs uppercase tracking-[0.3em] transition-colors hover:bg-foreground hover:text-background"
             >
@@ -87,6 +87,9 @@ export function CartDrawer() {
                         <p className="font-display text-lg">{it.name}</p>
                         <p className="mt-1 text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
                           {formatTND(it.price)}
+                          {it.withSupport && it.supportEnabled
+                            ? ` + ${it.supportName || t("support.label")}`
+                            : ""}
                         </p>
                       </div>
                       <div className="flex items-center justify-between">
@@ -128,10 +131,10 @@ export function CartDrawer() {
                 <p className="text-[10px] uppercase tracking-[0.4em] text-muted-foreground">
                   {t("checkout.subtotal")}
                 </p>
-                <p className="font-display text-2xl">{formatTotalTND(total())}</p>
+                <p className="font-display text-2xl">{formatTND(total())}</p>
               </div>
               <p className="mt-2 text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
-                {t("checkout.shippedFrom")}
+                {t("checkout.deliveryAtCheckout")}
               </p>
               <Link
                 to="/checkout"

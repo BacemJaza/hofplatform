@@ -1,12 +1,21 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useCart } from "@/stores/cart-store";
-import { formatTND, formatTotalTND } from "@/lib/price";
+import { formatTND, parsePrice } from "@/lib/price";
 import { useT } from "@/hooks/use-language";
 import { placeOrder } from "@/lib/orders.functions.server";
+import { getDeliveryFee } from "@/lib/settings.server";
+import { getActiveProducts } from "@/lib/products.server";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/checkout")({
+  loader: async () => {
+    const [deliveryFee, products] = await Promise.all([
+      getDeliveryFee(),
+      getActiveProducts(),
+    ]);
+    return { deliveryFee, products };
+  },
   head: () => ({
     meta: [
       { title: "Checkout — HOUSE OF FLAGS" },
@@ -35,7 +44,8 @@ const PHRASES = [
 
 function Checkout() {
   const navigate = useNavigate();
-  const { items, total, clear } = useCart();
+  const { deliveryFee, products } = Route.useLoaderData();
+  const { items, subtotal, clear, setWithSupport, lineUnitPrice, syncCatalog } = useCart();
   const t = useT();
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -49,6 +59,13 @@ function Checkout() {
     address: "",
     notes: "",
   });
+
+  useEffect(() => {
+    syncCatalog(products);
+  }, [products, syncCatalog]);
+
+  const itemsSubtotal = subtotal();
+  const orderTotal = itemsSubtotal + deliveryFee;
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,7 +81,11 @@ function Checkout() {
           city: form.city.trim(),
           address: form.address.trim(),
           notes: form.notes.trim(),
-          items: items.map((i) => ({ slug: i.slug, qty: i.qty })),
+          items: items.map((i) => ({
+            slug: i.slug,
+            qty: i.qty,
+            withSupport: Boolean(i.withSupport),
+          })),
         },
       });
 
@@ -117,7 +138,7 @@ function Checkout() {
             </p>
             <button
               type="button"
-              onClick={() => navigate({ to: "/" })}
+              onClick={() => navigate({ to: "/drops" })}
               className="border hairline px-10 py-4 text-xs uppercase tracking-[0.4em] transition-colors hover:bg-foreground hover:text-background"
             >
               {t("checkout.back")}
@@ -140,7 +161,7 @@ function Checkout() {
             {t("checkout.emptyText")}
           </p>
           <Link
-            to="/"
+            to="/drops"
             className="mt-10 border hairline px-8 py-4 text-xs uppercase tracking-[0.4em] transition-colors hover:bg-foreground hover:text-background"
           >
             {t("hero.cta")}
@@ -153,7 +174,6 @@ function Checkout() {
   return (
     <article className="pt-28">
       <div className="mx-auto grid max-w-[1400px] grid-cols-1 gap-16 px-6 py-16 md:grid-cols-[1.2fr_1fr] md:px-10 md:py-24">
-        {/* Form */}
         <div>
           <p className="text-[10px] uppercase tracking-[0.5em] text-muted-foreground">
             {t("checkout.tag")}
@@ -212,7 +232,7 @@ function Checkout() {
               disabled={submitting}
               className="mt-4 w-full border hairline py-5 text-xs uppercase tracking-[0.4em] transition-colors hover:bg-foreground hover:text-background disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {submitting ? "Sending…" : `${t("checkout.place")} — ${formatTotalTND(total())}`}
+              {submitting ? "Sending…" : `${t("checkout.place")} — ${formatTND(orderTotal)}`}
             </button>
             <p className="text-center text-[10px] uppercase tracking-[0.4em] ember-text">
               {t("checkout.soon")}
@@ -220,7 +240,6 @@ function Checkout() {
           </form>
         </div>
 
-        {/* Summary */}
         <aside className="md:sticky md:top-28 md:self-start">
           <div className="border hairline">
             <div className="border-b hairline px-6 py-5">
@@ -229,29 +248,72 @@ function Checkout() {
               </p>
             </div>
             <ul className="divide-y hairline">
-              {items.map((it) => (
-                <li key={it.slug} className="flex gap-4 px-6 py-5">
-                  <div className="h-20 w-16 shrink-0 overflow-hidden bg-card vignette">
-                    <img src={it.image} alt={it.name} className="h-full w-full object-cover" />
-                  </div>
-                  <div className="flex flex-1 items-center justify-between">
-                    <div>
-                      <p className="font-display text-lg">{it.name}</p>
-                      <p className="mt-1 text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
-                        Qty {it.qty}
-                      </p>
+              {items.map((it) => {
+                const catalog = products.find((p) => p.slug === it.slug);
+                const supportEnabled = catalog?.support.enabled ?? it.supportEnabled;
+                const supportName = catalog?.support.name ?? it.supportName;
+                const supportPrice = catalog?.support.price ?? it.supportPrice;
+
+                return (
+                  <li key={it.slug} className="space-y-4 px-6 py-5">
+                    <div className="flex gap-4">
+                      <div className="h-20 w-16 shrink-0 overflow-hidden bg-card vignette">
+                        <img src={it.image} alt={it.name} className="h-full w-full object-cover" />
+                      </div>
+                      <div className="flex flex-1 items-center justify-between gap-3">
+                        <div>
+                          <p className="font-display text-lg">{it.name}</p>
+                          <p className="mt-1 text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
+                            Qty {it.qty}
+                          </p>
+                        </div>
+                        <p className="text-xs">{formatTND(lineUnitPrice(it) * it.qty)}</p>
+                      </div>
                     </div>
-                    <p className="text-xs">{formatTND(it.price)}</p>
-                  </div>
-                </li>
-              ))}
+
+                    {supportEnabled && (
+                      <fieldset className="space-y-2 border-t hairline pt-4">
+                        <legend className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
+                          {t("support.question")}
+                        </legend>
+                        <label className="flex cursor-pointer items-center gap-2 text-xs">
+                          <input
+                            type="radio"
+                            name={`support-${it.slug}`}
+                            checked={!it.withSupport}
+                            onChange={() => setWithSupport(it.slug, false)}
+                            className="accent-foreground"
+                          />
+                          <span>{t("support.without")}</span>
+                        </label>
+                        <label className="flex cursor-pointer items-center gap-2 text-xs">
+                          <input
+                            type="radio"
+                            name={`support-${it.slug}`}
+                            checked={it.withSupport}
+                            onChange={() => setWithSupport(it.slug, true)}
+                            className="accent-foreground"
+                          />
+                          <span>
+                            {t("support.with")}
+                            {supportName ? ` — ${supportName}` : ""}
+                            {parsePrice(supportPrice) > 0
+                              ? ` (+${formatTND(supportPrice)})`
+                              : ""}
+                          </span>
+                        </label>
+                      </fieldset>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
             <div className="space-y-3 border-t hairline px-6 py-5 text-xs">
-              <Row label={t("checkout.subtotal")} value={formatTotalTND(total())} />
-              <Row label="Shipping" value={t("checkout.shipping")} />
+              <Row label={t("checkout.subtotal")} value={formatTND(itemsSubtotal)} />
+              <Row label={t("checkout.delivery")} value={formatTND(deliveryFee)} />
               <div className="mt-4 flex items-baseline justify-between border-t hairline pt-4">
                 <p className="text-[10px] uppercase tracking-[0.4em]">{t("checkout.total")}</p>
-                <p className="font-display text-3xl">{formatTotalTND(total())}</p>
+                <p className="font-display text-3xl">{formatTND(orderTotal)}</p>
               </div>
             </div>
           </div>

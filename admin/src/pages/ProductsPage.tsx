@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { api, ApiError } from "@/lib/api";
 import type { Product } from "@/lib/types";
-import { formatDate, formatEur } from "@/lib/format";
+import { formatDate, formatTnd } from "@/lib/format";
 import {
   Badge,
   Button,
@@ -119,9 +119,9 @@ export function ProductsPage() {
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
                       <div className="h-10 w-10 shrink-0 overflow-hidden rounded bg-background">
-                        {product.image_url ? (
+                        {(product.image_urls?.[0] || product.image_url) ? (
                           <img
-                            src={product.image_url}
+                            src={product.image_urls?.[0] || product.image_url}
                             alt=""
                             className="h-full w-full object-cover"
                             onError={(e) => {
@@ -137,7 +137,7 @@ export function ProductsPage() {
                     </div>
                   </td>
                   <td className="px-4 py-3 font-mono text-xs">{product.slug}</td>
-                  <td className="px-4 py-3">{formatEur(product.price_eur)}</td>
+                  <td className="px-4 py-3">{formatTnd(product.price_eur)}</td>
                   <td className="px-4 py-3">
                     <Badge tone={product.is_active ? "success" : "neutral"}>
                       {product.is_active ? "Active" : "Inactive"}

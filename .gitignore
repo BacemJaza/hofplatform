@@ -18,6 +18,7 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+admin/api/index.js
 .output
 .vinxi
 .tanstack/**
@@ -38,3 +39,4 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+.vercel
