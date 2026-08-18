@@ -21,16 +21,16 @@ export const Route = createFileRoute("/")({
   },
   head: () => ({
     meta: [
-      { title: "HOUSE OF FLAGS — Drop 001 / Fabric art for identity" },
+      { title: "HOUSE OF FLAGS — Drop 001 / Fabric flags made in Tunis" },
       {
         name: "description",
         content:
-          "HOUSE OF FLAGS Drop 001 — limited fabric wall flags from Tunis. Statements, not decoration. Once sold out, never returns.",
+          "HOUSE OF FLAGS Drop 001 — limited fabric wall flags made in Tunis. Real cotton. Made to say something. Once sold out, never returns.",
       },
       { property: "og:title", content: "HOUSE OF FLAGS — Drop 001" },
       {
         property: "og:description",
-        content: "Limited fabric wall flags. Statements you hang on your wall.",
+        content: "Limited fabric wall flags from Tunis. Something to actually hang.",
       },
       { property: "og:image", content: heroFlag },
       { property: "twitter:image", content: heroFlag },
@@ -58,6 +58,8 @@ export const Route = createFileRoute("/")({
   ),
   component: Index,
 });
+
+type Slide = { src: string; alt: string; labelKey: "hero.slide1" | "hero.slide2" | "hero.slide3" | "hero.slide4" | "hero.slide5" };
 
 function Index() {
   const t = useT();
@@ -139,7 +141,7 @@ function Index() {
         </div>
       </section>
 
-      {/* PHILOSOPHY BANNER — punchy intro */}
+      {/* PHILOSOPHY BANNER */}
       <section className="border-b hairline">
         <div className="mx-auto max-w-[1200px] px-6 py-20 text-center md:px-10 md:py-28">
           <p className="text-[10px] uppercase tracking-[0.5em] ember-text">
@@ -164,9 +166,13 @@ function Index() {
             </p>
             <h2 className="mt-6 font-display text-6xl md:text-8xl">{t("drop.title")}</h2>
           </div>
+          {products.length !== 0 ? (
           <p className="max-w-sm text-sm leading-relaxed text-muted-foreground">
-            {t("drop.intro")}
+          {t("drop.intro")}
           </p>
+          ) :(
+          <></>
+          )}
         </div>
 
         {products.length === 0 ? (
@@ -227,20 +233,6 @@ function Index() {
           <div className="flex flex-col justify-center gap-8 text-sm leading-relaxed text-muted-foreground">
             <p>{t("system.p1")}</p>
             <p>{t("system.p2")}</p>
-            <div className="grid grid-cols-3 gap-6 pt-6">
-              <div>
-                <p className="font-display text-3xl text-foreground">1</p>
-                <p className="mt-2 text-[10px] uppercase tracking-[0.3em]">{t("system.pieces")}</p>
-              </div>
-              <div>
-                <p className="font-display text-3xl text-foreground">50</p>
-                <p className="mt-2 text-[10px] uppercase tracking-[0.3em]">{t("system.flags")}</p>
-              </div>
-              <div>
-                <p className="font-display text-3xl ember-text">0</p>
-                <p className="mt-2 text-[10px] uppercase tracking-[0.3em]">{t("system.restocks")}</p>
-              </div>
-            </div>
           </div>
         </div>
       </section>

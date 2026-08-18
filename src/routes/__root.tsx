@@ -37,13 +37,13 @@ export const Route = createRootRoute({
       {
         name: "description",
         content:
-          "HOUSE OF FLAGS — premium fabric wall flags. Limited drops. Statements you hang on your wall. No restocks.",
+          "HOUSE OF FLAGS — premium fabric wall flags. Limited drops. Statements you hang on your wall. Limited restocks.",
       },
       { name: "author", content: "HOUSE OF FLAGS" },
       { property: "og:title", content: "HOUSE OF FLAGS — Fabric art for identity" },
       {
         property: "og:description",
-        content: "Limited fabric wall flags. Drop 001 out now. No restocks.",
+        content: "Limited fabric wall flags. Drop 001 out now. Limited restocks.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

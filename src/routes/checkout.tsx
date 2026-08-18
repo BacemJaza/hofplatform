@@ -22,7 +22,7 @@ export const Route = createFileRoute("/checkout")({
       {
         name: "description",
         content:
-          "Complete your HOUSE OF FLAGS order. Limited fabric flags shipped from Tunis. No restocks.",
+          "Complete your HOUSE OF FLAGS order. Limited fabric flags shipped from Tunis. Limited restocks.",
       },
       { property: "og:title", content: "Checkout — HOUSE OF FLAGS" },
       {
@@ -70,6 +70,54 @@ function Checkout() {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (submitting) return;
+
+    // Check for out-of-stock items or insufficient stock
+    const outOfStockItems: typeof items = [];
+    const insufficientStockItems: typeof items = [];
+
+    items.forEach((item) => {
+      const product = products.find((p) => p.slug === item.slug);
+      if (!product) return;
+
+      if (product.quantity === 0) {
+        outOfStockItems.push(item);
+      } else if (item.qty > product.quantity) {
+        insufficientStockItems.push(item);
+      }
+    });
+
+    // If any items have insufficient stock, redirect to preorder
+    if (insufficientStockItems.length > 0) {
+      const insufficientNames = insufficientStockItems
+        .map((item) => {
+          const product = products.find((p) => p.slug === item.slug);
+          return product?.name || item.slug;
+        })
+        .join(", ");
+
+      toast.error(t("checkout.exceedsAvailable"));
+      
+      // Redirect to preorder with first insufficient item
+      if (insufficientStockItems[0]) {
+        navigate({ to: "/pre-order", search: { slug: insufficientStockItems[0].slug } });
+      }
+      return;
+    }
+
+    if (outOfStockItems.length > 0) {
+      const outOfStockNames = outOfStockItems
+        .map((item) => {
+          const product = products.find((p) => p.slug === item.slug);
+          return product?.name || item.slug;
+        })
+        .join(", ");
+
+      toast.error(
+        `${outOfStockNames} ${outOfStockItems.length > 1 ? "are" : "is"} out of stock. Please use Pre-Order instead.`,
+      );
+      return;
+    }
+
     setSubmitting(true);
 
     try {
@@ -253,6 +301,7 @@ function Checkout() {
                 const supportEnabled = catalog?.support.enabled ?? it.supportEnabled;
                 const supportName = catalog?.support.name ?? it.supportName;
                 const supportPrice = catalog?.support.price ?? it.supportPrice;
+                const isOutOfStock = catalog && catalog.quantity === 0;
 
                 return (
                   <li key={it.slug} className="space-y-4 px-6 py-5">
@@ -266,6 +315,11 @@ function Checkout() {
                           <p className="mt-1 text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
                             Qty {it.qty}
                           </p>
+                          {isOutOfStock && (
+                            <p className="mt-2 text-[9px] uppercase tracking-[0.3em] text-destructive">
+                              ⚠️ Out of stock — use Pre-Order
+                            </p>
+                          )}
                         </div>
                         <p className="text-xs">{formatTND(lineUnitPrice(it) * it.qty)}</p>
                       </div>

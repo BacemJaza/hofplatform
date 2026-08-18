@@ -70,6 +70,7 @@ export const api = {
       name: string;
       label: string;
       price_eur: number;
+      quantity: number;
       image_urls: string[];
       story: string;
       tags: string[];
@@ -89,6 +90,7 @@ export const api = {
         name: string;
         label: string;
         price_eur: number;
+        quantity: number;
         image_urls: string[];
         story: string;
         tags: string[];
@@ -131,6 +133,18 @@ export const api = {
       }),
     delete: (id: string) =>
       request<{ ok: true }>(`/api/orders/${id}`, { method: "DELETE" }),
+  },
+
+  preOrders: {
+    list: () => request<{ preOrders: import("./types").PreOrder[] }>("/api/pre-orders"),
+    get: (id: string) =>
+      request<{ preOrder: import("./types").PreOrder }>(`/api/pre-orders/${id}`),
+    delete: (id: string) =>
+      request<{ ok: true }>(`/api/pre-orders/${id}`, { method: "DELETE" }),
+    activate: (id: string) =>
+      request<{ ok: true; order: import("./types").Order }>(`/api/pre-orders/${id}/activate`, {
+        method: "POST",
+      }),
   },
 
   messages: {

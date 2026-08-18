@@ -7,6 +7,7 @@ export type ProductRow = {
   name: string;
   label: string;
   price_eur: number;
+  quantity: number;
   image_url: string;
   image_urls: string[];
   story: string;
@@ -57,6 +58,33 @@ export type MessageRow = {
   full_name: string;
   email: string;
   notes: string;
+  created_at: string;
+};
+
+export type PreOrderItem = {
+  slug: string;
+  qty: number;
+  unit_price_tnd: number;
+  line_total_tnd: number;
+  with_support?: boolean;
+  support_name?: string | null;
+  support_unit_price_tnd?: number;
+};
+
+export type PreOrderRow = {
+  id: string;
+  pre_order_ref: string;
+  customer_name: string;
+  email: string;
+  phone: string;
+  city: string;
+  address: string;
+  notes: string | null;
+  items: PreOrderItem[];
+  total: number;
+  delivery_fee: number;
+  currency: string;
+  status: string;
   created_at: string;
 };
 

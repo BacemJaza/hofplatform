@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { Product } from "@/lib/products";
+import { canPreOrder, maxPurchasableQty } from "@/lib/products";
 import { parsePrice } from "@/lib/price";
 
 export type CartItem = {
@@ -9,6 +10,7 @@ export type CartItem = {
   price: string;
   image: string;
   qty: number;
+  isPreOrder: boolean;
   withSupport: boolean;
   supportEnabled: boolean;
   supportName: string;
@@ -40,6 +42,7 @@ function toCartItem(p: Product, qty: number, withSupport = false): CartItem {
     price: p.price,
     image: p.image,
     qty,
+    isPreOrder: canPreOrder(p),
     withSupport: p.support.enabled ? withSupport : false,
     supportEnabled: p.support.enabled,
     supportName: p.support.name,
@@ -65,12 +68,14 @@ export const useCart = create<CartState>()(
           const withSupport = opts?.withSupport ?? false;
           const existing = state.items.find((i) => i.slug === p.slug);
           if (existing) {
+            const nextQty = Math.min(maxPurchasableQty(p), existing.qty + 1);
             return {
               items: state.items.map((i) =>
                 i.slug === p.slug
                   ? {
                       ...i,
-                      qty: i.qty + 1,
+                      qty: nextQty,
+                      isPreOrder: canPreOrder(p),
                       // Refresh support metadata from catalog; keep choice unless newly enabled
                       supportEnabled: p.support.enabled,
                       supportName: p.support.name,
@@ -99,7 +104,11 @@ export const useCart = create<CartState>()(
       setQty: (slug, qty) =>
         set((state) => ({
           items: state.items
-            .map((i) => (i.slug === slug ? { ...i, qty } : i))
+            .map((i) => {
+              if (i.slug !== slug) return i;
+              const cap = i.isPreOrder ? 20 : Math.min(20, qty);
+              return { ...i, qty: Math.max(1, Math.min(cap, qty)) };
+            })
             .filter((i) => i.qty > 0),
         })),
       setWithSupport: (slug, withSupport) =>
@@ -112,19 +121,27 @@ export const useCart = create<CartState>()(
         })),
       syncCatalog: (products) =>
         set((state) => ({
-          items: state.items.map((item) => {
+          items: state.items.flatMap((item) => {
             const product = products.find((p) => p.slug === item.slug);
-            if (!product) return item;
-            return {
-              ...item,
-              name: product.name,
-              price: product.price,
-              image: product.image,
-              supportEnabled: product.support.enabled,
-              supportName: product.support.name,
-              supportPrice: product.support.price,
-              withSupport: product.support.enabled ? item.withSupport : false,
-            };
+            if (!product) return [item];
+            const isPreOrder = canPreOrder(product);
+            if (!isPreOrder && product.quantity === 0) return [];
+            const qty = isPreOrder ? item.qty : Math.min(item.qty, maxPurchasableQty(product));
+            if (qty <= 0) return [];
+            return [
+              {
+                ...item,
+                qty,
+                isPreOrder,
+                name: product.name,
+                price: product.price,
+                image: product.image,
+                supportEnabled: product.support.enabled,
+                supportName: product.support.name,
+                supportPrice: product.support.price,
+                withSupport: product.support.enabled ? item.withSupport : false,
+              },
+            ];
           }),
         })),
       clear: () => set({ items: [] }),
@@ -137,22 +154,25 @@ export const useCart = create<CartState>()(
     }),
     {
       name: "house-of-flags-cart",
-      version: 2,
-      migrate: (persisted) => {
+      version: 3,
+      migrate: (persisted, version) => {
         const state = persisted as { items?: Array<Partial<CartItem>> };
-        return {
-          items: (state.items ?? []).map((i) => ({
-            slug: i.slug ?? "",
-            name: i.name ?? "",
-            price: i.price ?? "0",
-            image: i.image ?? "",
-            qty: i.qty ?? 1,
-            withSupport: Boolean(i.withSupport),
-            supportEnabled: Boolean(i.supportEnabled),
-            supportName: i.supportName ?? "",
-            supportPrice: i.supportPrice ?? "0",
-          })),
-        };
+        const items = (state.items ?? []).map((i) => ({
+          slug: i.slug ?? "",
+          name: i.name ?? "",
+          price: i.price ?? "0",
+          image: i.image ?? "",
+          qty: i.qty ?? 1,
+          isPreOrder: Boolean(i.isPreOrder),
+          withSupport: Boolean(i.withSupport),
+          supportEnabled: Boolean(i.supportEnabled),
+          supportName: i.supportName ?? "",
+          supportPrice: i.supportPrice ?? "0",
+        }));
+        if (version < 3) {
+          return { items };
+        }
+        return { items };
       },
     },
   ),

@@ -18,6 +18,7 @@ type FormState = {
   name: string;
   label: string;
   price_eur: string;
+  quantity: string;
   image_urls: string[];
   story: string;
   tags: string;
@@ -32,6 +33,7 @@ const empty: FormState = {
   name: "",
   label: "",
   price_eur: "",
+  quantity: "0",
   image_urls: [""],
   story: "",
   tags: "",
@@ -70,6 +72,7 @@ export function ProductFormPage() {
           name: product.name,
           label: product.label,
           price_eur: String(product.price_eur),
+          quantity: String(product.quantity),
           image_urls: normalizeLoadedUrls(product),
           story: product.story,
           tags: joinTags(product.tags),
@@ -138,6 +141,7 @@ export function ProductFormPage() {
       name: form.name.trim(),
       label: form.label.trim(),
       price_eur: Number(form.price_eur),
+      quantity: Number(form.quantity),
       image_urls,
       story: form.story.trim(),
       tags: parseTags(form.tags),
@@ -205,6 +209,17 @@ export function ProductFormPage() {
               />
             </Field>
           </div>
+
+          <Field label="Stock quantity">
+            <Input
+              type="number"
+              min="0"
+              step="1"
+              value={form.quantity}
+              onChange={(e) => set("quantity", e.target.value)}
+              required
+            />
+          </Field>
 
           <div>
             <div className="mb-2 flex items-center justify-between">

@@ -1,18 +1,17 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { getExternalSupabaseAdmin } from "@/integrations/supabase/external-admin.server";
-import { getCanonicalProductPricing, generateOrderRef } from "../server/orders.server";
+import { generatePreOrderRef } from "../server/orders.server";
 import { fetchDeliveryFeeTND } from "@/lib/settings.server";
-// Resend order emails disabled for now.
-// import { sendOrderEmails } from "../server/notifications.server";
+import { getCanonicalProductPricing } from "../server/orders.server";
 
-const orderEmailDeduplicationWindowMs = 15_000;
-const recentOrderEmailRequests = new Map<
+const preOrderEmailDeduplicationWindowMs = 15_000;
+const recentPreOrderEmailRequests = new Map<
   string,
-  { orderRef: string; total: number; createdAt: number }
+  { preOrderRef: string; total: number; createdAt: number }
 >();
 
-function getOrderEmailDeduplicationKey(
+function getPreOrderEmailDeduplicationKey(
   data: {
     email: string;
     phone: string;
@@ -26,7 +25,7 @@ function getOrderEmailDeduplicationKey(
   return `${data.email.toLowerCase()}:${data.phone}:${itemKey}:${total}`;
 }
 
-const orderSchema = z.object({
+const preOrderSchema = z.object({
   name: z.string().trim().min(1).max(120),
   email: z.string().trim().email().max(255),
   phone: z.string().trim().min(4).max(40),
@@ -45,11 +44,11 @@ const orderSchema = z.object({
     .max(20),
 });
 
-export const placeOrder = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) => orderSchema.parse(input))
+export const placePreOrder = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => preOrderSchema.parse(input))
   .handler(async ({ data }) => {
     // Recompute items + total server-side from the canonical catalog + settings.
-    // Anything from the client (price, total, delivery fee, status) is discarded.
+    // Unlike orders, pre-orders do NOT reduce stock.
     const validatedItems: Array<{
       slug: string;
       qty: number;
@@ -64,19 +63,10 @@ export const placeOrder = createServerFn({ method: "POST" })
     for (const item of data.items) {
       const pricing = await getCanonicalProductPricing(item.slug);
       if (pricing == null) {
-        return { ok: false as const, error: "Unknown product in cart." };
+        return { ok: false as const, error: "Unknown product in pre-order." };
       }
 
-      if (pricing.quantity < item.qty) {
-        return {
-          ok: false as const,
-          error:
-            pricing.quantity === 0
-              ? `${item.slug} is out of stock. Use pre-order instead.`
-              : `Not enough stock for ${item.slug}. Only ${pricing.quantity} left.`,
-        };
-      }
-
+      // Pre-orders allow even if out of stock
       const wantsSupport = Boolean(item.withSupport);
       if (wantsSupport && !pricing.supportEnabled) {
         return { ok: false as const, error: "Support is not available for one of the products." };
@@ -102,7 +92,7 @@ export const placeOrder = createServerFn({ method: "POST" })
     const deliveryFee = await fetchDeliveryFeeTND();
     const total = subtotal + deliveryFee;
 
-    const emailDeduplicationKey = getOrderEmailDeduplicationKey(
+    const emailDeduplicationKey = getPreOrderEmailDeduplicationKey(
       {
         email: data.email,
         phone: data.phone,
@@ -115,35 +105,35 @@ export const placeOrder = createServerFn({ method: "POST" })
       total,
     );
     const now = Date.now();
-    const existingOrderRequest = recentOrderEmailRequests.get(emailDeduplicationKey);
+    const existingPreOrderRequest = recentPreOrderEmailRequests.get(emailDeduplicationKey);
 
     if (
-      existingOrderRequest &&
-      now - existingOrderRequest.createdAt < orderEmailDeduplicationWindowMs
+      existingPreOrderRequest &&
+      now - existingPreOrderRequest.createdAt < preOrderEmailDeduplicationWindowMs
     ) {
       return {
         ok: true as const,
-        orderRef: existingOrderRequest.orderRef,
-        total: existingOrderRequest.total,
+        preOrderRef: existingPreOrderRequest.preOrderRef,
+        total: existingPreOrderRequest.total,
       };
     }
 
-    const orderRef = generateOrderRef();
-    recentOrderEmailRequests.set(emailDeduplicationKey, {
-      orderRef,
+    const preOrderRef = generatePreOrderRef();
+    recentPreOrderEmailRequests.set(emailDeduplicationKey, {
+      preOrderRef,
       total,
       createdAt: now,
     });
     setTimeout(() => {
-      recentOrderEmailRequests.delete(emailDeduplicationKey);
-    }, orderEmailDeduplicationWindowMs);
+      recentPreOrderEmailRequests.delete(emailDeduplicationKey);
+    }, preOrderEmailDeduplicationWindowMs);
 
     let insertErrorMessage: string | null = null;
     let tableMissing = false;
 
     try {
-      const { error } = await getExternalSupabaseAdmin().from("orders").insert({
-        order_ref: orderRef,
+      const { error } = await getExternalSupabaseAdmin().from("pre_orders").insert({
+        pre_order_ref: preOrderRef,
         customer_name: data.name,
         email: data.email,
         phone: data.phone,
@@ -165,45 +155,32 @@ export const placeOrder = createServerFn({ method: "POST" })
       tableMissing =
         insertErrorMessage.includes("Could not find the table") ||
         insertErrorMessage.includes("schema cache") ||
-        insertErrorMessage.includes('relation "public.orders"') ||
+        insertErrorMessage.includes('relation "public.pre_orders"') ||
         insertErrorMessage.includes("does not exist");
 
       if (!tableMissing) {
-        console.error("placeOrder insert failed:", insertErrorMessage);
+        console.error("placePreOrder insert failed:", insertErrorMessage);
         const misconfigured =
           insertErrorMessage.includes("not configured") ||
           insertErrorMessage.includes("Missing Supabase");
         return {
           ok: false as const,
           error: misconfigured
-            ? "Checkout is temporarily unavailable. Try again later."
-            : "Could not save order.",
+            ? "Pre-order system is temporarily unavailable. Try again later."
+            : "Could not save pre-order.",
         };
       }
 
-      console.error("orders table is unavailable.");
+      console.error("pre_orders table is unavailable.");
       return {
         ok: false as const,
-        error: "Could not save order.",
+        error: "Could not save pre-order.",
       };
     }
 
-    // Resend order emails disabled for now.
-    // try {
-    //   await sendOrderEmails({
-    //     orderRef,
-    //     customerName: data.name,
-    //     email: data.email,
-    //     phone: data.phone,
-    //     city: data.city,
-    //     address: data.address,
-    //     notes: data.notes ? data.notes : null,
-    //     items: validatedItems,
-    //     total,
-    //   });
-    // } catch (mailErr) {
-    //   console.error("sendOrderEmails threw unexpectedly:", mailErr);
-    // }
-
-    return { ok: true as const, orderRef, total, deliveryFee, subtotal };
+    return {
+      ok: true as const,
+      preOrderRef,
+      total,
+    };
   });

@@ -12,32 +12,12 @@ export function SiteFooter() {
   return (
     <footer className="border-t hairline mt-32">
       <div className="mx-auto max-w-[1600px] px-6 py-16 md:px-10">
-        <div className="grid grid-cols-1 gap-12 md:grid-cols-4">
+        <div className="grid grid-cols-1 gap-12 md:grid-cols-3">
           <div>
             <p className="font-display text-3xl tracking-tight">HOUSE OF FLAGS</p>
             <p className="mt-4 max-w-xs text-sm text-muted-foreground">
               {t("footer.tag")}
             </p>
-          </div>
-          <div className="text-xs uppercase tracking-[0.25em] text-muted-foreground">
-            <p className="text-foreground">{t("footer.index")}</p>
-            <ul className="mt-4 space-y-3">
-              <li>
-                <Link to="/drops" className="transition-colors hover:text-foreground">
-                  {t("nav.drop")}
-                </Link>
-              </li>
-              <li>
-                <Link to="/drops" className="transition-colors hover:text-foreground">
-                  {t("nav.drops")}
-                </Link>
-              </li>
-              {/*<li>
-                <Link to="/contact" className="transition-colors hover:text-foreground">
-                  {t("nav.contact")}
-                </Link>
-              </li>*/}
-            </ul>
           </div>
           <div className="text-xs uppercase tracking-[0.25em] text-muted-foreground">
             <p className="text-foreground">{t("footer.follow")}</p>

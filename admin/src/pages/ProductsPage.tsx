@@ -11,15 +11,17 @@ import {
   ErrorBanner,
   PageHeader,
   Spinner,
+  Input,
 } from "@/components/ui";
 
-type Filter = "all" | "active" | "inactive";
+type Filter = "all" | "active" | "inactive" | "in-stock" | "out-of-stock" | "available-pre-order";
 
 export function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [filter, setFilter] = useState<Filter>("all");
+  const [search, setSearch] = useState("");
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
 
@@ -40,10 +42,26 @@ export function ProductsPage() {
   }, []);
 
   const filtered = useMemo(() => {
-    if (filter === "active") return products.filter((p) => p.is_active);
-    if (filter === "inactive") return products.filter((p) => !p.is_active);
-    return products;
-  }, [products, filter]);
+    let result = products;
+
+    if (filter === "active") result = result.filter((p) => p.is_active);
+    else if (filter === "inactive") result = result.filter((p) => !p.is_active);
+    else if (filter === "in-stock") result = result.filter((p) => p.is_active && p.quantity > 0);
+    else if (filter === "out-of-stock") result = result.filter((p) => p.is_active && p.quantity === 0);
+    else if (filter === "available-pre-order") result = result.filter((p) => p.is_active && p.quantity === 0);
+
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      result = result.filter(
+        (p) =>
+          p.name.toLowerCase().includes(q) ||
+          p.slug.toLowerCase().includes(q) ||
+          p.label.toLowerCase().includes(q)
+      );
+    }
+
+    return result;
+  }, [products, filter, search]);
 
   const toggleActive = async (product: Product) => {
     try {
@@ -84,18 +102,36 @@ export function ProductsPage() {
 
       {error && <ErrorBanner message={error} />}
 
-      <div className="mb-4 flex gap-2">
-        {(["all", "active", "inactive"] as const).map((f) => (
-          <button
-            key={f}
-            onClick={() => setFilter(f)}
-            className={`rounded-full px-3 py-1 text-xs font-medium capitalize transition-colors ${
-              filter === f ? "bg-accent text-white" : "bg-background text-muted hover:text-foreground"
-            }`}
-          >
-            {f}
-          </button>
-        ))}
+      <div className="mb-4 space-y-3">
+        <div className="flex flex-wrap gap-2">
+          {(["all", "active", "inactive", "in-stock", "out-of-stock", "available-pre-order"] as const).map(
+            (f) => (
+              <button
+                key={f}
+                onClick={() => setFilter(f)}
+                className={`rounded-full px-3 py-1 text-xs font-medium capitalize transition-colors ${
+                  filter === f
+                    ? "bg-accent text-white"
+                    : "bg-background text-muted hover:text-foreground"
+                }`}
+              >
+                {f === "in-stock"
+                  ? "In Stock"
+                  : f === "out-of-stock"
+                    ? "Out of Stock"
+                    : f === "available-pre-order"
+                      ? "Available for Pre-Order"
+                      : f}
+              </button>
+            )
+          )}
+        </div>
+        <Input
+          placeholder="Search by name, slug, or label..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="max-w-sm"
+        />
       </div>
 
       {filtered.length === 0 ? (
@@ -108,6 +144,7 @@ export function ProductsPage() {
                 <th className="px-4 py-3 font-medium">Product</th>
                 <th className="px-4 py-3 font-medium">Slug</th>
                 <th className="px-4 py-3 font-medium">Price</th>
+                <th className="px-4 py-3 font-medium">Quantity</th>
                 <th className="px-4 py-3 font-medium">Status</th>
                 <th className="px-4 py-3 font-medium">Updated</th>
                 <th className="px-4 py-3 font-medium text-right">Actions</th>
@@ -139,8 +176,27 @@ export function ProductsPage() {
                   <td className="px-4 py-3 font-mono text-xs">{product.slug}</td>
                   <td className="px-4 py-3">{formatTnd(product.price_eur)}</td>
                   <td className="px-4 py-3">
-                    <Badge tone={product.is_active ? "success" : "neutral"}>
-                      {product.is_active ? "Active" : "Inactive"}
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">{product.quantity}</span>
+                      {product.quantity === 0 && <Badge tone="danger">Out</Badge>}
+                      {product.quantity > 0 && product.quantity <= 5 && <Badge tone="warning">Low</Badge>}
+                    </div>
+                  </td>
+                  <td className="px-4 py-3">
+                    <Badge
+                      tone={
+                        product.is_active
+                          ? product.quantity > 0
+                            ? "success"
+                            : "warning"
+                          : "neutral"
+                      }
+                    >
+                      {product.is_active
+                        ? product.quantity > 0
+                          ? "In Stock"
+                          : "Pre-Order"
+                        : "Inactive"}
                     </Badge>
                   </td>
                   <td className="px-4 py-3 text-xs text-muted">{formatDate(product.updated_at)}</td>

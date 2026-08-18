@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import type { Product } from "@/lib/products";
-import { pickHoverImage, productImages } from "@/lib/products";
+import { pickHoverImage, productImages, canPreOrder } from "@/lib/products";
 import { formatTND, parsePrice } from "@/lib/price";
 import { useCart } from "@/stores/cart-store";
 import { useT } from "@/hooks/use-language";
@@ -96,43 +96,53 @@ export function ProductBuyCard({ product }: { product: Product }) {
         </p>
       </div>
 
-      {/* Qty + Buy */}
-      <div className="mt-5 flex flex-col gap-3 sm:mt-6 sm:flex-row sm:items-stretch sm:gap-4">
-        <div
-          className="flex items-center justify-between border hairline sm:justify-start"
-          aria-label="Quantity selector"
+      {/* Qty + Buy or Pre-Order */}
+      {canPreOrder(product) ? (
+        <Link
+          to="/pre-order"
+          search={{ slug: product.slug }}
+          className="mt-5 block border hairline px-4 py-4 text-center text-[10px] uppercase tracking-[0.25em] transition-colors hover:bg-foreground hover:text-background sm:mt-6 sm:px-8 sm:text-xs sm:tracking-[0.4em]"
         >
+          Pre-Order — {formatTND(product.price)}
+        </Link>
+      ) : (
+        <div className="mt-5 flex flex-col gap-3 sm:mt-6 sm:flex-row sm:items-stretch sm:gap-4">
+          <div
+            className="flex items-center justify-between border hairline sm:justify-start"
+            aria-label="Quantity selector"
+          >
+            <button
+              type="button"
+              onClick={dec}
+              disabled={qty <= 1}
+              className="px-4 py-3 text-sm transition-colors hover:bg-foreground hover:text-background disabled:cursor-not-allowed disabled:opacity-40"
+              aria-label="Decrease quantity"
+            >
+              −
+            </button>
+            <span className="min-w-10 px-2 text-center font-display text-lg">
+              {qty}
+            </span>
+            <button
+              type="button"
+              onClick={inc}
+              disabled={qty >= 20}
+              className="px-4 py-3 text-sm transition-colors hover:bg-foreground hover:text-background disabled:cursor-not-allowed disabled:opacity-40"
+              aria-label="Increase quantity"
+            >
+              +
+            </button>
+          </div>
+
           <button
             type="button"
-            onClick={dec}
-            disabled={qty <= 1}
-            className="px-4 py-3 text-sm transition-colors hover:bg-foreground hover:text-background disabled:cursor-not-allowed disabled:opacity-40"
-            aria-label="Decrease quantity"
+            onClick={onBuy}
+            className="flex-1 whitespace-nowrap border hairline px-4 py-4 text-[10px] uppercase tracking-[0.25em] transition-colors hover:bg-foreground hover:text-background sm:px-8 sm:text-xs sm:tracking-[0.4em]"
           >
-            −
-          </button>
-          <span className="min-w-10 px-2 text-center font-display text-lg">
-            {qty}
-          </span>
-          <button
-            type="button"
-            onClick={inc}
-            disabled={qty >= 20}
-            className="px-4 py-3 text-sm transition-colors hover:bg-foreground hover:text-background disabled:cursor-not-allowed disabled:opacity-40"
-            aria-label="Increase quantity"
-          >
-            +
+            {t("buy.cta")} — {formatTND(lineTotal)}
           </button>
         </div>
-
-        <button
-          type="button"
-          onClick={onBuy}
-          className="flex-1 whitespace-nowrap border hairline px-4 py-4 text-[10px] uppercase tracking-[0.25em] transition-colors hover:bg-foreground hover:text-background sm:px-8 sm:text-xs sm:tracking-[0.4em]"
-        >
-          {t("buy.cta")} — {formatTND(lineTotal)}
-        </button>
-      </div>
+      )}
 
       <p className="mt-4 text-[9px] uppercase tracking-[0.35em] ember-text sm:text-[10px] sm:tracking-[0.4em]">
         {t("cart.noRestock")}

@@ -19,8 +19,26 @@ export type Product = {
   story: string;
   tags: string[];
   is_active: boolean;
+  /** Available units; 0 means out of stock (pre-order when active). */
+  quantity: number;
   support: ProductSupport;
 };
+
+export function isInStock(product: Pick<Product, "quantity">): boolean {
+  return product.quantity > 0;
+}
+
+export function isOutOfStock(product: Pick<Product, "quantity" | "is_active">): boolean {
+  return product.is_active && product.quantity === 0;
+}
+
+export function canPreOrder(product: Pick<Product, "quantity" | "is_active">): boolean {
+  return product.is_active && product.quantity === 0;
+}
+
+export function maxPurchasableQty(product: Pick<Product, "quantity">): number {
+  return isInStock(product) ? Math.min(20, product.quantity) : 20;
+}
 
 /** Resolve a stable gallery list, falling back to the primary image. */
 export function productImages(product: Pick<Product, "image" | "images">): string[] {

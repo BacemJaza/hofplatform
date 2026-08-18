@@ -23,3 +23,7 @@ export async function getCanonicalProductPricing(slug: string) {
 export function generateOrderRef(): string {
   return `KH-${Date.now().toString(36).toUpperCase().slice(-6)}`;
 }
+
+export function generatePreOrderRef(): string {
+  return `PO-${Date.now().toString(36).toUpperCase().slice(-6)}`;
+}

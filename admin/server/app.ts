@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import { authRouter } from "./routes/auth";
 import { productsRouter } from "./routes/products";
 import { ordersRouter } from "./routes/orders";
+import { preOrdersRouter } from "./routes/pre-orders";
 import { messagesRouter } from "./routes/messages";
 import { settingsRouter } from "./routes/settings";
 import { supabase } from "./supabase";
@@ -52,6 +53,7 @@ export function createApp(options: { serveStatic?: boolean } = {}) {
   app.use("/api/auth", authRouter);
   app.use("/api/products", productsRouter);
   app.use("/api/orders", ordersRouter);
+  app.use("/api/pre-orders", preOrdersRouter);
   app.use("/api/messages", messagesRouter);
   app.use("/api/settings", settingsRouter);
 

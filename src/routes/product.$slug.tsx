@@ -6,7 +6,7 @@ import { formatTND, parsePrice } from "@/lib/price";
 import { useT } from "@/hooks/use-language";
 import { ProductsLoading } from "@/components/products-loading";
 import { getActiveProducts, getProductBySlug } from "@/lib/products.server";
-import { productImages } from "@/lib/products";
+import { productImages, canPreOrder } from "@/lib/products";
 
 export const Route = createFileRoute("/product/$slug")({
   loader: async ({ params }) => {
@@ -206,17 +206,23 @@ function ProductPage() {
             </fieldset>
           )}
 
-          <button
-            type="button"
-            onClick={onAdd}
-            className="mt-12 w-full border hairline py-5 text-xs uppercase tracking-[0.4em] transition-colors hover:bg-foreground hover:text-background md:w-auto md:px-16"
-          >
-            {t("cart.add")} — {priceTND}
-          </button>
-
-          <p className="mt-6 text-[10px] uppercase tracking-[0.4em] ember-text">
-            {t("cart.noRestock")}
-          </p>
+          {canPreOrder(product) ? (
+            <Link
+              to="/pre-order"
+              search={{ slug: product.slug }}
+              className="mt-12 inline-block border hairline py-5 px-8 text-xs uppercase tracking-[0.4em] transition-colors hover:bg-foreground hover:text-background"
+            >
+              Pre-Order — {formatTND(product.price)}
+            </Link>
+          ) : (
+            <button
+              type="button"
+              onClick={onAdd}
+              className="mt-12 w-full border hairline py-5 text-xs uppercase tracking-[0.4em] transition-colors hover:bg-foreground hover:text-background md:w-auto md:px-16"
+            >
+              {t("cart.add")} — {priceTND}
+            </button>
+          )}
 
           <div className="mt-12 border-t hairline pt-8 text-xs leading-relaxed text-muted-foreground">
             <p className="uppercase tracking-[0.3em] text-foreground">{t("product.details")}</p>

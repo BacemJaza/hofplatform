@@ -12,7 +12,7 @@ export class ProductFetchError extends Error {
 }
 
 const PRODUCT_COLUMNS =
-  "id,slug,name,label,price_eur,image_url,image_urls,story,tags,is_active,support_enabled,support_name,support_price_eur" as const;
+  "id,slug,name,label,price_eur,image_url,image_urls,story,tags,is_active,quantity,support_enabled,support_name,support_price_eur" as const;
 
 type ProductRow = {
   id: string;
@@ -25,6 +25,7 @@ type ProductRow = {
   story: string;
   tags: string[] | null;
   is_active: boolean;
+  quantity: number;
   support_enabled: boolean | null;
   support_name: string | null;
   support_price_eur: number | null;
@@ -51,6 +52,7 @@ function normalizeProduct(row: ProductRow): Product {
     story: row.story,
     tags: row.tags ?? [],
     is_active: row.is_active,
+    quantity: row.quantity ?? 0,
     support: {
       enabled: supportEnabled,
       name: supportEnabled ? (row.support_name?.trim() || "Support") : "",
@@ -110,6 +112,7 @@ export const getProductBySlug = createServerFn({ method: "GET" })
 
 export type ProductPricing = {
   unitPrice: number;
+  quantity: number;
   supportEnabled: boolean;
   supportName: string | null;
   supportPrice: number;
@@ -119,7 +122,7 @@ export async function getProductPricing(slug: string): Promise<ProductPricing | 
   try {
     const { data, error } = await supabaseAdmin
       .from("products")
-      .select("price_eur,support_enabled,support_name,support_price_eur")
+      .select("price_eur,quantity,support_enabled,support_name,support_price_eur")
       .eq("slug", slug)
       .eq("is_active", true)
       .maybeSingle();
@@ -132,6 +135,7 @@ export async function getProductPricing(slug: string): Promise<ProductPricing | 
 
     return {
       unitPrice: Number(data.price_eur),
+      quantity: Number(data.quantity ?? 0),
       supportEnabled: Boolean(data.support_enabled),
       supportName: data.support_name,
       supportPrice: data.support_enabled ? Number(data.support_price_eur ?? 0) : 0,

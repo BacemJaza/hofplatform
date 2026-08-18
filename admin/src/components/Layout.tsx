@@ -5,6 +5,7 @@ import { Button } from "@/components/ui";
 const nav = [
   { to: "/products", label: "Products" },
   { to: "/orders", label: "Orders" },
+  { to: "/pre-orders", label: "Pre-Orders" },
   { to: "/messages", label: "Messages" },
   { to: "/settings", label: "Settings" },
 ];
