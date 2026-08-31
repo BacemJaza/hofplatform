@@ -6,7 +6,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, "..");
 
 await esbuild.build({
-  entryPoints: [path.join(root, "api/server.ts")],
+  entryPoints: [path.join(root, "server/vercel.ts")],
   bundle: true,
   platform: "node",
   target: "node20",

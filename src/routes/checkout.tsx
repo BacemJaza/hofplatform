@@ -306,7 +306,7 @@ function Checkout() {
                 return (
                   <li key={it.slug} className="space-y-4 px-6 py-5">
                     <div className="flex gap-4">
-                      <div className="h-20 w-16 shrink-0 overflow-hidden bg-card vignette">
+                      <div className="h-20 w-16 shrink-0 overflow-hidden bg-card">
                         <img src={it.image} alt={it.name} className="h-full w-full object-cover" />
                       </div>
                       <div className="flex flex-1 items-center justify-between gap-3">

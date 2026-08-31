@@ -74,7 +74,7 @@ export function CartDrawer() {
                       to="/product/$slug"
                       params={{ slug: it.slug }}
                       onClick={() => setOpen(false)}
-                      className="block h-28 w-24 shrink-0 overflow-hidden bg-card vignette"
+                      className="block h-28 w-24 shrink-0 overflow-hidden bg-card"
                     >
                       <img
                         src={it.image}

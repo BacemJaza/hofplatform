@@ -34,7 +34,7 @@ export function ProductCard({
   const inner = (
     <>
       <div
-        className="relative aspect-[3/4] overflow-hidden bg-card vignette sm:aspect-[4/5]"
+        className="relative aspect-[3/4] overflow-hidden bg-card sm:aspect-[4/5]"
         onMouseEnter={onEnter}
         onMouseLeave={onLeave}
       >
@@ -44,11 +44,11 @@ export function ProductCard({
           width={1024}
           height={1280}
           loading="lazy"
-          className={`h-full w-full object-cover transition-[transform,opacity] duration-700 ease-out ${
+          className={`h-full w-full object-cover duration-700 ease-out ${
             comingSoon ? "scale-105 blur-xl grayscale" : "group-hover:scale-105"
           }`}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-background/40 via-transparent to-transparent opacity-60 transition-opacity duration-700 group-hover:opacity-30" />
+        <div className="absolute duration-700 group-hover:opacity-30" />
 
         {comingSoon && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/40 backdrop-blur-sm">

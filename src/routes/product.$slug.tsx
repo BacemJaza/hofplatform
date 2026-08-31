@@ -93,7 +93,7 @@ function ProductPage() {
         {/* Gallery */}
         <div className="space-y-4">
           <div
-            className="relative aspect-[4/5] overflow-hidden bg-card vignette cursor-zoom-in"
+            className="relative aspect-[4/5] overflow-hidden bg-card cursor-zoom-in"
             onClick={() => setZoom((z) => !z)}
           >
             <img
@@ -255,7 +255,7 @@ function ProductPage() {
                 params={{ slug: p.slug }}
                 className="group block"
               >
-                <div className="relative aspect-[4/5] overflow-hidden bg-card vignette">
+                <div className="relative aspect-[4/5] overflow-hidden bg-card">
                   <img
                     src={p.image}
                     alt={p.name}

@@ -179,14 +179,6 @@
     mix-blend-mode: overlay;
   }
 
-  .vignette::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background: radial-gradient(ellipse at center, transparent 50%, color-mix(in oklab, var(--color-background) 80%, transparent) 100%);
-  }
-
   .indigo-text {
     color: var(--color-indigo);
   }

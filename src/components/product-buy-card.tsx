@@ -65,7 +65,7 @@ export function ProductBuyCard({ product }: { product: Product }) {
         onMouseEnter={onEnter}
         onMouseLeave={onLeave}
       >
-        <div className="relative aspect-[3/4] overflow-hidden bg-card vignette sm:aspect-[4/5]">
+        <div className="relative aspect-[3/4] overflow-hidden bg-card sm:aspect-[4/5]">
           <img
             src={displaySrc}
             alt={`${product.name} fabric flag hanging on a wall`}
