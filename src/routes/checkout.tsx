@@ -45,7 +45,7 @@ const PHRASES = [
 function Checkout() {
   const navigate = useNavigate();
   const { deliveryFee, products } = Route.useLoaderData();
-  const { items, subtotal, clear, setWithSupport, lineUnitPrice, syncCatalog } = useCart();
+  const { items, subtotal, clear, setWithSupport, setSupportQty, lineUnitPrice, syncCatalog } = useCart();
   const t = useT();
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -132,7 +132,7 @@ function Checkout() {
           items: items.map((i) => ({
             slug: i.slug,
             qty: i.qty,
-            withSupport: Boolean(i.withSupport),
+            supportQty: i.withSupport ? i.supportQty : 0,
           })),
         },
       });
@@ -312,8 +312,9 @@ function Checkout() {
                       <div className="flex flex-1 items-center justify-between gap-3">
                         <div>
                           <p className="font-display text-lg">{it.name}</p>
-                          <p className="mt-1 text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
-                            Qty {it.qty}
+                          <p className="mt-1 text-[10px] uppercase tracking-[0.3em] text-muted-foreground">Qty {it.qty}</p>
+                          <p className="mt-1 text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                            With support: {it.withSupport ? it.supportQty : 0} · Without support: {it.qty - (it.withSupport ? it.supportQty : 0)}
                           </p>
                           {isOutOfStock && (
                             <p className="mt-2 text-[9px] uppercase tracking-[0.3em] text-destructive">
@@ -321,41 +322,35 @@ function Checkout() {
                             </p>
                           )}
                         </div>
-                        <p className="text-xs">{formatTND(lineUnitPrice(it) * it.qty)}</p>
+                        <p className="text-xs">{formatTND(lineUnitPrice(it))}</p>
                       </div>
                     </div>
 
                     {supportEnabled && (
                       <fieldset className="space-y-2 border-t hairline pt-4">
-                        <legend className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
-                          {t("support.question")}
-                        </legend>
+                        <legend className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">{t("support.question")}</legend>
                         <label className="flex cursor-pointer items-center gap-2 text-xs">
                           <input
-                            type="radio"
-                            name={`support-${it.slug}`}
-                            checked={!it.withSupport}
-                            onChange={() => setWithSupport(it.slug, false)}
-                            className="accent-foreground"
-                          />
-                          <span>{t("support.without")}</span>
-                        </label>
-                        <label className="flex cursor-pointer items-center gap-2 text-xs">
-                          <input
-                            type="radio"
-                            name={`support-${it.slug}`}
+                            type="checkbox"
                             checked={it.withSupport}
-                            onChange={() => setWithSupport(it.slug, true)}
+                            onChange={(event) => setWithSupport(it.slug, event.target.checked)}
                             className="accent-foreground"
                           />
-                          <span>
-                            {t("support.with")}
-                            {supportName ? ` — ${supportName}` : ""}
-                            {parsePrice(supportPrice) > 0
-                              ? ` (+${formatTND(supportPrice)})`
-                              : ""}
-                          </span>
+                          <span>{t("support.with")}{supportName ? ` — ${supportName}` : ""}{parsePrice(supportPrice) > 0 ? ` (+${formatTND(supportPrice)} / unit)` : ""}</span>
                         </label>
+                        {it.withSupport && (
+                          <label className="flex items-center justify-between gap-3 text-xs">
+                            <span>{t("support.quantity")}</span>
+                            <input
+                              type="number"
+                              min="0"
+                              max={it.qty}
+                              value={it.supportQty}
+                              onChange={(event) => setSupportQty(it.slug, Number(event.target.value))}
+                              className="w-20 border hairline bg-transparent px-2 py-1 text-center"
+                            />
+                          </label>
+                        )}
                       </fieldset>
                     )}
                   </li>

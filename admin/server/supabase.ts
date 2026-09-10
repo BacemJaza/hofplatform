@@ -26,6 +26,8 @@ export type OrderItem = {
   unit_price_tnd: number;
   line_total_tnd: number;
   with_support?: boolean;
+  support_qty?: number;
+  without_support_qty?: number;
   support_name?: string | null;
   support_unit_price_tnd?: number;
 };

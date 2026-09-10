@@ -35,6 +35,7 @@ function PreOrderPage() {
   const [preOrderRef, setPreOrderRef] = useState("");
   const [qty, setQty] = useState(1);
   const [withSupport, setWithSupport] = useState(false);
+  const [supportQty, setSupportQty] = useState(0);
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -89,10 +90,8 @@ function PreOrderPage() {
     );
   }
 
-  const supportExtra =
-    product.support.enabled && withSupport ? parsePrice(product.support.price) : 0;
-  const unitTotal = parsePrice(product.price) + supportExtra;
-  const lineTotal = unitTotal * qty;
+  const supportExtra = product.support.enabled ? parsePrice(product.support.price) : 0;
+  const lineTotal = parsePrice(product.price) * qty + (withSupport ? supportExtra * supportQty : 0);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -112,7 +111,7 @@ function PreOrderPage() {
             {
               slug: product.slug,
               qty,
-              withSupport: Boolean(withSupport),
+              supportQty: withSupport ? supportQty : 0,
             },
           ],
         },
@@ -206,10 +205,10 @@ function PreOrderPage() {
                 <span className="font-display text-lg">{formatTND(product.price)}</span>
               </div>
 
-              {product.support.enabled && withSupport && (
+              {product.support.enabled && withSupport && supportQty > 0 && (
                 <div className="flex items-baseline justify-between">
                   <span className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
-                    {product.support.name}
+                    {product.support.name} x {supportQty}
                   </span>
                   <span className="font-display text-lg">
                     {formatTND(product.support.price)}
@@ -248,7 +247,11 @@ function PreOrderPage() {
               <div className="flex items-center border hairline">
                 <button
                   type="button"
-                  onClick={() => setQty(Math.max(1, qty - 1))}
+                  onClick={() => {
+                    const nextQty = Math.max(1, qty - 1);
+                    setQty(nextQty);
+                    setSupportQty((current) => Math.min(current, nextQty));
+                  }}
                   disabled={qty <= 1}
                   className="px-4 py-3 text-sm transition-colors hover:bg-foreground hover:text-background disabled:cursor-not-allowed disabled:opacity-40"
                 >
@@ -296,6 +299,19 @@ function PreOrderPage() {
                       : ""}
                   </span>
                 </label>
+                {withSupport && (
+                  <label className="flex items-center justify-between gap-3 text-sm">
+                    <span>{t("support.quantity")}</span>
+                    <input
+                      type="number"
+                      min="0"
+                      max={qty}
+                      value={supportQty}
+                      onChange={(event) => setSupportQty(Math.max(0, Math.min(qty, Number(event.target.value))))}
+                      className="w-20 border hairline bg-transparent px-2 py-1 text-center"
+                    />
+                  </label>
+                )}
               </fieldset>
             )}
 

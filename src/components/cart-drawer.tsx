@@ -5,7 +5,7 @@ import { formatTND } from "@/lib/price";
 import { useT } from "@/hooks/use-language";
 
 export function CartDrawer() {
-  const { items, open, setOpen, setQty, remove, total } = useCart();
+  const { items, open, setOpen, setQty, setWithSupport, setSupportQty, remove, total } = useCart();
   const t = useT();
 
   useEffect(() => {
@@ -120,6 +120,32 @@ export function CartDrawer() {
                           {t("bag.remove")}
                         </button>
                       </div>
+                      {it.supportEnabled && (
+                        <div className="mt-3 space-y-2 text-xs">
+                          <label className="flex items-center gap-2">
+                            <input
+                              type="checkbox"
+                              checked={it.withSupport}
+                              onChange={(event) => setWithSupport(it.slug, event.target.checked)}
+                              className="accent-foreground"
+                            />
+                            <span>{t("support.with")}</span>
+                          </label>
+                          {it.withSupport && (
+                            <label className="flex items-center justify-between gap-3 text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                              <span>{t("support.quantity")}</span>
+                              <input
+                                type="number"
+                                min="0"
+                                max={it.qty}
+                                value={it.supportQty}
+                                onChange={(event) => setSupportQty(it.slug, Number(event.target.value))}
+                                className="w-16 border hairline bg-transparent px-2 py-1 text-center text-xs text-foreground"
+                              />
+                            </label>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </li>
                 ))}

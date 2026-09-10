@@ -31,11 +31,31 @@ type ProductRow = {
   support_price_eur: number | null;
 };
 
+const LOCAL_PRODUCT_IMAGES: Record<string, string> = {
+  "https://i.postimg.cc/ZKLFPYKW/Messenger-creation-C8CF47C9-82E2-492F-9C90-336BF1048C7C.jpg":
+    "/product-images/featured.webp",
+  "https://i.postimg.cc/zBfws4v6/chat-bonnet-design.png":
+    "/product-images/chat-bonnet.webp",
+  "https://i.postimg.cc/PxFzSQWf/tunisian-vase-design.png":
+    "/product-images/tunisian-vase.webp",
+  "https://i.postimg.cc/4N8PyZ7P/desenio-1.png": "/product-images/desenio-1.webp",
+  "https://i.postimg.cc/7PzbbNCx/desenio-8.png": "/product-images/desenio-8.webp",
+  "https://i.postimg.cc/hjSMhGsW/better-call-saul-characters.png":
+    "/product-images/better-call-saul.webp",
+  "https://i.postimg.cc/s2tm9c3V/adriano-banner-a-la-maradona.jpg":
+    "/product-images/adriano-banner.webp",
+  "https://i.postimg.cc/mkFGpVHD/desenio-7.png": "/product-images/desenio-7.webp",
+};
+
+function resolveProductImageUrl(url: string): string {
+  return LOCAL_PRODUCT_IMAGES[url] ?? url;
+}
+
 function normalizeImages(row: Pick<ProductRow, "image_url" | "image_urls">): string[] {
   const fromGallery = (row.image_urls ?? []).map((u) => u.trim()).filter(Boolean);
-  if (fromGallery.length > 0) return fromGallery;
+  if (fromGallery.length > 0) return fromGallery.map(resolveProductImageUrl);
   const primary = row.image_url?.trim();
-  return primary ? [primary] : [];
+  return primary ? [resolveProductImageUrl(primary)] : [];
 }
 
 function normalizeProduct(row: ProductRow): Product {

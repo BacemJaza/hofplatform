@@ -1,42 +1,9 @@
 import { Router } from "express";
-import { z } from "zod";
 import { requireAuth } from "../auth";
 import { supabase, type PreOrderRow } from "../supabase";
 
 export const preOrdersRouter = Router();
 preOrdersRouter.use(requireAuth);
-
-const PRE_ORDER_STATUSES = ["pending", "confirmed", "shipped", "delivered", "cancelled"] as const;
-
-const preOrderItemSchema = z.object({
-  slug: z.string().trim().min(1).max(60),
-  qty: z.coerce.number().int().min(1).max(99),
-  unit_price_tnd: z.coerce.number().nonnegative(),
-  line_total_tnd: z.coerce.number().nonnegative(),
-  with_support: z.boolean().optional(),
-  support_name: z.string().trim().max(120).nullable().optional(),
-  support_unit_price_tnd: z.coerce.number().nonnegative().optional(),
-});
-
-const preOrderSchema = z.object({
-  pre_order_ref: z.string().trim().min(1).max(40),
-  customer_name: z.string().trim().min(1).max(120),
-  email: z.string().trim().email().max(255),
-  phone: z.string().trim().min(4).max(40),
-  city: z.string().trim().min(1).max(120),
-  address: z.string().trim().min(1).max(500),
-  notes: z.string().trim().max(1000).nullable().optional(),
-  items: z.array(preOrderItemSchema).min(1).max(20),
-  total: z.coerce.number().nonnegative(),
-  delivery_fee: z.coerce.number().nonnegative().default(0),
-  currency: z.string().trim().min(1).max(10).default("TND"),
-  status: z.enum(PRE_ORDER_STATUSES).default("pending"),
-});
-
-const preOrderUpdateSchema = preOrderSchema.partial().refine(
-  (data) => Object.keys(data).length > 0,
-  "At least one field is required.",
-);
 
 preOrdersRouter.get("/", async (_req, res) => {
   const { data, error } = await supabase

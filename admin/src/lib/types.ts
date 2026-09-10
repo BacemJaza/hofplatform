@@ -23,6 +23,8 @@ export type OrderItem = {
   unit_price_tnd: number;
   line_total_tnd: number;
   with_support?: boolean;
+  support_qty?: number;
+  without_support_qty?: number;
   support_name?: string | null;
   support_unit_price_tnd?: number;
 };
@@ -94,3 +96,51 @@ export const ORDER_STATUSES = [
 ] as const;
 
 export type OrderStatus = (typeof ORDER_STATUSES)[number];
+
+export type SalesGranularity = "daily" | "monthly" | "yearly";
+
+export type SalesSummary = {
+  totalRevenue: number;
+  orderCount: number;
+  averageOrderValue: number;
+  productsSold: number;
+  currency: string;
+};
+
+export type OrdersByStatus = {
+  completed: number;
+  pending: number;
+  cancelled: number;
+};
+
+export type RevenuePoint = {
+  period: string;
+  label: string;
+  revenue: number;
+  orders: number;
+};
+
+export type TopProduct = {
+  slug: string;
+  name: string;
+  quantity: number;
+  revenue: number;
+};
+
+export type RecentOrder = {
+  id: string;
+  order_ref: string;
+  customer_name: string;
+  total: number;
+  currency: string;
+  status: string;
+  created_at: string;
+};
+
+export type SalesStats = {
+  summary: SalesSummary;
+  ordersByStatus: OrdersByStatus;
+  revenueSeries: RevenuePoint[];
+  topProducts: TopProduct[];
+  recentOrders: RecentOrder[];
+};

@@ -5,6 +5,7 @@ import { pickHoverImage, productImages, canPreOrder } from "@/lib/products";
 import { formatTND, parsePrice } from "@/lib/price";
 import { useCart } from "@/stores/cart-store";
 import { useT } from "@/hooks/use-language";
+import { ProductImage } from "@/components/product-image";
 
 /**
  * Landing-page product card with an inline quantity counter and a Buy button
@@ -66,12 +67,12 @@ export function ProductBuyCard({ product }: { product: Product }) {
         onMouseLeave={onLeave}
       >
         <div className="relative aspect-[3/4] overflow-hidden bg-card sm:aspect-[4/5]">
-          <img
+          <ProductImage
             src={displaySrc}
             alt={`${product.name} fabric flag hanging on a wall`}
-            width={1024}
-            height={1280}
-            loading="lazy"
+            loading="eager"
+            fetchPriority="high"
+            sizes="(min-width: 640px) 520px, 100vw"
             className="h-full w-full object-cover transition-[transform,opacity] duration-700 ease-out group-hover:scale-105"
           />
           <div className="absolute inset-0 from-background/40 via-transparent to-transparent opacity-60 transition-opacity duration-700 group-hover:opacity-30" />

@@ -16,12 +16,12 @@ function getOrderEmailDeduplicationKey(
   data: {
     email: string;
     phone: string;
-    items: Array<{ slug: string; qty: number; withSupport: boolean }>;
+    items: Array<{ slug: string; qty: number; supportQty?: number }>;
   },
   total: number,
 ): string {
   const itemKey = data.items
-    .map((item) => `${item.slug}:${item.qty}:${item.withSupport ? "s" : "b"}`)
+    .map((item) => `${item.slug}:${item.qty}:${item.supportQty}`)
     .join("|");
   return `${data.email.toLowerCase()}:${data.phone}:${itemKey}:${total}`;
 }
@@ -39,6 +39,7 @@ const orderSchema = z.object({
         slug: z.string().trim().min(1).max(60),
         qty: z.number().int().min(1).max(20),
         withSupport: z.boolean().default(false),
+        supportQty: z.number().int().min(0).max(20).optional(),
       }),
     )
     .min(1)
@@ -55,6 +56,8 @@ export const placeOrder = createServerFn({ method: "POST" })
       qty: number;
       unit_price_tnd: number;
       with_support: boolean;
+      support_qty: number;
+      without_support_qty: number;
       support_name: string | null;
       support_unit_price_tnd: number;
       line_total_tnd: number;
@@ -77,15 +80,17 @@ export const placeOrder = createServerFn({ method: "POST" })
         };
       }
 
-      const wantsSupport = Boolean(item.withSupport);
-      if (wantsSupport && !pricing.supportEnabled) {
+      const supportQty = item.supportQty ?? (item.withSupport ? item.qty : 0);
+      if (supportQty < 0 || supportQty > item.qty) {
+        return { ok: false as const, error: "Support quantity must be between 0 and total quantity." };
+      }
+      if (supportQty > 0 && !pricing.supportEnabled) {
         return { ok: false as const, error: "Support is not available for one of the products." };
       }
 
-      const withSupport = wantsSupport && pricing.supportEnabled;
+      const withSupport = supportQty > 0 && pricing.supportEnabled;
       const supportUnit = withSupport ? pricing.supportPrice : 0;
-      const unitWithSupport = pricing.unitPrice + supportUnit;
-      const lineTotal = unitWithSupport * item.qty;
+      const lineTotal = pricing.unitPrice * item.qty + supportUnit * supportQty;
       subtotal += lineTotal;
 
       validatedItems.push({
@@ -93,6 +98,8 @@ export const placeOrder = createServerFn({ method: "POST" })
         qty: item.qty,
         unit_price_tnd: pricing.unitPrice,
         with_support: withSupport,
+        support_qty: supportQty,
+        without_support_qty: item.qty - supportQty,
         support_name: withSupport ? pricing.supportName : null,
         support_unit_price_tnd: supportUnit,
         line_total_tnd: lineTotal,
@@ -109,7 +116,7 @@ export const placeOrder = createServerFn({ method: "POST" })
         items: data.items.map((i) => ({
           slug: i.slug,
           qty: i.qty,
-          withSupport: Boolean(i.withSupport),
+          supportQty: i.supportQty,
         })),
       },
       total,

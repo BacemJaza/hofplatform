@@ -4,6 +4,7 @@ import type { Product } from "@/lib/products";
 import { pickHoverImage, productImages } from "@/lib/products";
 import { formatTND } from "@/lib/price";
 import { useT } from "@/hooks/use-language";
+import { ProductImage } from "@/components/product-image";
 
 export function ProductCard({
   product,
@@ -38,12 +39,12 @@ export function ProductCard({
         onMouseEnter={onEnter}
         onMouseLeave={onLeave}
       >
-        <img
+        <ProductImage
           src={displaySrc}
           alt={`${product.name} fabric flag hanging on a wall`}
-          width={1024}
-          height={1280}
-          loading="lazy"
+          loading={index === 0 ? "eager" : "lazy"}
+          fetchPriority={index === 0 ? "high" : "auto"}
+          sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
           className={`h-full w-full object-cover duration-700 ease-out ${
             comingSoon ? "scale-105 blur-xl grayscale" : "group-hover:scale-105"
           }`}

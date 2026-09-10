@@ -168,6 +168,7 @@ export function OrdersPage() {
               <tr>
                 <th className="px-4 py-3 font-medium">Reference</th>
                 <th className="px-4 py-3 font-medium">Customer</th>
+                <th className="px-4 py-3 font-medium">Items / Support</th>
                 <th className="px-4 py-3 font-medium">Total</th>
                 <th className="px-4 py-3 font-medium">Status</th>
                 <th className="px-4 py-3 font-medium">Date</th>
@@ -181,6 +182,19 @@ export function OrdersPage() {
                   <td className="px-4 py-3">
                     <p className="font-medium">{order.customer_name}</p>
                     <p className="text-xs text-muted">{order.email}</p>
+                  </td>
+                  <td className="px-4 py-3 text-xs">
+                    <div className="space-y-2">
+                      {order.items.map((item) => {
+                        const supportQty = item.support_qty ?? (item.with_support ? item.qty : 0);
+                        return (
+                          <div key={item.slug}>
+                            <p className="font-medium">{item.slug} — Qty: {item.qty}</p>
+                            <p className="text-muted">With support: {supportQty} · Without support: {item.qty - supportQty}</p>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </td>
                   <td className="px-4 py-3">{formatMoney(order.total, order.currency)}</td>
                   <td className="px-4 py-3">

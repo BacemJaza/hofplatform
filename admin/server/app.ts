@@ -8,6 +8,7 @@ import { ordersRouter } from "./routes/orders";
 import { preOrdersRouter } from "./routes/pre-orders";
 import { messagesRouter } from "./routes/messages";
 import { settingsRouter } from "./routes/settings";
+import { salesRouter } from "./routes/sales";
 import { supabase } from "./supabase";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -56,6 +57,7 @@ export function createApp(options: { serveStatic?: boolean } = {}) {
   app.use("/api/pre-orders", preOrdersRouter);
   app.use("/api/messages", messagesRouter);
   app.use("/api/settings", settingsRouter);
+  app.use("/api/sales", salesRouter);
 
   if (options.serveStatic !== false) {
     const dist = path.join(root, "dist");

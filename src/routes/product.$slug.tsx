@@ -7,6 +7,7 @@ import { useT } from "@/hooks/use-language";
 import { ProductsLoading } from "@/components/products-loading";
 import { getActiveProducts, getProductBySlug } from "@/lib/products.server";
 import { productImages, canPreOrder } from "@/lib/products";
+import { ProductImage } from "@/components/product-image";
 
 export const Route = createFileRoute("/product/$slug")({
   loader: async ({ params }) => {
@@ -81,7 +82,7 @@ function ProductPage() {
   const priceTND = formatTND(unitTotal);
 
   const onAdd = () => {
-    add(product, { withSupport });
+    add(product, { withSupport, supportQty: withSupport ? 1 : 0 });
     toast(`${product.name} — added to your bag`, {
       description: "From the studio in Tunis to your wall.",
     });
@@ -96,11 +97,12 @@ function ProductPage() {
             className="relative aspect-[4/5] overflow-hidden bg-card cursor-zoom-in"
             onClick={() => setZoom((z) => !z)}
           >
-            <img
+            <ProductImage
               src={activeImage}
               alt={`${product.name} fabric wall flag`}
-              width={1024}
-              height={1280}
+              loading="eager"
+              fetchPriority="high"
+              sizes="(min-width: 768px) 50vw, 100vw"
               className={`h-full w-full object-cover transition-transform duration-[1200ms] ease-out ${
                 zoom ? "scale-150" : "scale-100"
               }`}
@@ -128,11 +130,14 @@ function ProductPage() {
                   aria-label={`View image ${i + 1}`}
                   aria-current={i === activeIndex}
                 >
-                  <img
+                  <ProductImage
                     src={src}
                     alt=""
+                    width={64}
+                    height={80}
                     className="h-full w-full object-cover"
                     loading="lazy"
+                    sizes="64px"
                   />
                 </button>
               ))}
@@ -180,20 +185,9 @@ function ProductPage() {
               </legend>
               <label className="flex cursor-pointer items-center gap-3 text-sm">
                 <input
-                  type="radio"
-                  name="support"
-                  checked={!withSupport}
-                  onChange={() => setWithSupport(false)}
-                  className="accent-foreground"
-                />
-                <span>{t("support.without")}</span>
-              </label>
-              <label className="flex cursor-pointer items-center gap-3 text-sm">
-                <input
-                  type="radio"
-                  name="support"
+                  type="checkbox"
                   checked={withSupport}
-                  onChange={() => setWithSupport(true)}
+                  onChange={(event) => setWithSupport(event.target.checked)}
                   className="accent-foreground"
                 />
                 <span>
@@ -256,7 +250,7 @@ function ProductPage() {
                 className="group block"
               >
                 <div className="relative aspect-[4/5] overflow-hidden bg-card">
-                  <img
+                  <ProductImage
                     src={p.image}
                     alt={p.name}
                     width={1024}

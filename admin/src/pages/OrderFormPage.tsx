@@ -38,6 +38,8 @@ const emptyItem = (): OrderItem => ({
   with_support: false,
   support_name: null,
   support_unit_price_tnd: 0,
+  support_qty: 0,
+  without_support_qty: 1,
 });
 
 const empty: FormState = {
@@ -55,8 +57,16 @@ const empty: FormState = {
 };
 
 function recalcItem(item: OrderItem): OrderItem {
+  const supportQty = Math.max(0, Math.min(item.qty, Number(item.support_qty ?? 0)));
   const support = item.with_support ? Number(item.support_unit_price_tnd ?? 0) : 0;
-  return { ...item, line_total_tnd: item.qty * (item.unit_price_tnd + support) };
+  return { ...item, support_qty: supportQty, without_support_qty: item.qty - supportQty, line_total_tnd: item.qty * item.unit_price_tnd + supportQty * support };
+}
+
+function normalizeItem(item: OrderItem): OrderItem {
+  return recalcItem({
+    ...item,
+    support_qty: item.support_qty ?? (item.with_support ? item.qty : 0),
+  });
 }
 
 export function OrderFormPage() {
@@ -85,7 +95,7 @@ export function OrderFormPage() {
           currency: order.currency,
           status: order.status,
           delivery_fee: String(order.delivery_fee ?? 0),
-          items: order.items.length ? order.items : [emptyItem()],
+          items: order.items.length ? order.items.map(normalizeItem) : [emptyItem()],
         });
       } catch (err) {
         setError(err instanceof ApiError ? err.message : "Failed to load order.");
@@ -228,6 +238,15 @@ export function OrderFormPage() {
                     placeholder="Slug"
                     value={item.slug}
                     onChange={(e) => updateItem(index, { slug: e.target.value })}
+                    required
+                  />
+                  <Input
+                    type="number"
+                    min="0"
+                    max={item.qty}
+                    placeholder="With support"
+                    value={item.support_qty ?? 0}
+                    onChange={(e) => updateItem(index, { support_qty: Number(e.target.value), with_support: Number(e.target.value) > 0 })}
                     required
                   />
                   <Input

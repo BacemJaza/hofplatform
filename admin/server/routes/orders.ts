@@ -14,8 +14,13 @@ const orderItemSchema = z.object({
   unit_price_tnd: z.coerce.number().nonnegative(),
   line_total_tnd: z.coerce.number().nonnegative(),
   with_support: z.boolean().optional(),
+  support_qty: z.coerce.number().int().min(0).optional(),
+  without_support_qty: z.coerce.number().int().min(0).optional(),
   support_name: z.string().trim().max(120).nullable().optional(),
   support_unit_price_tnd: z.coerce.number().nonnegative().optional(),
+}).refine((item) => (item.support_qty ?? (item.with_support ? item.qty : 0)) <= item.qty, {
+  message: "Support quantity cannot exceed total quantity.",
+  path: ["support_qty"],
 });
 
 const orderSchema = z.object({

@@ -9,26 +9,16 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as PreOrderRouteImport } from './routes/pre-order'
-import { Route as DropsRouteImport } from './routes/drops'
-import { Route as ContactRouteImport } from './routes/contact'
-import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CheckoutRouteImport } from './routes/checkout'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as DropsRouteImport } from './routes/drops'
+import { Route as PreOrderRouteImport } from './routes/pre-order'
 import { Route as ProductSlugRouteImport } from './routes/product.$slug'
 
-const PreOrderRoute = PreOrderRouteImport.update({
-  id: '/pre-order',
-  path: '/pre-order',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DropsRoute = DropsRouteImport.update({
-  id: '/drops',
-  path: '/drops',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ContactRoute = ContactRouteImport.update({
-  id: '/contact',
-  path: '/contact',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CheckoutRoute = CheckoutRouteImport.update({
@@ -36,9 +26,19 @@ const CheckoutRoute = CheckoutRouteImport.update({
   path: '/checkout',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DropsRoute = DropsRouteImport.update({
+  id: '/drops',
+  path: '/drops',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PreOrderRoute = PreOrderRouteImport.update({
+  id: '/pre-order',
+  path: '/pre-order',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProductSlugRoute = ProductSlugRouteImport.update({
@@ -75,20 +75,10 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/'
-    | '/checkout'
-    | '/contact'
-    | '/drops'
-    | '/pre-order'
-    | '/product/$slug'
+    '/' | '/checkout' | '/contact' | '/drops' | '/pre-order' | '/product/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/'
-    | '/checkout'
-    | '/contact'
-    | '/drops'
-    | '/pre-order'
-    | '/product/$slug'
+    '/' | '/checkout' | '/contact' | '/drops' | '/pre-order' | '/product/$slug'
   id:
     | '__root__'
     | '/'
@@ -110,25 +100,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/pre-order': {
-      id: '/pre-order'
-      path: '/pre-order'
-      fullPath: '/pre-order'
-      preLoaderRoute: typeof PreOrderRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/drops': {
-      id: '/drops'
-      path: '/drops'
-      fullPath: '/drops'
-      preLoaderRoute: typeof DropsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/contact': {
-      id: '/contact'
-      path: '/contact'
-      fullPath: '/contact'
-      preLoaderRoute: typeof ContactRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/checkout': {
@@ -138,11 +114,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CheckoutRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/drops': {
+      id: '/drops'
+      path: '/drops'
+      fullPath: '/drops'
+      preLoaderRoute: typeof DropsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pre-order': {
+      id: '/pre-order'
+      path: '/pre-order'
+      fullPath: '/pre-order'
+      preLoaderRoute: typeof PreOrderRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/product/$slug': {

@@ -163,6 +163,21 @@ export const api = {
         body: JSON.stringify(data),
       }),
   },
+
+  sales: {
+    stats: (params: {
+      from: string;
+      to: string;
+      granularity: import("./types").SalesGranularity;
+    }) => {
+      const search = new URLSearchParams({
+        from: params.from,
+        to: params.to,
+        granularity: params.granularity,
+      });
+      return request<{ stats: import("./types").SalesStats }>(`/api/sales?${search.toString()}`);
+    },
+  },
 };
 
 export { ApiError };

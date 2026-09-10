@@ -69,6 +69,10 @@ export const Route = createRootRoute({
         crossOrigin: "anonymous",
       },
       {
+        rel: "preconnect",
+        href: "https://i.postimg.cc",
+      },
+      {
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@300;400;500;600&display=swap",
       },

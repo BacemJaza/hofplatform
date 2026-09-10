@@ -12,6 +12,7 @@ export type CartItem = {
   qty: number;
   isPreOrder: boolean;
   withSupport: boolean;
+  supportQty: number;
   supportEnabled: boolean;
   supportName: string;
   supportPrice: string;
@@ -20,10 +21,11 @@ export type CartItem = {
 type CartState = {
   items: CartItem[];
   open: boolean;
-  add: (p: Product, opts?: { withSupport?: boolean }) => void;
+  add: (p: Product, opts?: { withSupport?: boolean; supportQty?: number }) => void;
   remove: (slug: string) => void;
   setQty: (slug: string, qty: number) => void;
   setWithSupport: (slug: string, withSupport: boolean) => void;
+  setSupportQty: (slug: string, supportQty: number) => void;
   syncCatalog: (products: Product[]) => void;
   clear: () => void;
   setOpen: (v: boolean) => void;
@@ -35,7 +37,8 @@ type CartState = {
   lineUnitPrice: (item: CartItem) => number;
 };
 
-function toCartItem(p: Product, qty: number, withSupport = false): CartItem {
+function toCartItem(p: Product, qty: number, withSupport = false, supportQty = 0): CartItem {
+  const nextSupportQty = p.support.enabled && withSupport ? Math.min(qty, Math.max(0, supportQty || 1)) : 0;
   return {
     slug: p.slug,
     name: p.name,
@@ -43,7 +46,8 @@ function toCartItem(p: Product, qty: number, withSupport = false): CartItem {
     image: p.image,
     qty,
     isPreOrder: canPreOrder(p),
-    withSupport: p.support.enabled ? withSupport : false,
+    withSupport: nextSupportQty > 0,
+    supportQty: nextSupportQty,
     supportEnabled: p.support.enabled,
     supportName: p.support.name,
     supportPrice: p.support.price,
@@ -52,10 +56,8 @@ function toCartItem(p: Product, qty: number, withSupport = false): CartItem {
 
 function lineUnitPrice(item: CartItem): number {
   const base = parsePrice(item.price);
-  if (item.withSupport && item.supportEnabled) {
-    return base + parsePrice(item.supportPrice);
-  }
-  return base;
+  return base * item.qty +
+    (item.withSupport && item.supportEnabled ? parsePrice(item.supportPrice) * item.supportQty : 0);
 }
 
 export const useCart = create<CartState>()(
@@ -66,6 +68,7 @@ export const useCart = create<CartState>()(
       add: (p, opts) =>
         set((state) => {
           const withSupport = opts?.withSupport ?? false;
+          const supportQty = opts?.supportQty ?? (withSupport ? 1 : 0);
           const existing = state.items.find((i) => i.slug === p.slug);
           if (existing) {
             const nextQty = Math.min(maxPurchasableQty(p), existing.qty + 1);
@@ -82,9 +85,14 @@ export const useCart = create<CartState>()(
                       supportPrice: p.support.price,
                       withSupport: p.support.enabled
                         ? opts?.withSupport !== undefined
-                          ? withSupport
+                          ? withSupport && Math.min(nextQty, supportQty || 1) > 0
                           : i.withSupport
                         : false,
+                      supportQty: p.support.enabled
+                        ? opts?.withSupport !== undefined
+                          ? withSupport ? Math.min(nextQty, supportQty || 1) : 0
+                          : Math.min(nextQty, i.supportQty)
+                        : 0,
                       image: p.image,
                       price: p.price,
                       name: p.name,
@@ -95,7 +103,7 @@ export const useCart = create<CartState>()(
             };
           }
           return {
-            items: [...state.items, toCartItem(p, 1, withSupport)],
+            items: [...state.items, toCartItem(p, 1, withSupport, supportQty)],
             open: true,
           };
         }),
@@ -107,7 +115,9 @@ export const useCart = create<CartState>()(
             .map((i) => {
               if (i.slug !== slug) return i;
               const cap = i.isPreOrder ? 20 : Math.min(20, qty);
-              return { ...i, qty: Math.max(1, Math.min(cap, qty)) };
+              const nextQty = Math.max(1, Math.min(cap, qty));
+              const nextSupportQty = Math.min(i.supportQty, nextQty);
+              return { ...i, qty: nextQty, supportQty: nextSupportQty };
             })
             .filter((i) => i.qty > 0),
         })),
@@ -115,9 +125,21 @@ export const useCart = create<CartState>()(
         set((state) => ({
           items: state.items.map((i) =>
             i.slug === slug
-              ? { ...i, withSupport: i.supportEnabled ? withSupport : false }
+              ? {
+                  ...i,
+                  withSupport: i.supportEnabled ? withSupport : false,
+                  supportQty: i.supportEnabled && withSupport ? Math.min(i.qty, i.supportQty || 1) : 0,
+                }
               : i,
           ),
+        })),
+      setSupportQty: (slug, supportQty) =>
+        set((state) => ({
+          items: state.items.map((i) => {
+            if (i.slug !== slug || !i.supportEnabled) return i;
+            const nextSupportQty = Math.max(0, Math.min(i.qty, Math.floor(supportQty)));
+            return { ...i, supportQty: nextSupportQty };
+          }),
         })),
       syncCatalog: (products) =>
         set((state) => ({
@@ -140,6 +162,7 @@ export const useCart = create<CartState>()(
                 supportName: product.support.name,
                 supportPrice: product.support.price,
                 withSupport: product.support.enabled ? item.withSupport : false,
+                supportQty: product.support.enabled ? Math.min(qty, item.supportQty) : 0,
               },
             ];
           }),
@@ -148,13 +171,13 @@ export const useCart = create<CartState>()(
       setOpen: (v) => set({ open: v }),
       count: () => get().items.reduce((n, i) => n + i.qty, 0),
       subtotal: () =>
-        get().items.reduce((n, i) => n + lineUnitPrice(i) * i.qty, 0),
+          get().items.reduce((n, i) => n + lineUnitPrice(i), 0),
       total: () => get().subtotal(),
       lineUnitPrice,
     }),
     {
       name: "house-of-flags-cart",
-      version: 3,
+      version: 4,
       migrate: (persisted, version) => {
         const state = persisted as { items?: Array<Partial<CartItem>> };
         const items = (state.items ?? []).map((i) => ({
@@ -165,6 +188,7 @@ export const useCart = create<CartState>()(
           qty: i.qty ?? 1,
           isPreOrder: Boolean(i.isPreOrder),
           withSupport: Boolean(i.withSupport),
+          supportQty: Math.max(0, Math.min(Number(i.qty ?? 1), Number(i.supportQty ?? (i.withSupport ? 1 : 0)))),
           supportEnabled: Boolean(i.supportEnabled),
           supportName: i.supportName ?? "",
           supportPrice: i.supportPrice ?? "0",

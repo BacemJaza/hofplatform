@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
 import { api, ApiError } from "@/lib/api";
 import type { PreOrder } from "@/lib/types";
 import { formatDate, formatMoney } from "@/lib/format";
@@ -13,8 +12,6 @@ import {
   Spinner,
   Input,
 } from "@/components/ui";
-
-type Filter = "all" | "pending" | "confirmed" | "shipped" | "delivered" | "cancelled";
 
 const statusTone: Record<string, "neutral" | "success" | "danger" | "warning"> = {
   pending: "warning",
