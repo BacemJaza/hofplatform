@@ -69,6 +69,8 @@ export type Database = {
           image_url: string
           image_urls: string[]
           is_active: boolean
+          quantity: number
+          status: "active" | "inactive" | "coming_soon"
           label: string
           name: string
           price_eur: number
@@ -86,6 +88,8 @@ export type Database = {
           image_url: string
           image_urls?: string[]
           is_active?: boolean
+          quantity?: number
+          status?: "active" | "inactive" | "coming_soon"
           label: string
           name: string
           price_eur: number
@@ -103,6 +107,8 @@ export type Database = {
           image_url?: string
           image_urls?: string[]
           is_active?: boolean
+          quantity?: number
+          status?: "active" | "inactive" | "coming_soon"
           label?: string
           name?: string
           price_eur?: number
@@ -148,6 +154,9 @@ export type Database = {
           notes: string | null
           order_ref: string
           phone: string
+          promo_code: string | null
+          discount_percent: number | null
+          discount_amount: number
           status: string
           total: number
         }
@@ -164,6 +173,9 @@ export type Database = {
           notes?: string | null
           order_ref: string
           phone: string
+          promo_code?: string | null
+          discount_percent?: number | null
+          discount_amount?: number
           status?: string
           total: number
         }
@@ -180,8 +192,41 @@ export type Database = {
           notes?: string | null
           order_ref?: string
           phone?: string
+          promo_code?: string | null
+          discount_percent?: number | null
+          discount_amount?: number
           status?: string
           total?: number
+        }
+        Relationships: []
+      }
+      discounts: {
+        Row: {
+          id: string
+          code: string
+          discount_percent: number
+          usage_count: number
+          is_active: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          code: string
+          discount_percent: number
+          usage_count?: number
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          code?: string
+          discount_percent?: number
+          usage_count?: number
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -190,7 +235,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      increment_discount_usage: {
+        Args: { discount_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

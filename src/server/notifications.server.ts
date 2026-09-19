@@ -2,6 +2,13 @@
 // Resend is temporarily disabled — uncomment the implementation at the bottom
 // when transactional email should send again.
 
+import {
+  FunctionsFetchError,
+  FunctionsHttpError,
+  FunctionsRelayError,
+} from "@supabase/supabase-js";
+import { getExternalSupabaseAdmin } from "@/integrations/supabase/external-admin.server";
+
 type OrderItem = {
   slug: string;
   qty: number;
@@ -31,6 +38,55 @@ export async function sendFeedbackEmail(_input: {
   notes: string;
 }): Promise<void> {
   return;
+}
+
+export async function sendCheckoutSuccessEmail(input: {
+  email: string;
+  customerName: string;
+  discountActivated: boolean;
+  promoCode: string | null;
+}): Promise<void> {
+  const { data, error } = await getExternalSupabaseAdmin().functions.invoke(
+    "send-checkout-success-email",
+    { body: input },
+  );
+
+  if (error) {
+    let detail = error.message ?? "send-checkout-success-email invoke failed";
+
+    if (error instanceof FunctionsHttpError && error.context instanceof Response) {
+      const response = error.context;
+      let body = "";
+      try {
+        body = await response.clone().text();
+      } catch {
+        body = "(could not read response body)";
+      }
+      detail = `send-checkout-success-email failed [${response.status} ${response.statusText}]: ${body || "(empty body)"}`;
+    } else if (error instanceof FunctionsRelayError) {
+      detail = `send-checkout-success-email relay error: ${error.message}`;
+      if (error.context instanceof Response) {
+        try {
+          const body = await error.context.clone().text();
+          if (body) detail += ` — ${body}`;
+        } catch {
+          // ignore unreadable relay response body
+        }
+      }
+    } else if (error instanceof FunctionsFetchError) {
+      detail = `send-checkout-success-email fetch error: ${error.message}`;
+    }
+
+    console.error("sendCheckoutSuccessEmail invoke error:", {
+      errorName: error instanceof Error ? error.name : typeof error,
+      detail,
+    });
+    throw new Error(detail);
+  }
+
+  if (data && typeof data === "object" && "error" in data && data.error) {
+    throw new Error(String(data.error));
+  }
 }
 
 /*

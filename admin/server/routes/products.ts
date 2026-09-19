@@ -14,6 +14,7 @@ const slugSchema = z
   .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Slug must be lowercase kebab-case.");
 
 const imageUrlSchema = z.string().trim().min(1).max(500);
+const productStatusSchema = z.enum(["active", "inactive", "coming_soon"]);
 
 const productSchema = z
   .object({
@@ -26,6 +27,7 @@ const productSchema = z
     story: z.string().trim().min(1).max(5000),
     tags: z.array(z.string().trim().min(1).max(60)).default([]),
     is_active: z.boolean().default(false),
+    status: productStatusSchema.optional(),
     support_enabled: z.boolean().default(false),
     support_name: z.string().trim().max(120).nullable().optional(),
     support_price_eur: z.coerce.number().min(0).max(99999).nullable().optional(),
@@ -61,7 +63,8 @@ const productSchema = z
       image_url: image_urls[0],
       story: data.story,
       tags: data.tags,
-      is_active: data.is_active,
+      is_active: data.status ? data.status !== "inactive" : data.is_active,
+      status: data.status ?? (data.is_active ? "active" : "inactive"),
       support_enabled,
       support_name: support_enabled ? data.support_name!.trim() : null,
       support_price_eur: support_enabled ? Number(data.support_price_eur) : null,
@@ -79,6 +82,7 @@ const productUpdateSchema = z
     story: z.string().trim().min(1).max(5000).optional(),
     tags: z.array(z.string().trim().min(1).max(60)).optional(),
     is_active: z.boolean().optional(),
+    status: productStatusSchema.optional(),
     support_enabled: z.boolean().optional(),
     support_name: z.string().trim().max(120).nullable().optional(),
     support_price_eur: z.coerce.number().min(0).max(99999).nullable().optional(),
@@ -105,6 +109,11 @@ const productUpdateSchema = z
     if (data.support_enabled === false) {
       next.support_name = null;
       next.support_price_eur = null;
+    }
+    if (data.status) {
+      next.is_active = data.status !== "inactive";
+    } else if (data.is_active !== undefined) {
+      next.status = data.is_active ? "active" : "inactive";
     }
     return next;
   });
@@ -198,7 +207,38 @@ productsRouter.patch("/:id/active", async (req, res) => {
 
   const { data, error } = await supabase
     .from("products")
-    .update({ is_active: parsed.data.is_active })
+    .update({
+      is_active: parsed.data.is_active,
+      status: parsed.data.is_active ? "active" : "inactive",
+    })
+    .eq("id", req.params.id)
+    .select("*")
+    .maybeSingle();
+
+  if (error) {
+    res.status(500).json({ error: error.message });
+    return;
+  }
+  if (!data) {
+    res.status(404).json({ error: "Product not found." });
+    return;
+  }
+  res.json({ product: data as ProductRow });
+});
+
+productsRouter.patch("/:id/status", async (req, res) => {
+  const parsed = z.object({ status: productStatusSchema }).safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: "status must be active, inactive, or coming_soon." });
+    return;
+  }
+
+  const { data, error } = await supabase
+    .from("products")
+    .update({
+      status: parsed.data.status,
+      is_active: parsed.data.status !== "inactive",
+    })
     .eq("id", req.params.id)
     .select("*")
     .maybeSingle();

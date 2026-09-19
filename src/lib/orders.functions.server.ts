@@ -5,6 +5,13 @@ import { getCanonicalProductPricing, generateOrderRef } from "../server/orders.s
 import { fetchDeliveryFeeTND } from "@/lib/settings.server";
 // Resend order emails disabled for now.
 // import { sendOrderEmails } from "../server/notifications.server";
+import { sendCheckoutSuccessEmail } from "../server/notifications.server";
+import {
+  calculateDiscountAmount,
+  findActiveDiscountByCode,
+  incrementDiscountUsage,
+  normalizePromoCode,
+} from "@/lib/discounts.server";
 
 const orderEmailDeduplicationWindowMs = 15_000;
 const recentOrderEmailRequests = new Map<
@@ -44,6 +51,7 @@ const orderSchema = z.object({
     )
     .min(1)
     .max(20),
+  promoCode: z.string().trim().max(40).optional().or(z.literal("")),
 });
 
 export const placeOrder = createServerFn({ method: "POST" })
@@ -107,7 +115,25 @@ export const placeOrder = createServerFn({ method: "POST" })
     }
 
     const deliveryFee = await fetchDeliveryFeeTND();
-    const total = subtotal + deliveryFee;
+
+    let promoCode: string | null = null;
+    let discountPercent: number | null = null;
+    let discountAmount = 0;
+    let appliedDiscountId: string | null = null;
+
+    if (data.promoCode?.trim()) {
+      const discount = await findActiveDiscountByCode(data.promoCode);
+      if (!discount) {
+        return { ok: false as const, error: "Invalid or inactive discount code." };
+      }
+
+      promoCode = normalizePromoCode(discount.code);
+      discountPercent = discount.discountPercent;
+      discountAmount = calculateDiscountAmount(subtotal, discountPercent);
+      appliedDiscountId = discount.id;
+    }
+
+    const total = subtotal - discountAmount + deliveryFee;
 
     const emailDeduplicationKey = getOrderEmailDeduplicationKey(
       {
@@ -160,6 +186,9 @@ export const placeOrder = createServerFn({ method: "POST" })
         items: validatedItems,
         total,
         delivery_fee: deliveryFee,
+        promo_code: promoCode,
+        discount_percent: discountPercent,
+        discount_amount: discountAmount,
         currency: "TND",
         status: "pending",
       });
@@ -212,5 +241,29 @@ export const placeOrder = createServerFn({ method: "POST" })
     //   console.error("sendOrderEmails threw unexpectedly:", mailErr);
     // }
 
-    return { ok: true as const, orderRef, total, deliveryFee, subtotal };
+    if (appliedDiscountId) {
+      await incrementDiscountUsage(appliedDiscountId);
+    }
+
+    try {
+      await sendCheckoutSuccessEmail({
+        email: data.email,
+        customerName: data.name,
+        discountActivated: Boolean(promoCode),
+        promoCode,
+      });
+    } catch (mailErr) {
+      console.error("sendCheckoutSuccessEmail failed:", mailErr);
+    }
+
+    return {
+      ok: true as const,
+      orderRef,
+      total,
+      deliveryFee,
+      subtotal,
+      promoCode,
+      discountPercent,
+      discountAmount,
+    };
   });

@@ -4,6 +4,8 @@ import { useCart } from "@/stores/cart-store";
 import { formatTND, parsePrice } from "@/lib/price";
 import { useT } from "@/hooks/use-language";
 import { placeOrder } from "@/lib/orders.functions.server";
+import { validatePromoCode } from "@/lib/discounts.functions.server";
+import { calculateDiscountAmount } from "@/lib/discounts.server";
 import { getDeliveryFee } from "@/lib/settings.server";
 import { getActiveProducts } from "@/lib/products.server";
 import { toast } from "sonner";
@@ -59,13 +61,61 @@ function Checkout() {
     address: "",
     notes: "",
   });
+  const [promoInput, setPromoInput] = useState("");
+  const [appliedPromo, setAppliedPromo] = useState<{
+    code: string;
+    discountPercent: number;
+  } | null>(null);
+  const [promoMessage, setPromoMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [promoLoading, setPromoLoading] = useState(false);
 
   useEffect(() => {
     syncCatalog(products);
   }, [products, syncCatalog]);
 
   const itemsSubtotal = subtotal();
-  const orderTotal = itemsSubtotal + deliveryFee;
+  const discountAmount = appliedPromo
+    ? calculateDiscountAmount(itemsSubtotal, appliedPromo.discountPercent)
+    : 0;
+  const discountedSubtotal = itemsSubtotal - discountAmount;
+  const orderTotal = discountedSubtotal + deliveryFee;
+
+  const applyPromoCode = async () => {
+    const code = promoInput.trim();
+    if (!code) {
+      setPromoMessage({ type: "error", text: "Enter a promo code." });
+      return;
+    }
+
+    setPromoLoading(true);
+    setPromoMessage(null);
+
+    try {
+      const result = await validatePromoCode({ data: { code } });
+      if (!result.ok) {
+        setAppliedPromo(null);
+        setPromoMessage({ type: "error", text: result.error });
+        return;
+      }
+
+      setAppliedPromo({
+        code: result.code,
+        discountPercent: result.discountPercent,
+      });
+      setPromoInput(result.code);
+      setPromoMessage({ type: "success", text: "Discount code activated" });
+    } catch {
+      setPromoMessage({ type: "error", text: "Could not validate promo code. Try again." });
+    } finally {
+      setPromoLoading(false);
+    }
+  };
+
+  const removePromoCode = () => {
+    setAppliedPromo(null);
+    setPromoInput("");
+    setPromoMessage(null);
+  };
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -134,6 +184,7 @@ function Checkout() {
             qty: i.qty,
             supportQty: i.withSupport ? i.supportQty : 0,
           })),
+          promoCode: appliedPromo?.code ?? "",
         },
       });
 
@@ -357,8 +408,67 @@ function Checkout() {
                 );
               })}
             </ul>
+            <div className="space-y-4 border-t hairline px-6 py-5">
+              <div>
+                <p className="text-[10px] uppercase tracking-[0.4em] text-muted-foreground">
+                  Promo code
+                </p>
+                {appliedPromo ? (
+                  <div className="mt-3 space-y-2">
+                    <div className="flex items-center justify-between gap-3 border hairline px-3 py-2">
+                      <div>
+                        <p className="font-mono text-sm">{appliedPromo.code}</p>
+                        <p className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
+                          {appliedPromo.discountPercent}% off items
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={removePromoCode}
+                        className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground transition-colors hover:text-foreground"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                    {promoMessage?.type === "success" && (
+                      <p className="text-xs text-emerald-600">{promoMessage.text}</p>
+                    )}
+                  </div>
+                ) : (
+                  <div className="mt-3 flex gap-2">
+                    <input
+                      type="text"
+                      value={promoInput}
+                      onChange={(e) => setPromoInput(e.target.value.toUpperCase())}
+                      placeholder="Enter code"
+                      className="flex-1 border-b hairline bg-transparent py-2 text-sm uppercase outline-none transition-colors focus:border-foreground"
+                    />
+                    <button
+                      type="button"
+                      onClick={applyPromoCode}
+                      disabled={promoLoading}
+                      className="border hairline px-4 py-2 text-[10px] uppercase tracking-[0.3em] transition-colors hover:bg-foreground hover:text-background disabled:opacity-50"
+                    >
+                      {promoLoading ? "Checking…" : "Apply"}
+                    </button>
+                  </div>
+                )}
+                {promoMessage?.type === "error" && (
+                  <p className="mt-2 text-xs text-destructive">{promoMessage.text}</p>
+                )}
+              </div>
+            </div>
             <div className="space-y-3 border-t hairline px-6 py-5 text-xs">
               <Row label={t("checkout.subtotal")} value={formatTND(itemsSubtotal)} />
+              {appliedPromo && discountAmount > 0 && (
+                <>
+                  <Row
+                    label={`Discount (${appliedPromo.discountPercent}%)`}
+                    value={`-${formatTND(discountAmount)}`}
+                  />
+                  <Row label="Discounted subtotal" value={formatTND(discountedSubtotal)} />
+                </>
+              )}
               <Row label={t("checkout.delivery")} value={formatTND(deliveryFee)} />
               <div className="mt-4 flex items-baseline justify-between border-t hairline pt-4">
                 <p className="text-[10px] uppercase tracking-[0.4em]">{t("checkout.total")}</p>

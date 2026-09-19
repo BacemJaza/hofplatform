@@ -16,7 +16,7 @@ export const Route = createFileRoute("/product/$slug")({
       getActiveProducts(),
     ]);
 
-    if (!product || !product.is_active) throw notFound();
+    if (!product || product.status !== "active") throw notFound();
 
     return {
       product,

@@ -55,7 +55,7 @@ function PreOrderPage() {
         }
 
         const productData = await getProductBySlug({ data: slug });
-        if (!productData || !productData.is_active) {
+        if (!productData || productData.status !== "active") {
           setError("Product not found or inactive");
           return;
         }

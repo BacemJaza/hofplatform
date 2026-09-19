@@ -27,6 +27,9 @@ type FormState = {
   currency: string;
   status: string;
   delivery_fee: string;
+  promo_code: string;
+  discount_percent: string;
+  discount_amount: string;
   items: OrderItem[];
 };
 
@@ -53,6 +56,9 @@ const empty: FormState = {
   currency: "TND",
   status: "pending",
   delivery_fee: "0",
+  promo_code: "",
+  discount_percent: "",
+  discount_amount: "0",
   items: [emptyItem()],
 };
 
@@ -95,6 +101,9 @@ export function OrderFormPage() {
           currency: order.currency,
           status: order.status,
           delivery_fee: String(order.delivery_fee ?? 0),
+          promo_code: order.promo_code ?? "",
+          discount_percent: order.discount_percent != null ? String(order.discount_percent) : "",
+          discount_amount: String(order.discount_amount ?? 0),
           items: order.items.length ? order.items.map(normalizeItem) : [emptyItem()],
         });
       } catch (err) {
@@ -126,7 +135,9 @@ export function OrderFormPage() {
 
   const itemsTotal = form.items.reduce((sum, i) => sum + i.line_total_tnd, 0);
   const deliveryFee = Number(form.delivery_fee) || 0;
-  const total = itemsTotal + deliveryFee;
+  const discountAmount = Number(form.discount_amount) || 0;
+  const total = itemsTotal - discountAmount + deliveryFee;
+  const hasPromo = Boolean(form.promo_code.trim());
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -144,6 +155,9 @@ export function OrderFormPage() {
       items: form.items,
       delivery_fee: deliveryFee,
       total,
+      promo_code: form.promo_code.trim() || null,
+      discount_percent: form.discount_percent ? Number(form.discount_percent) : null,
+      discount_amount: discountAmount,
       currency: form.currency.trim(),
       status: form.status,
     };
@@ -223,6 +237,23 @@ export function OrderFormPage() {
           <Field label="Notes">
             <Textarea value={form.notes} onChange={(e) => set("notes", e.target.value)} />
           </Field>
+
+          {hasPromo && (
+            <div className="rounded-md border border-accent/40 bg-accent/5 p-4">
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-xs font-semibold uppercase tracking-wide text-accent">
+                  Promo code applied
+                </p>
+                <span className="rounded-full bg-accent/10 px-2 py-1 text-xs font-medium text-accent">
+                  {form.discount_percent ?? "0"}% off
+                </span>
+              </div>
+              <p className="mt-2 font-mono text-sm font-medium">{form.promo_code}</p>
+              <p className="mt-1 text-sm text-muted">
+                Discount amount: {discountAmount.toFixed(2)} {form.currency}
+              </p>
+            </div>
+          )}
 
           <div>
             <div className="mb-2 flex items-center justify-between">

@@ -10,7 +10,7 @@ import { getProducts } from "@/lib/products.server";
 export const Route = createFileRoute("/")({
   loader: async () => {
     const products = await getProducts();
-    const activeProducts = products.filter((product) => product.is_active);
+    const activeProducts = products.filter((product) => product.status === "active");
     const featured = activeProducts.length === 1 ? activeProducts[0] : null;
 
     return {
@@ -190,7 +190,7 @@ function Index() {
                     key={product.slug}
                     product={product}
                     index={index}
-                    comingSoon={!product.is_active}
+                    comingSoon={product.status === "coming_soon"}
                   />
                 ))}
               </div>

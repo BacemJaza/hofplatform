@@ -10,6 +10,7 @@ export type Product = {
   story: string;
   tags: string[];
   is_active: boolean;
+  status: "active" | "inactive" | "coming_soon";
   support_enabled: boolean;
   support_name: string | null;
   support_price_eur: number | null;
@@ -41,6 +42,9 @@ export type Order = {
   items: OrderItem[];
   total: number;
   delivery_fee: number;
+  promo_code: string | null;
+  discount_percent: number | null;
+  discount_amount: number;
   currency: string;
   status: string;
   created_at: string;
@@ -85,6 +89,16 @@ export type Message = {
   email: string;
   notes: string;
   created_at: string;
+};
+
+export type Discount = {
+  id: string;
+  code: string;
+  discount_percent: number;
+  usage_count: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
 };
 
 export const ORDER_STATUSES = [

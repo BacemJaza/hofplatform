@@ -75,6 +75,7 @@ export const api = {
       story: string;
       tags: string[];
       is_active: boolean;
+      status: "active" | "inactive" | "coming_soon";
       support_enabled: boolean;
       support_name: string | null;
       support_price_eur: number | null;
@@ -95,6 +96,7 @@ export const api = {
         story: string;
         tags: string[];
         is_active: boolean;
+        status?: "active" | "inactive" | "coming_soon";
         support_enabled: boolean;
         support_name: string | null;
         support_price_eur: number | null;
@@ -104,10 +106,10 @@ export const api = {
         method: "PUT",
         body: JSON.stringify(data),
       }),
-    toggleActive: (id: string, is_active: boolean) =>
-      request<{ product: import("./types").Product }>(`/api/products/${id}/active`, {
+    setStatus: (id: string, status: "active" | "inactive" | "coming_soon") =>
+      request<{ product: import("./types").Product }>(`/api/products/${id}/status`, {
         method: "PATCH",
-        body: JSON.stringify({ is_active }),
+        body: JSON.stringify({ status }),
       }),
     delete: (id: string) =>
       request<{ ok: true }>(`/api/products/${id}`, { method: "DELETE" }),
@@ -177,6 +179,40 @@ export const api = {
       });
       return request<{ stats: import("./types").SalesStats }>(`/api/sales?${search.toString()}`);
     },
+  },
+
+  discounts: {
+    list: () => request<{ discounts: import("./types").Discount[] }>("/api/discounts"),
+    get: (id: string) =>
+      request<{ discount: import("./types").Discount }>(`/api/discounts/${id}`),
+    create: (data: {
+      code: string;
+      discount_percent: number;
+      is_active?: boolean;
+    }) =>
+      request<{ discount: import("./types").Discount }>("/api/discounts", {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
+    update: (
+      id: string,
+      data: Partial<{
+        code: string;
+        discount_percent: number;
+        is_active: boolean;
+      }>,
+    ) =>
+      request<{ discount: import("./types").Discount }>(`/api/discounts/${id}`, {
+        method: "PUT",
+        body: JSON.stringify(data),
+      }),
+    setStatus: (id: string, is_active: boolean) =>
+      request<{ discount: import("./types").Discount }>(`/api/discounts/${id}/status`, {
+        method: "PATCH",
+        body: JSON.stringify({ is_active }),
+      }),
+    delete: (id: string) =>
+      request<{ ok: true }>(`/api/discounts/${id}`, { method: "DELETE" }),
   },
 };
 

@@ -42,5 +42,7 @@ export const env = {
   sessionSecret: required("SESSION_SECRET"),
   supabaseUrl: required("SUPABASE_URL"),
   supabaseServiceRoleKey: assertServiceRoleKey(required("SUPABASE_SERVICE_ROLE_KEY")),
+  /** Storefront origin for resolving relative product image paths (e.g. http://localhost:5173). */
+  storefrontUrl: process.env.STOREFRONT_URL?.trim() || "http://localhost:5173",
   isProduction: process.env.NODE_ENV === "production",
 };

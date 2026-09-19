@@ -40,3 +40,4 @@ admin/api/index.js
 *.sln
 *.sw?
 .vercel
+.env*

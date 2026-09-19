@@ -23,6 +23,7 @@ type FormState = {
   story: string;
   tags: string;
   is_active: boolean;
+  status: "active" | "inactive" | "coming_soon";
   support_enabled: boolean;
   support_name: string;
   support_price_eur: string;
@@ -38,6 +39,7 @@ const empty: FormState = {
   story: "",
   tags: "",
   is_active: false,
+  status: "inactive",
   support_enabled: false,
   support_name: "",
   support_price_eur: "0",
@@ -77,6 +79,7 @@ export function ProductFormPage() {
           story: product.story,
           tags: joinTags(product.tags),
           is_active: product.is_active,
+          status: product.status,
           support_enabled: Boolean(product.support_enabled),
           support_name: product.support_name ?? "",
           support_price_eur:
@@ -146,6 +149,7 @@ export function ProductFormPage() {
       story: form.story.trim(),
       tags: parseTags(form.tags),
       is_active: form.is_active,
+      status: form.status,
       support_enabled: form.support_enabled,
       support_name: form.support_enabled ? form.support_name.trim() : null,
       support_price_eur: form.support_enabled ? Number(form.support_price_eur) : null,
@@ -343,11 +347,33 @@ export function ProductFormPage() {
             <input
               type="checkbox"
               checked={form.is_active}
-              onChange={(e) => set("is_active", e.target.checked)}
+              onChange={(e) => {
+                const is_active = e.target.checked;
+                setForm((prev) => ({
+                  ...prev,
+                  is_active,
+                  status: is_active ? "active" : "inactive",
+                }));
+              }}
               className="rounded border-border"
             />
             Active (available for purchase on storefront)
           </label>
+
+          <Field label="Catalog status">
+            <select
+              value={form.status}
+              onChange={(e) => {
+                const status = e.target.value as FormState["status"];
+                setForm((prev) => ({ ...prev, status, is_active: status !== "inactive" }));
+              }}
+              className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+            >
+              <option value="active">Active</option>
+              <option value="inactive">Inactive (hidden)</option>
+              <option value="coming_soon">Coming Soon (visible, unavailable)</option>
+            </select>
+          </Field>
 
           <div className="flex gap-2 pt-2">
             <Button type="submit" disabled={saving}>

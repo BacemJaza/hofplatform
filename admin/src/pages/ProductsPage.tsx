@@ -13,6 +13,7 @@ import {
   Spinner,
   Input,
 } from "@/components/ui";
+import { PrintPrepareModal } from "@/components/PrintPrepareModal";
 
 type Filter = "all" | "active" | "inactive" | "in-stock" | "out-of-stock" | "available-pre-order";
 
@@ -24,6 +25,7 @@ export function ProductsPage() {
   const [search, setSearch] = useState("");
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [printProduct, setPrintProduct] = useState<Product | null>(null);
 
   const load = async () => {
     setError("");
@@ -44,11 +46,11 @@ export function ProductsPage() {
   const filtered = useMemo(() => {
     let result = products;
 
-    if (filter === "active") result = result.filter((p) => p.is_active);
-    else if (filter === "inactive") result = result.filter((p) => !p.is_active);
-    else if (filter === "in-stock") result = result.filter((p) => p.is_active && p.quantity > 0);
-    else if (filter === "out-of-stock") result = result.filter((p) => p.is_active && p.quantity === 0);
-    else if (filter === "available-pre-order") result = result.filter((p) => p.is_active && p.quantity === 0);
+    if (filter === "active") result = result.filter((p) => p.status === "active");
+    else if (filter === "inactive") result = result.filter((p) => p.status === "inactive");
+    else if (filter === "in-stock") result = result.filter((p) => p.status === "active" && p.quantity > 0);
+    else if (filter === "out-of-stock") result = result.filter((p) => p.status === "active" && p.quantity === 0);
+    else if (filter === "available-pre-order") result = result.filter((p) => p.status === "active" && p.quantity === 0);
 
     if (search.trim()) {
       const q = search.toLowerCase();
@@ -63,9 +65,9 @@ export function ProductsPage() {
     return result;
   }, [products, filter, search]);
 
-  const toggleActive = async (product: Product) => {
+  const setStatus = async (product: Product, status: Product["status"]) => {
     try {
-      const { product: updated } = await api.products.toggleActive(product.id, !product.is_active);
+      const { product: updated } = await api.products.setStatus(product.id, status);
       setProducts((prev) => prev.map((p) => (p.id === updated.id ? updated : p)));
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Failed to update product.");
@@ -185,25 +187,42 @@ export function ProductsPage() {
                   <td className="px-4 py-3">
                     <Badge
                       tone={
-                        product.is_active
-                          ? product.quantity > 0
+                        product.status === "coming_soon"
+                          ? "warning"
+                          : product.status === "active"
+                            ? product.quantity > 0
                             ? "success"
                             : "warning"
-                          : "neutral"
+                            : "neutral"
                       }
                     >
-                      {product.is_active
-                        ? product.quantity > 0
+                      {product.status === "coming_soon"
+                        ? "Coming Soon"
+                        : product.status === "active"
+                          ? product.quantity > 0
                           ? "In Stock"
                           : "Pre-Order"
-                        : "Inactive"}
+                          : "Inactive"}
                     </Badge>
                   </td>
                   <td className="px-4 py-3 text-xs text-muted">{formatDate(product.updated_at)}</td>
                   <td className="px-4 py-3">
-                    <div className="flex justify-end gap-2">
-                      <Button variant="ghost" onClick={() => toggleActive(product)}>
-                        {product.is_active ? "Deactivate" : "Activate"}
+                    <div className="flex flex-wrap justify-end gap-2">
+                      <Button
+                        variant="ghost"
+                        onClick={() => setPrintProduct(product)}
+                        disabled={!(product.image_urls?.[0] || product.image_url)}
+                      >
+                        Prepare for Print
+                      </Button>
+                      <Button variant="ghost" onClick={() => setStatus(product, "inactive")}>
+                        Deactivate
+                      </Button>
+                      <Button variant="ghost" onClick={() => setStatus(product, "active")}>
+                        Activate
+                      </Button>
+                      <Button variant="ghost" onClick={() => setStatus(product, "coming_soon")}>
+                        Coming Soon
                       </Button>
                       <Link to={`/products/${product.id}/edit`}>
                         <Button variant="secondary">Edit</Button>
@@ -228,6 +247,8 @@ export function ProductsPage() {
         onCancel={() => setDeleteId(null)}
         loading={deleting}
       />
+
+      <PrintPrepareModal product={printProduct} onClose={() => setPrintProduct(null)} />
     </>
   );
 }

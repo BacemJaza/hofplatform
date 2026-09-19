@@ -34,6 +34,9 @@ const orderSchema = z.object({
   items: z.array(orderItemSchema).min(1).max(20),
   total: z.coerce.number().nonnegative(),
   delivery_fee: z.coerce.number().nonnegative().default(0),
+  promo_code: z.string().trim().max(40).nullable().optional(),
+  discount_percent: z.coerce.number().min(0).max(100).nullable().optional(),
+  discount_amount: z.coerce.number().nonnegative().default(0),
   currency: z.string().trim().min(1).max(10).default("TND"),
   status: z.enum(ORDER_STATUSES).default("pending"),
 });

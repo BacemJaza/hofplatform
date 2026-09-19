@@ -89,6 +89,56 @@ function shell(inner: string): string {
 </html>`;
 }
 
+export function checkoutSuccessEmail(customerName: string): {
+  subject: string;
+  html: string;
+  plain: string;
+} {
+  const subject = "Thank you for shopping with House of Flags";
+  const plain = [
+    `Hello ${customerName},`,
+    "",
+    "Thank you for shopping with House of Flags.",
+    "",
+    "Your checkout was completed successfully, and we have received your request.",
+    "",
+    "We will contact you shortly regarding your order.",
+    "",
+    "Thank you,",
+    "House of Flags",
+  ].join("\n");
+
+  const inner = `
+    <tr>
+      <td style="padding:32px;">
+        <div style="font-size:10px;letter-spacing:0.5em;text-transform:uppercase;color:${EMBER};font-family:Helvetica,Arial,sans-serif;margin-bottom:16px;">Checkout complete</div>
+        <h1 style="margin:0 0 24px 0;font-size:34px;line-height:1.05;font-weight:normal;color:${FG};">
+          Thank you for<br/>shopping with us.
+        </h1>
+        <p style="margin:0 0 20px 0;font-size:15px;line-height:1.65;color:${FG};">
+          Hello ${escape(customerName)},
+        </p>
+        <p style="margin:0 0 20px 0;font-size:14px;line-height:1.65;color:${FG};">
+          Thank you for shopping with House of Flags.
+        </p>
+        <div style="border-left:3px solid ${EMBER};padding:16px 0 16px 20px;margin:0 0 24px 0;">
+          <p style="margin:0;font-size:14px;line-height:1.65;color:${FG};">
+            Your checkout was completed successfully, and we have received your request.
+          </p>
+        </div>
+        <p style="margin:0 0 28px 0;font-size:14px;line-height:1.65;color:${MUTED};">
+          We will contact you shortly regarding your order.
+        </p>
+        <p style="margin:0;font-size:14px;line-height:1.65;color:${FG};">
+          Thank you,<br/>
+          <span style="color:${EMBER};letter-spacing:0.12em;text-transform:uppercase;font-family:Helvetica,Arial,sans-serif;font-size:11px;">House of Flags</span>
+        </p>
+      </td>
+    </tr>`;
+
+  return { subject, html: shell(inner), plain };
+}
+
 export function customerOrderEmail(data: OrderEmailData): { subject: string; html: string } {
   const inner = `
     <tr>

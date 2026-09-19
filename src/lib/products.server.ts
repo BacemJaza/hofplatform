@@ -12,7 +12,7 @@ export class ProductFetchError extends Error {
 }
 
 const PRODUCT_COLUMNS =
-  "id,slug,name,label,price_eur,image_url,image_urls,story,tags,is_active,quantity,support_enabled,support_name,support_price_eur" as const;
+  "id,slug,name,label,price_eur,image_url,image_urls,story,tags,is_active,status,quantity,support_enabled,support_name,support_price_eur" as const;
 
 type ProductRow = {
   id: string;
@@ -25,6 +25,7 @@ type ProductRow = {
   story: string;
   tags: string[] | null;
   is_active: boolean;
+  status?: "active" | "inactive" | "coming_soon";
   quantity: number;
   support_enabled: boolean | null;
   support_name: string | null;
@@ -72,6 +73,7 @@ function normalizeProduct(row: ProductRow): Product {
     story: row.story,
     tags: row.tags ?? [],
     is_active: row.is_active,
+    status: row.status ?? (row.is_active ? "active" : "inactive"),
     quantity: row.quantity ?? 0,
     support: {
       enabled: supportEnabled,
@@ -88,7 +90,9 @@ async function fetchProducts(activeOnly = false): Promise<Product[]> {
     .order("created_at", { ascending: true });
 
   if (activeOnly) {
-    query = query.eq("is_active", true);
+    query = query.eq("is_active", true).eq("status", "active");
+  } else {
+    query = query.neq("status", "inactive");
   }
 
   const { data, error } = await query;
@@ -142,9 +146,10 @@ export async function getProductPricing(slug: string): Promise<ProductPricing | 
   try {
     const { data, error } = await supabaseAdmin
       .from("products")
-      .select("price_eur,quantity,support_enabled,support_name,support_price_eur")
+      .select("price_eur,quantity,support_enabled,support_name,support_price_eur,status")
       .eq("slug", slug)
       .eq("is_active", true)
+      .eq("status", "active")
       .maybeSingle();
 
     if (error) {

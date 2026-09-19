@@ -57,12 +57,32 @@ export function Label({ children, htmlFor }: { children: ReactNode; htmlFor?: st
   );
 }
 
-export function Field({ label, children }: { label: string; children: ReactNode }) {
+export function Field({ label, children }: { label: ReactNode; children: ReactNode }) {
   return (
     <div>
-      <Label>{label}</Label>
+      {typeof label === "string" ? <Label>{label}</Label> : <div className="mb-1.5">{label}</div>}
       {children}
     </div>
+  );
+}
+
+export function InfoTooltip({ text }: { text: string }) {
+  return (
+    <span className="group relative inline-flex align-middle">
+      <button
+        type="button"
+        className="ml-1 inline-flex h-4 w-4 items-center justify-center rounded-full border border-border bg-background text-[10px] font-semibold leading-none text-muted hover:border-accent hover:text-foreground"
+        aria-label="More information"
+      >
+        i
+      </button>
+      <span
+        role="tooltip"
+        className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 hidden w-64 -translate-x-1/2 rounded-md border border-border bg-card px-3 py-2 text-left text-[11px] font-normal normal-case leading-snug tracking-normal text-foreground shadow-lg group-hover:block group-focus-within:block"
+      >
+        {text}
+      </span>
+    </span>
   );
 }
 

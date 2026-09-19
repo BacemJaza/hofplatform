@@ -52,7 +52,7 @@ function groupProductsIntoDrops(products: Product[]): DropGroup[] {
   }
 
   return Array.from(byLabel.entries()).map(([name, designs], index) => {
-    const hasLive = designs.some((d) => d.is_active);
+    const hasLive = designs.some((d) => d.status === "active");
     return {
       code: String(index + 1).padStart(3, "0"),
       name,
@@ -156,7 +156,7 @@ function Drops() {
                         key={product.slug}
                         product={product}
                         index={index}
-                        comingSoon={!product.is_active}
+                        comingSoon={product.status === "coming_soon"}
                       />
                     ))}
                   </div>

@@ -19,6 +19,7 @@ export type Product = {
   story: string;
   tags: string[];
   is_active: boolean;
+  status: "active" | "inactive" | "coming_soon";
   /** Available units; 0 means out of stock (pre-order when active). */
   quantity: number;
   support: ProductSupport;
@@ -34,6 +35,10 @@ export function isOutOfStock(product: Pick<Product, "quantity" | "is_active">): 
 
 export function canPreOrder(product: Pick<Product, "quantity" | "is_active">): boolean {
   return product.is_active && product.quantity === 0;
+}
+
+export function isComingSoon(product: Pick<Product, "status">): boolean {
+  return product.status === "coming_soon";
 }
 
 export function maxPurchasableQty(product: Pick<Product, "quantity">): number {
