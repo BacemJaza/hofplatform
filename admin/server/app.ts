@@ -9,6 +9,7 @@ import { preOrdersRouter } from "./routes/pre-orders";
 import { messagesRouter } from "./routes/messages";
 import { settingsRouter } from "./routes/settings";
 import { salesRouter } from "./routes/sales";
+import { expensesRouter } from "./routes/expenses";
 import { discountsRouter } from "./routes/discounts";
 import { imageProxyRouter } from "./routes/image-proxy";
 import { supabase } from "./supabase";
@@ -60,6 +61,7 @@ export function createApp(options: { serveStatic?: boolean } = {}) {
   app.use("/api/messages", messagesRouter);
   app.use("/api/settings", settingsRouter);
   app.use("/api/sales", salesRouter);
+  app.use("/api/expenses", expensesRouter);
   app.use("/api/discounts", discountsRouter);
   app.use("/api/image-proxy", imageProxyRouter);
 

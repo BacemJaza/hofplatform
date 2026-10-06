@@ -12,14 +12,17 @@ export class ProductFetchError extends Error {
 }
 
 const PRODUCT_COLUMNS =
-  "id,slug,name,label,price_eur,image_url,image_urls,story,tags,is_active,status,quantity,support_enabled,support_name,support_price_eur" as const;
+  "id,slug,name,label,width_cm,height_cm,price_eur,discount_percent,image_url,image_urls,story,tags,is_active,status,quantity,support_enabled,support_name,support_price_eur" as const;
 
 type ProductRow = {
   id: string;
   slug: string;
   name: string;
   label: string;
+  width_cm: number | null;
+  height_cm: number | null;
   price_eur: number;
+  discount_percent: number;
   image_url: string;
   image_urls: string[] | null;
   story: string;
@@ -67,7 +70,10 @@ function normalizeProduct(row: ProductRow): Product {
     slug: row.slug,
     name: row.name,
     label: row.label,
+    width_cm: Number(row.width_cm ?? 90),
+    height_cm: Number(row.height_cm ?? 140),
     price: String(row.price_eur),
+    discount_percent: Number(row.discount_percent ?? 0),
     image: images[0] ?? row.image_url,
     images,
     story: row.story,
@@ -146,7 +152,7 @@ export async function getProductPricing(slug: string): Promise<ProductPricing | 
   try {
     const { data, error } = await supabaseAdmin
       .from("products")
-      .select("price_eur,quantity,support_enabled,support_name,support_price_eur,status")
+      .select("price_eur,discount_percent,quantity,support_enabled,support_name,support_price_eur,status")
       .eq("slug", slug)
       .eq("is_active", true)
       .eq("status", "active")
@@ -159,7 +165,9 @@ export async function getProductPricing(slug: string): Promise<ProductPricing | 
     if (!data) return null;
 
     return {
-      unitPrice: Number(data.price_eur),
+      unitPrice: Math.round(
+        Number(data.price_eur) * (1 - Number(data.discount_percent ?? 0) / 100) * 1000,
+      ) / 1000,
       quantity: Number(data.quantity ?? 0),
       supportEnabled: Boolean(data.support_enabled),
       supportName: data.support_name,

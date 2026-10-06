@@ -150,8 +150,6 @@ function Index() {
           <p className="mt-8 font-display text-3xl leading-[1.15] text-balance md:text-5xl">
             {t("banner.line1")}
             <br />
-            <span className="text-foreground">{t("banner.line2")}</span>
-            <br />
             <span className="ember-text">{t("banner.line3")}</span>
           </p>
         </div>

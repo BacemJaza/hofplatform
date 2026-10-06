@@ -6,7 +6,10 @@ export type ProductRow = {
   slug: string;
   name: string;
   label: string;
+  width_cm: number;
+  height_cm: number;
   price_eur: number;
+  discount_percent: number;
   quantity: number;
   image_url: string;
   image_urls: string[];
@@ -56,6 +59,32 @@ export type OrderRow = {
 export type SiteSettingsRow = {
   id: number;
   delivery_fee_tnd: number;
+  company_name?: string;
+  company_address?: string | null;
+  company_email?: string | null;
+  company_phone?: string | null;
+  company_logo_url?: string | null;
+  updated_at: string;
+};
+
+export type ExpenseRow = {
+  id: string;
+  invoice_number: string | null;
+  supplier_name: string | null;
+  title: string;
+  description: string | null;
+  category: string;
+  payment_date: string;
+  amount_ht: number;
+  vat_rate: number | null;
+  vat_amount: number;
+  amount_ttc: number;
+  currency: string;
+  payment_status: "paid" | "pending";
+  attachment_path: string | null;
+  notes: string | null;
+  status: "active" | "voided";
+  created_at: string;
   updated_at: string;
 };
 

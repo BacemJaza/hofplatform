@@ -11,6 +11,8 @@ import { PreOrdersPage } from "@/pages/PreOrdersPage";
 import { MessagesPage } from "@/pages/MessagesPage";
 import { SettingsPage } from "@/pages/SettingsPage";
 import { SalesPage } from "@/pages/SalesPage";
+import { FacturationPage } from "@/pages/FacturationPage";
+import { ExpenseFormPage } from "@/pages/ExpenseFormPage";
 import { DiscountsPage } from "@/pages/DiscountsPage";
 import { DiscountFormPage } from "@/pages/DiscountFormPage";
 
@@ -36,6 +38,9 @@ export function App() {
               <Route path="/discounts/new" element={<DiscountFormPage />} />
               <Route path="/discounts/:id/edit" element={<DiscountFormPage />} />
               <Route path="/sales" element={<SalesPage />} />
+              <Route path="/facturation" element={<FacturationPage />} />
+              <Route path="/facturation/new" element={<ExpenseFormPage />} />
+              <Route path="/facturation/:id/edit" element={<ExpenseFormPage />} />
               <Route path="/pre-orders" element={<PreOrdersPage />} />
               <Route path="/messages" element={<MessagesPage />} />
               <Route path="/settings" element={<SettingsPage />} />

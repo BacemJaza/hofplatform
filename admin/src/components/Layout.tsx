@@ -6,7 +6,11 @@ const nav = [
   { to: "/products", label: "Products" },
   { to: "/orders", label: "Orders" },
   { to: "/discounts", label: "Discounts" },
-  { to: "/sales", label: "Sales" },
+  {
+    to: "/sales",
+    label: "Sales",
+    children: [{ to: "/facturation", label: "Facturation" }],
+  },
   { to: "/pre-orders", label: "Pre-Orders" },
   { to: "/messages", label: "Messages" },
   { to: "/settings", label: "Settings" },
@@ -31,19 +35,35 @@ export function Layout() {
 
         <nav className="flex-1 space-y-1 p-3">
           {nav.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              className={({ isActive }) =>
-                `block rounded-md px-3 py-2 text-sm transition-colors ${
-                  isActive
-                    ? "bg-white/10 text-sidebar-fg"
-                    : "text-sidebar-fg/75 hover:bg-white/5 hover:text-sidebar-fg"
-                }`
-              }
-            >
-              {item.label}
-            </NavLink>
+            <div key={item.to}>
+              <NavLink
+                to={item.to}
+                className={({ isActive }) =>
+                  `block rounded-md px-3 py-2 text-sm transition-colors ${
+                    isActive
+                      ? "bg-white/10 text-sidebar-fg"
+                      : "text-sidebar-fg/75 hover:bg-white/5 hover:text-sidebar-fg"
+                  }`
+                }
+              >
+                {item.label}
+              </NavLink>
+              {item.children?.map((child) => (
+                <NavLink
+                  key={child.to}
+                  to={child.to}
+                  className={({ isActive }) =>
+                    `ml-3 block rounded-md px-3 py-2 text-sm transition-colors ${
+                      isActive
+                        ? "bg-white/10 text-sidebar-fg"
+                        : "text-sidebar-fg/65 hover:bg-white/5 hover:text-sidebar-fg"
+                    }`
+                  }
+                >
+                  {child.label}
+                </NavLink>
+              ))}
+            </div>
           ))}
         </nav>
 

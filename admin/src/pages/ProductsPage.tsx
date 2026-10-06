@@ -176,7 +176,23 @@ export function ProductsPage() {
                     </div>
                   </td>
                   <td className="px-4 py-3 font-mono text-xs">{product.slug}</td>
-                  <td className="px-4 py-3">{formatTnd(product.price_eur)}</td>
+                  <td className="px-4 py-3">
+                    {product.discount_percent > 0 ? (
+                      <div>
+                        <span className="mr-2 text-muted line-through">
+                          {formatTnd(product.price_eur)}
+                        </span>
+                        <span className="font-medium">
+                          {formatTnd(product.price_eur * (1 - product.discount_percent / 100))}
+                        </span>
+                        <span className="ml-2 text-xs text-green-700">
+                          -{product.discount_percent}%
+                        </span>
+                      </div>
+                    ) : (
+                      formatTnd(product.price_eur)
+                    )}
+                  </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
                       <span className="font-medium">{product.quantity}</span>

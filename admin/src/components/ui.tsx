@@ -161,6 +161,8 @@ export function ConfirmDialog({
   onConfirm,
   onCancel,
   loading,
+  confirmLabel = "Delete",
+  loadingLabel = "Deleting…",
 }: {
   open: boolean;
   title: string;
@@ -168,6 +170,8 @@ export function ConfirmDialog({
   onConfirm: () => void;
   onCancel: () => void;
   loading?: boolean;
+  confirmLabel?: string;
+  loadingLabel?: string;
 }) {
   if (!open) return null;
   return (
@@ -180,7 +184,7 @@ export function ConfirmDialog({
             Cancel
           </Button>
           <Button variant="danger" onClick={onConfirm} disabled={loading}>
-            {loading ? "Deleting…" : "Delete"}
+            {loading ? loadingLabel : confirmLabel}
           </Button>
         </div>
       </Card>

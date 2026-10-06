@@ -6,7 +6,7 @@ import { useT } from "@/hooks/use-language";
 import { placePreOrder } from "@/lib/pre-orders.functions.server";
 import { getProductBySlug } from "@/lib/products.server";
 import { ProductsLoading } from "@/components/products-loading";
-import type { Product } from "@/lib/products";
+import { discountedPrice, type Product } from "@/lib/products";
 
 export const Route = createFileRoute("/pre-order")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -91,7 +91,8 @@ function PreOrderPage() {
   }
 
   const supportExtra = product.support.enabled ? parsePrice(product.support.price) : 0;
-  const lineTotal = parsePrice(product.price) * qty + (withSupport ? supportExtra * supportQty : 0);
+  const currentPrice = discountedPrice(product.price, product.discount_percent);
+  const lineTotal = currentPrice * qty + (withSupport ? supportExtra * supportQty : 0);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -202,7 +203,19 @@ function PreOrderPage() {
                 <span className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
                   Base Price
                 </span>
-                <span className="font-display text-lg">{formatTND(product.price)}</span>
+                <span className="font-display text-lg">
+                  {product.discount_percent > 0 && (
+                    <span className="mr-2 text-sm text-muted-foreground line-through">
+                      {formatTND(product.price)}
+                    </span>
+                  )}
+                  {formatTND(currentPrice)}
+                  {product.discount_percent > 0 && (
+                    <span className="ml-2 text-[10px] uppercase text-ember">
+                      {product.discount_percent}% off
+                    </span>
+                  )}
+                </span>
               </div>
 
               {product.support.enabled && withSupport && supportQty > 0 && (

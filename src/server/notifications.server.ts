@@ -89,6 +89,34 @@ export async function sendCheckoutSuccessEmail(input: {
   }
 }
 
+export async function sendPreOrderConfirmationEmail(input: {
+  email: string;
+  customerName: string;
+  preOrderRef: string;
+  items: Array<{ slug: string; qty: number; line_total_tnd: number }>;
+}): Promise<void> {
+  const sharedSecret = process.env.PREORDER_EMAIL_SECRET;
+  if (!sharedSecret) {
+    throw new Error("PREORDER_EMAIL_SECRET is not configured");
+  }
+
+  const { data, error } = await getExternalSupabaseAdmin().functions.invoke(
+    "send-pre-order-confirmation-email",
+    {
+      body: input,
+      headers: { "x-preorder-email-secret": sharedSecret },
+    },
+  );
+
+  if (error) {
+    throw new Error(`send-pre-order-confirmation-email invoke failed: ${error.message}`);
+  }
+
+  if (data && typeof data === "object" && "error" in data && data.error) {
+    throw new Error(String(data.error));
+  }
+}
+
 /*
 // --- Resend implementation (restore when needed) ---
 

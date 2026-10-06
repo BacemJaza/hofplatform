@@ -69,7 +69,10 @@ export const api = {
       slug: string;
       name: string;
       label: string;
+      width_cm: number;
+      height_cm: number;
       price_eur: number;
+      discount_percent: number;
       quantity: number;
       image_urls: string[];
       story: string;
@@ -90,7 +93,10 @@ export const api = {
         slug: string;
         name: string;
         label: string;
+        width_cm: number;
+        height_cm: number;
         price_eur: number;
+        discount_percent: number;
         quantity: number;
         image_urls: string[];
         story: string;
@@ -178,6 +184,117 @@ export const api = {
         granularity: params.granularity,
       });
       return request<{ stats: import("./types").SalesStats }>(`/api/sales?${search.toString()}`);
+    },
+  },
+
+  expenses: {
+    list: (params: {
+      from: string;
+      to: string;
+      page?: number;
+      pageSize?: number;
+      q?: string;
+    }) => {
+      const search = new URLSearchParams({
+        from: params.from,
+        to: params.to,
+        page: String(params.page ?? 1),
+        pageSize: String(params.pageSize ?? 25),
+      });
+      if (params.q?.trim()) search.set("q", params.q.trim());
+      return request<{
+        expenses: import("./types").Expense[];
+        pagination: import("./types").ExpensePagination;
+      }>(`/api/expenses?${search.toString()}`);
+    },
+    dashboard: (params: { from: string; to: string }) => {
+      const search = new URLSearchParams({ from: params.from, to: params.to });
+      return request<{ dashboard: import("./types").BillingDashboard }>(
+        `/api/expenses/dashboard?${search.toString()}`,
+      );
+    },
+    get: (id: string) =>
+      request<{ expense: import("./types").Expense }>(`/api/expenses/${id}`),
+    create: (data: {
+      invoice_number?: string | null;
+      supplier_name?: string | null;
+      title: string;
+      description?: string | null;
+      category: string;
+      payment_date: string;
+      payment_status: import("./types").ExpensePaymentStatus;
+      amount_ht: number;
+      vat_enabled: boolean;
+      vat_rate?: number | null;
+      currency?: string;
+      notes?: string | null;
+    }) =>
+      request<{ expense: import("./types").Expense }>("/api/expenses", {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
+    update: (
+      id: string,
+      data: Partial<{
+        invoice_number: string | null;
+        supplier_name: string | null;
+        title: string;
+        description: string | null;
+        category: string;
+        payment_date: string;
+        payment_status: import("./types").ExpensePaymentStatus;
+        amount_ht: number;
+        vat_enabled: boolean;
+        vat_rate: number | null;
+        currency: string;
+        notes: string | null;
+      }>,
+    ) =>
+      request<{ expense: import("./types").Expense }>(`/api/expenses/${id}`, {
+        method: "PUT",
+        body: JSON.stringify(data),
+      }),
+    void: (id: string) =>
+      request<{ expense: import("./types").Expense }>(`/api/expenses/${id}/void`, {
+        method: "PATCH",
+      }),
+    attachmentUrl: (id: string) =>
+      request<{ url: string }>(`/api/expenses/${id}/attachment-url`),
+    uploadAttachment: async (id: string, file: File) => {
+      const form = new FormData();
+      form.append("file", file);
+      const res = await fetch(`/api/expenses/${id}/attachment`, {
+        method: "POST",
+        body: form,
+        credentials: "include",
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new ApiError(
+          typeof body.error === "string" ? body.error : "Upload failed",
+          res.status,
+          body.error,
+        );
+      }
+      return body as { expense: import("./types").Expense };
+    },
+    downloadPdf: async (id: string, filename: string) => {
+      const res = await fetch(`/api/expenses/${id}/pdf`, { credentials: "include" });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new ApiError(
+          typeof body.error === "string" ? body.error : "PDF download failed",
+          res.status,
+          body.error,
+        );
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = filename;
+      anchor.click();
+      URL.revokeObjectURL(url);
     },
   },
 

@@ -4,5 +4,6 @@ export function parsePrice(value: string | number): number {
 }
 
 export function formatTND(value: string | number): string {
-  return `${Math.round(parsePrice(value))} TND`;
+  const amount = Math.round(parsePrice(value) * 1000) / 1000;
+  return `${amount.toFixed(3).replace(/\.?0+$/, "")} TND`;
 }

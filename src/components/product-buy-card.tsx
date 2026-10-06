@@ -1,8 +1,8 @@
 import { useRef, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import type { Product } from "@/lib/products";
-import { pickHoverImage, productImages, canPreOrder } from "@/lib/products";
-import { formatTND, parsePrice } from "@/lib/price";
+import { discountedPrice, pickHoverImage, productImages, canPreOrder } from "@/lib/products";
+import { formatTND } from "@/lib/price";
 import { useCart } from "@/stores/cart-store";
 import { useT } from "@/hooks/use-language";
 import { ProductImage } from "@/components/product-image";
@@ -43,7 +43,8 @@ export function ProductBuyCard({ product }: { product: Product }) {
   const dec = () => setLocalQty((q) => Math.max(1, q - 1));
   const inc = () => setLocalQty((q) => Math.min(20, q + 1));
 
-  const lineTotal = parsePrice(product.price) * qty;
+  const currentPrice = discountedPrice(product.price, product.discount_percent);
+  const lineTotal = currentPrice * qty;
 
   const onBuy = () => {
     // Replace any prior cart state for this slug with the chosen qty.
@@ -82,6 +83,11 @@ export function ProductBuyCard({ product }: { product: Product }) {
           <div className="absolute right-4 top-4 text-[10px] uppercase tracking-[0.3em] ember-text">
             ● Limited
           </div>
+          {product.discount_percent > 0 && (
+            <div className="absolute bottom-4 left-4 bg-ember px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-background">
+              {product.discount_percent}% off
+            </div>
+          )}
         </div>
       </Link>
 
@@ -92,9 +98,14 @@ export function ProductBuyCard({ product }: { product: Product }) {
             {product.label}
           </p>
         </div>
-        <p className="font-display text-lg text-foreground sm:text-xl">
-          {formatTND(product.price)}
-        </p>
+        <div className="text-right font-display text-lg text-foreground sm:text-xl">
+          {product.discount_percent > 0 && (
+            <span className="block text-xs text-muted-foreground line-through">
+              {formatTND(product.price)}
+            </span>
+          )}
+          {formatTND(currentPrice)}
+        </div>
       </div>
 
       {/* Qty + Buy or Pre-Order */}
@@ -104,7 +115,7 @@ export function ProductBuyCard({ product }: { product: Product }) {
           search={{ slug: product.slug }}
           className="mt-5 block border hairline px-4 py-4 text-center text-[10px] uppercase tracking-[0.25em] transition-colors hover:bg-foreground hover:text-background sm:mt-6 sm:px-8 sm:text-xs sm:tracking-[0.4em]"
         >
-          Pre-Order — {formatTND(product.price)}
+          Pre-Order — {formatTND(currentPrice)}
         </Link>
       ) : (
         <div className="mt-5 flex flex-col gap-3 sm:mt-6 sm:flex-row sm:items-stretch sm:gap-4">

@@ -1,13 +1,14 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { Product } from "@/lib/products";
-import { canPreOrder, maxPurchasableQty } from "@/lib/products";
+import { canPreOrder, discountedPrice, maxPurchasableQty } from "@/lib/products";
 import { parsePrice } from "@/lib/price";
 
 export type CartItem = {
   slug: string;
   name: string;
   price: string;
+  discount_percent: number;
   image: string;
   qty: number;
   isPreOrder: boolean;
@@ -43,6 +44,7 @@ function toCartItem(p: Product, qty: number, withSupport = false, supportQty = 0
     slug: p.slug,
     name: p.name,
     price: p.price,
+    discount_percent: p.discount_percent,
     image: p.image,
     qty,
     isPreOrder: canPreOrder(p),
@@ -55,7 +57,7 @@ function toCartItem(p: Product, qty: number, withSupport = false, supportQty = 0
 }
 
 function lineUnitPrice(item: CartItem): number {
-  const base = parsePrice(item.price);
+  const base = discountedPrice(item.price, item.discount_percent);
   return base * item.qty +
     (item.withSupport && item.supportEnabled ? parsePrice(item.supportPrice) * item.supportQty : 0);
 }
@@ -95,6 +97,7 @@ export const useCart = create<CartState>()(
                         : 0,
                       image: p.image,
                       price: p.price,
+                      discount_percent: p.discount_percent,
                       name: p.name,
                     }
                   : i,
@@ -157,6 +160,7 @@ export const useCart = create<CartState>()(
                 isPreOrder,
                 name: product.name,
                 price: product.price,
+                discount_percent: product.discount_percent,
                 image: product.image,
                 supportEnabled: product.support.enabled,
                 supportName: product.support.name,
@@ -184,6 +188,7 @@ export const useCart = create<CartState>()(
           slug: i.slug ?? "",
           name: i.name ?? "",
           price: i.price ?? "0",
+          discount_percent: i.discount_percent ?? 0,
           image: i.image ?? "",
           qty: i.qty ?? 1,
           isPreOrder: Boolean(i.isPreOrder),

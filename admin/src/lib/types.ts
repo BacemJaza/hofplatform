@@ -3,7 +3,10 @@ export type Product = {
   slug: string;
   name: string;
   label: string;
+  width_cm: number;
+  height_cm: number;
   price_eur: number;
+  discount_percent: number;
   quantity: number;
   image_url: string;
   image_urls: string[];
@@ -157,4 +160,45 @@ export type SalesStats = {
   revenueSeries: RevenuePoint[];
   topProducts: TopProduct[];
   recentOrders: RecentOrder[];
+};
+
+export type ExpensePaymentStatus = "paid" | "pending";
+export type ExpenseRecordStatus = "active" | "voided";
+
+export type Expense = {
+  id: string;
+  invoice_number: string | null;
+  supplier_name: string | null;
+  title: string;
+  description: string | null;
+  category: string;
+  payment_date: string;
+  amount_ht: number;
+  vat_rate: number | null;
+  vat_amount: number;
+  amount_ttc: number;
+  currency: string;
+  payment_status: ExpensePaymentStatus;
+  attachment_path: string | null;
+  notes: string | null;
+  status: ExpenseRecordStatus;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ExpensePagination = {
+  page: number;
+  pageSize: number;
+  total: number;
+  totalPages: number;
+};
+
+export type BillingDashboard = {
+  revenue: number;
+  paidExpenses: number;
+  pendingExpenses: number;
+  net: number;
+  currency: string;
+  expensesByCategory: { category: string; totalTtc: number }[];
+  monthlySeries: { period: string; revenue: number; expenses: number; net: number }[];
 };

@@ -10,8 +10,11 @@ export type Product = {
   slug: string;
   name: string;
   label: string;
+  width_cm: number;
+  height_cm: number;
   /** Price in TND (stored as price_eur in the database). */
   price: string;
+  discount_percent: number;
   /** Primary/cover image (first gallery entry). */
   image: string;
   /** Ordered gallery; first entry is always the primary image. */
@@ -24,6 +27,12 @@ export type Product = {
   quantity: number;
   support: ProductSupport;
 };
+
+export function discountedPrice(price: string | number, discountPercent: number): number {
+  const basePrice = typeof price === "number" ? price : Number(price) || 0;
+  const percent = Math.min(100, Math.max(0, discountPercent || 0));
+  return Math.round(basePrice * (1 - percent / 100) * 1000) / 1000;
+}
 
 export function isInStock(product: Pick<Product, "quantity">): boolean {
   return product.quantity > 0;

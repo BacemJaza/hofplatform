@@ -8,6 +8,7 @@ if (-not $env:SUPABASE_ACCESS_TOKEN) {
 
 $functions = @(
   "send-checkout-success-email",
+  "send-pre-order-confirmation-email",
   "gateway-diagnostic-hello"
 )
 

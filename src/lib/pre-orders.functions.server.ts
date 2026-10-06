@@ -4,6 +4,7 @@ import { getExternalSupabaseAdmin } from "@/integrations/supabase/external-admin
 import { generatePreOrderRef } from "../server/orders.server";
 import { fetchDeliveryFeeTND } from "@/lib/settings.server";
 import { getCanonicalProductPricing } from "../server/orders.server";
+import { sendPreOrderConfirmationEmail } from "../server/notifications.server";
 
 const preOrderEmailDeduplicationWindowMs = 15_000;
 const recentPreOrderEmailRequests = new Map<
@@ -183,6 +184,21 @@ export const placePreOrder = createServerFn({ method: "POST" })
         ok: false as const,
         error: "Could not save pre-order.",
       };
+    }
+
+    try {
+      await sendPreOrderConfirmationEmail({
+        email: data.email,
+        customerName: data.name,
+        preOrderRef,
+        items: validatedItems.map(({ slug, qty, line_total_tnd }) => ({
+          slug,
+          qty,
+          line_total_tnd,
+        })),
+      });
+    } catch (mailErr) {
+      console.error("sendPreOrderConfirmationEmail failed:", mailErr);
     }
 
     return {

@@ -1,4 +1,7 @@
 import type { OrderItem, OrderRow } from "../supabase";
+import { countsAsRevenue, orderRevenue } from "./order-revenue";
+
+export { countsAsRevenue };
 export type SalesGranularity = "daily" | "monthly" | "yearly";
 export type SalesSummary = { totalRevenue: number; orderCount: number; averageOrderValue: number; productsSold: number; currency: string };
 export type OrdersByStatus = { completed: number; pending: number; cancelled: number };
@@ -9,10 +12,8 @@ export type SalesStats = { summary: SalesSummary; ordersByStatus: OrdersByStatus
 const COMPLETED_STATUSES = new Set(["confirmed", "shipped", "delivered", "completed"]);
 const PENDING_STATUSES = new Set(["pending", "processing"]);
 function safeNumber(value: unknown): number { const number = Number(value); return !Number.isFinite(number) || number < 0 ? 0 : number; }
-export function countsAsRevenue(status: string): boolean { return status !== "cancelled"; }
 export function getStatusBucket(status: string): keyof OrdersByStatus { if (status === "cancelled") return "cancelled"; if (PENDING_STATUSES.has(status)) return "pending"; if (COMPLETED_STATUSES.has(status)) return "completed"; return "pending"; }
 function lineRevenue(item: OrderItem): number { const lineTotal = safeNumber(item.line_total_tnd); if (lineTotal > 0) return lineTotal; const quantity = safeNumber(item.qty); const unit = safeNumber(item.unit_price_tnd); const support = item.with_support ? safeNumber(item.support_unit_price_tnd) : 0; return (unit + support) * quantity; }
-function orderRevenue(order: OrderRow): number { const total = safeNumber(order.total); return total > 0 ? total : (order.items ?? []).reduce((sum, item) => sum + lineRevenue(item), 0) + safeNumber(order.delivery_fee); }
 function lineQuantity(item: OrderItem): number { return Math.max(0, Math.floor(safeNumber(item.qty))); }
 function periodKey(iso: string, granularity: SalesGranularity): string { const date = new Date(iso); const year = date.getUTCFullYear(); const month = String(date.getUTCMonth() + 1).padStart(2, "0"); const day = String(date.getUTCDate()).padStart(2, "0"); return granularity === "yearly" ? String(year) : granularity === "monthly" ? `${year}-${month}` : `${year}-${month}-${day}`; }
 function periodLabel(key: string, granularity: SalesGranularity): string { if (granularity === "yearly") return key; const parts = key.split("-"); const date = granularity === "monthly" ? new Date(Date.UTC(Number(parts[0]), Number(parts[1]) - 1, 1)) : new Date(Date.UTC(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]))); return date.toLocaleDateString("en-GB", granularity === "monthly" ? { month: "short", year: "numeric", timeZone: "UTC" } : { day: "2-digit", month: "short", year: "numeric", timeZone: "UTC" }); }

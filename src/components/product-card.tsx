@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import type { Product } from "@/lib/products";
-import { pickHoverImage, productImages } from "@/lib/products";
+import { discountedPrice, pickHoverImage, productImages } from "@/lib/products";
 import { formatTND } from "@/lib/price";
 import { useT } from "@/hooks/use-language";
 import { ProductImage } from "@/components/product-image";
@@ -73,6 +73,11 @@ export function ProductCard({
             <div className="absolute right-4 top-4 text-[10px] uppercase tracking-[0.3em] ember-text">
               ● Limited
             </div>
+            {product.discount_percent > 0 && (
+              <div className="absolute bottom-4 left-4 bg-ember px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-background">
+                {product.discount_percent}% off
+              </div>
+            )}
           </>
         )}
       </div>
@@ -85,11 +90,20 @@ export function ProductCard({
             {comingSoon ? t("drop.comingSoon") : product.label}
           </p>
         </div>
-        <p className={`font-display text-base transition-colors sm:text-lg ${
+        <div className={`text-right font-display text-base transition-colors sm:text-lg ${
           comingSoon ? "text-muted-foreground/50" : "text-muted-foreground group-hover:text-foreground"
         }`}>
-          {comingSoon ? "—" : formatTND(product.price)}
-        </p>
+          {comingSoon ? "—" : product.discount_percent > 0 ? (
+            <>
+              <span className="block text-xs text-muted-foreground line-through">
+                {formatTND(product.price)}
+              </span>
+              <span className="text-foreground">
+                {formatTND(discountedPrice(product.price, product.discount_percent))}
+              </span>
+            </>
+          ) : formatTND(product.price)}
+        </div>
       </div>
     </>
   );

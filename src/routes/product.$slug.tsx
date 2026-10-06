@@ -6,7 +6,7 @@ import { formatTND, parsePrice } from "@/lib/price";
 import { useT } from "@/hooks/use-language";
 import { ProductsLoading } from "@/components/products-loading";
 import { getActiveProducts, getProductBySlug } from "@/lib/products.server";
-import { productImages, canPreOrder } from "@/lib/products";
+import { discountedPrice, productImages, canPreOrder } from "@/lib/products";
 import { ProductImage } from "@/components/product-image";
 
 export const Route = createFileRoute("/product/$slug")({
@@ -78,8 +78,12 @@ function ProductPage() {
   const activeImage = images[activeIndex] ?? product.image;
   const supportExtra =
     product.support.enabled && withSupport ? parsePrice(product.support.price) : 0;
-  const unitTotal = parsePrice(product.price) + supportExtra;
+  const currentPrice = discountedPrice(product.price, product.discount_percent);
+  const unitTotal = currentPrice + supportExtra;
   const priceTND = formatTND(unitTotal);
+  const productSpec = t("product.spec")
+    .replace("{width}", String(product.width_cm ?? 90))
+    .replace("{height}", String(product.height_cm ?? 140));
 
   const onAdd = () => {
     add(product, { withSupport, supportQty: withSupport ? 1 : 0 });
@@ -94,7 +98,7 @@ function ProductPage() {
         {/* Gallery */}
         <div className="space-y-4">
           <div
-            className="relative aspect-[4/5] overflow-hidden bg-card cursor-zoom-in"
+            className="relative aspect-[4/5] overflow-hidden bg-card"
             onClick={() => setZoom((z) => !z)}
           >
             <ProductImage
@@ -145,7 +149,7 @@ function ProductPage() {
           )}
 
           <p className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
-            {t("product.spec")}
+            {productSpec}
           </p>
         </div>
 
@@ -156,8 +160,18 @@ function ProductPage() {
           </p>
           <h1 className="mt-6 font-display text-7xl md:text-8xl">{product.name}</h1>
 
-          <div className="mt-8 flex items-baseline gap-4">
-            <span className="font-display text-3xl">{formatTND(product.price)}</span>
+          <div className="mt-8 flex flex-wrap items-baseline gap-4">
+            {product.discount_percent > 0 && (
+              <>
+                <span className="font-display text-xl text-muted-foreground line-through">
+                  {formatTND(product.price)}
+                </span>
+                <span className="bg-ember px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-background">
+                  {product.discount_percent}% off
+                </span>
+              </>
+            )}
+            <span className="font-display text-3xl">{formatTND(currentPrice)}</span>
             <span className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
               {t("cart.shippingNote")}
             </span>
@@ -206,7 +220,7 @@ function ProductPage() {
               search={{ slug: product.slug }}
               className="mt-12 inline-block border hairline py-5 px-8 text-xs uppercase tracking-[0.4em] transition-colors hover:bg-foreground hover:text-background"
             >
-              Pre-Order — {formatTND(product.price)}
+              Pre-Order — {formatTND(currentPrice)}
             </Link>
           ) : (
             <button
@@ -221,10 +235,10 @@ function ProductPage() {
           <div className="mt-12 border-t hairline pt-8 text-xs leading-relaxed text-muted-foreground">
             <p className="uppercase tracking-[0.3em] text-foreground">{t("product.details")}</p>
             <ul className="mt-4 space-y-2">
-              <li>— 100% cotton flag fabric, 220 gsm</li>
-              <li>— Hand-trimmed, brass grommets, hanging cord included</li>
-              <li>— Each flag numbered & signed</li>
-              <li>— Ships in 5–7 days from Tunis</li>
+              <li>{t("product.detail.fabric")}</li>
+              <li>{t("product.detail.handTrimmed")}</li>
+              <li>{t("product.detail.numbered")}</li>
+              <li>{t("product.detail.shipping")}</li>
             </ul>
           </div>
         </div>

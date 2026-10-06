@@ -65,6 +65,8 @@ export type Database = {
       products: {
         Row: {
           created_at: string
+          discount_percent: number
+          height_cm: number
           id: string
           image_url: string
           image_urls: string[]
@@ -81,9 +83,12 @@ export type Database = {
           support_price_eur: number | null
           tags: string[]
           updated_at: string
+          width_cm: number
         }
         Insert: {
           created_at?: string
+          discount_percent?: number
+          height_cm?: number
           id?: string
           image_url: string
           image_urls?: string[]
@@ -100,9 +105,12 @@ export type Database = {
           support_price_eur?: number | null
           tags?: string[]
           updated_at?: string
+          width_cm?: number
         }
         Update: {
           created_at?: string
+          discount_percent?: number
+          height_cm?: number
           id?: string
           image_url?: string
           image_urls?: string[]
@@ -119,6 +127,7 @@ export type Database = {
           support_price_eur?: number | null
           tags?: string[]
           updated_at?: string
+          width_cm?: number
         }
         Relationships: []
       }

@@ -17,7 +17,10 @@ type FormState = {
   slug: string;
   name: string;
   label: string;
+  width_cm: string;
+  height_cm: string;
   price_eur: string;
+  discount_percent: string;
   quantity: string;
   image_urls: string[];
   story: string;
@@ -33,7 +36,10 @@ const empty: FormState = {
   slug: "",
   name: "",
   label: "",
+  width_cm: "90",
+  height_cm: "140",
   price_eur: "",
+  discount_percent: "0",
   quantity: "0",
   image_urls: [""],
   story: "",
@@ -73,7 +79,10 @@ export function ProductFormPage() {
           slug: product.slug,
           name: product.name,
           label: product.label,
+          width_cm: String(product.width_cm ?? 90),
+          height_cm: String(product.height_cm ?? 140),
           price_eur: String(product.price_eur),
+          discount_percent: String(product.discount_percent ?? 0),
           quantity: String(product.quantity),
           image_urls: normalizeLoadedUrls(product),
           story: product.story,
@@ -143,7 +152,10 @@ export function ProductFormPage() {
       slug: form.slug.trim(),
       name: form.name.trim(),
       label: form.label.trim(),
+      width_cm: Number(form.width_cm),
+      height_cm: Number(form.height_cm),
       price_eur: Number(form.price_eur),
+      discount_percent: Number(form.discount_percent),
       quantity: Number(form.quantity),
       image_urls,
       story: form.story.trim(),
@@ -213,6 +225,41 @@ export function ProductFormPage() {
               />
             </Field>
           </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="Width (cm)">
+              <Input
+                type="number"
+                min="1"
+                step="0.1"
+                value={form.width_cm}
+                onChange={(e) => set("width_cm", e.target.value)}
+                required
+              />
+            </Field>
+            <Field label="Height (cm)">
+              <Input
+                type="number"
+                min="1"
+                step="0.1"
+                value={form.height_cm}
+                onChange={(e) => set("height_cm", e.target.value)}
+                required
+              />
+            </Field>
+          </div>
+
+          <Field label="Product discount (%)">
+            <Input
+              type="number"
+              min="0"
+              max="100"
+              step="0.01"
+              value={form.discount_percent}
+              onChange={(e) => set("discount_percent", e.target.value)}
+              required
+            />
+          </Field>
 
           <Field label="Stock quantity">
             <Input

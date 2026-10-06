@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { useCart } from "@/stores/cart-store";
 import { useEffect } from "react";
 import { formatTND } from "@/lib/price";
+import { discountedPrice } from "@/lib/products";
 import { useT } from "@/hooks/use-language";
 
 export function CartDrawer() {
@@ -86,7 +87,10 @@ export function CartDrawer() {
                       <div>
                         <p className="font-display text-lg">{it.name}</p>
                         <p className="mt-1 text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
-                          {formatTND(it.price)}
+                          {it.discount_percent > 0 && (
+                            <span className="mr-2 line-through">{formatTND(it.price)}</span>
+                          )}
+                          {formatTND(discountedPrice(it.price, it.discount_percent))}
                           {it.withSupport && it.supportEnabled
                             ? ` + ${it.supportName || t("support.label")}`
                             : ""}
