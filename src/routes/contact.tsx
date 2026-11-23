@@ -11,12 +11,12 @@ export const Route = createFileRoute("/contact")({
       {
         name: "description",
         content:
-          "Reach HOUSE OF FLAGS — Tunis. Email, phone, Instagram, TikTok, or send a note from the studio.",
+          "Contact HOUSE OF FLAGS for order support, custom enquiries, or press enquiries.",
       },
       { property: "og:title", content: "Contact — HOUSE OF FLAGS" },
       {
         property: "og:description",
-        content: "Get in touch with the studio in Tunis.",
+        content: "Contact the HOUSE OF FLAGS team.",
       },
     ],
   }),
@@ -28,6 +28,11 @@ const INSTAGRAM_URL = "https://www.instagram.com/houseofflagstn";
 const EMAIL = "houseofflagstn@gmail.com";
 const PHONE_DISPLAY = "+216 53 069 199";
 const PHONE_HREF = "+21653069199";
+const GUIDANCE_STEPS = [
+  { title: "contact.guidanceStep1Title", body: "contact.guidanceStep1Body" },
+  { title: "contact.guidanceStep2Title", body: "contact.guidanceStep2Body" },
+  { title: "contact.guidanceStep3Title", body: "contact.guidanceStep3Body" },
+] as const;
 
 function Contact() {
   const t = useT();
@@ -48,14 +53,14 @@ function Contact() {
         },
       });
       if (!res.ok) {
-        toast.error(res.error || "Could not send your message.");
+        toast.error(res.error || t("contact.sendError"));
         return;
       }
       setSubmitted(true);
       setForm({ full_name: "", email: "", notes: "" });
     } catch (err) {
       console.error("Feedback submission failed:", err);
-      toast.error("Could not send your message. Try again in a moment.");
+      toast.error(t("contact.sendErrorRetry"));
     } finally {
       setSubmitting(false);
     }
@@ -70,9 +75,35 @@ function Contact() {
         <h1 className="mt-6 font-display text-5xl leading-[0.95] break-words sm:text-6xl md:mt-8 md:text-8xl">
           {t("contact.title")}
         </h1>
-        <p className="mt-6 max-w-md text-sm leading-relaxed text-muted-foreground md:mt-8">
+        <p className="mt-6 max-w-xl text-base leading-relaxed text-muted-foreground md:mt-8 md:text-lg">
           {t("contact.intro")}
         </p>
+      </section>
+
+      <section className="mx-auto max-w-[1100px] px-6 pb-12 md:px-10">
+        <div className="border border-ember/35 border-l-4 border-l-ember bg-ember/5 p-6 md:p-8">
+          <p className="text-[10px] uppercase tracking-[0.5em] ember-text">
+            {t("contact.guidanceTitle")}
+          </p>
+          <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+            {t("contact.guidanceIntro")}
+          </p>
+          <ol className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-3">
+            {GUIDANCE_STEPS.map((step, index) => (
+              <li key={step.title} className="border-t border-ember/25 pt-4">
+                <p className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-ember/40 bg-ember/10 font-display text-sm text-ember">
+                  /0{index + 1}
+                </p>
+                <h2 className="mt-3 font-display text-xl">
+                  {t(step.title)}
+                </h2>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  {t(step.body)}
+                </p>
+              </li>
+            ))}
+          </ol>
+        </div>
       </section>
 
       <section className="mx-auto grid max-w-[1100px] grid-cols-1 gap-12 px-6 pb-24 md:gap-16 md:grid-cols-[1fr_1.2fr] md:px-10">

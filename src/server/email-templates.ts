@@ -1,5 +1,4 @@
-// Pure HTML email templates themed to match HOUSE OF FLAGS's editorial look:
-// dark bg, hairline borders, uppercase tracking, ember accent.
+// Pure HTML email templates for HOUSE OF FLAGS order updates.
 
 type OrderItem = {
   slug: string;
@@ -78,7 +77,7 @@ function shell(inner: string): string {
             ${inner}
             <tr>
               <td style="padding:24px 32px;border-top:1px solid ${HAIRLINE};font-size:10px;letter-spacing:0.4em;text-transform:uppercase;color:${MUTED};font-family:Helvetica,Arial,sans-serif;">
-                Shipped from Tunis · No restocks
+                Thank you for choosing HOUSE OF FLAGS.
               </td>
             </tr>
           </table>
@@ -94,15 +93,15 @@ export function checkoutSuccessEmail(customerName: string): {
   html: string;
   plain: string;
 } {
-  const subject = "Thank you for shopping with House of Flags";
+  const subject = "Order received — HOUSE OF FLAGS";
   const plain = [
     `Hello ${customerName},`,
     "",
-    "Thank you for shopping with House of Flags.",
+    "Thank you for your order.",
     "",
-    "Your checkout was completed successfully, and we have received your request.",
+    "We have received your order request. Our team will contact you shortly to confirm payment and delivery.",
     "",
-    "We will contact you shortly regarding your order.",
+    "We will be in touch shortly with the next steps.",
     "",
     "Thank you,",
     "House of Flags",
@@ -113,21 +112,21 @@ export function checkoutSuccessEmail(customerName: string): {
       <td style="padding:32px;">
         <div style="font-size:10px;letter-spacing:0.5em;text-transform:uppercase;color:${EMBER};font-family:Helvetica,Arial,sans-serif;margin-bottom:16px;">Checkout complete</div>
         <h1 style="margin:0 0 24px 0;font-size:34px;line-height:1.05;font-weight:normal;color:${FG};">
-          Thank you for<br/>shopping with us.
+          Thank you for<br/>your order.
         </h1>
         <p style="margin:0 0 20px 0;font-size:15px;line-height:1.65;color:${FG};">
           Hello ${escape(customerName)},
         </p>
         <p style="margin:0 0 20px 0;font-size:14px;line-height:1.65;color:${FG};">
-          Thank you for shopping with House of Flags.
+          Thank you for your order.
         </p>
         <div style="border-left:3px solid ${EMBER};padding:16px 0 16px 20px;margin:0 0 24px 0;">
           <p style="margin:0;font-size:14px;line-height:1.65;color:${FG};">
-            Your checkout was completed successfully, and we have received your request.
+            We have received your order request. Our team will contact you shortly to confirm payment and delivery.
           </p>
         </div>
         <p style="margin:0 0 28px 0;font-size:14px;line-height:1.65;color:${MUTED};">
-          We will contact you shortly regarding your order.
+          We will be in touch shortly with the next steps.
         </p>
         <p style="margin:0;font-size:14px;line-height:1.65;color:${FG};">
           Thank you,<br/>
@@ -145,13 +144,13 @@ export function customerOrderEmail(data: OrderEmailData): { subject: string; htm
       <td style="padding:32px;">
         <div style="font-size:10px;letter-spacing:0.5em;text-transform:uppercase;color:${MUTED};font-family:Helvetica,Arial,sans-serif;margin-bottom:16px;">Order received</div>
         <h1 style="margin:0 0 24px 0;font-size:36px;line-height:1;font-weight:normal;color:${FG};">
-          In a heartbeat,<br/>it's yours.
+          Thank you for<br/>your order.
         </h1>
         <p style="margin:0 0 24px 0;font-size:14px;line-height:1.6;color:${FG};">
-          ${escape(data.customerName)}, we got it. Your flag is being prepared. We'll reach out shortly with shipping details.
+          Hello ${escape(data.customerName)}, we’ve received your order. Our team will contact you shortly to confirm payment and delivery.
         </p>
         <div style="border:1px solid ${HAIRLINE};padding:16px 20px;margin:0 0 32px 0;">
-          <div style="font-size:10px;letter-spacing:0.4em;text-transform:uppercase;color:${MUTED};font-family:Helvetica,Arial,sans-serif;margin-bottom:6px;">Reference</div>
+          <div style="font-size:10px;letter-spacing:0.4em;text-transform:uppercase;color:${MUTED};font-family:Helvetica,Arial,sans-serif;margin-bottom:6px;">Order reference</div>
           <div style="font-size:20px;color:${FG};">${escape(data.orderRef)}</div>
         </div>
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0">

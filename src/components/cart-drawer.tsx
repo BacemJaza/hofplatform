@@ -102,7 +102,7 @@ export function CartDrawer() {
                             type="button"
                             onClick={() => setQty(it.slug, it.qty - 1)}
                             className="px-3 py-1 text-sm hover:bg-foreground hover:text-background"
-                            aria-label="Decrease"
+                            aria-label={t("cart.decrease")}
                           >
                             −
                           </button>
@@ -111,7 +111,7 @@ export function CartDrawer() {
                             type="button"
                             onClick={() => setQty(it.slug, it.qty + 1)}
                             className="px-3 py-1 text-sm hover:bg-foreground hover:text-background"
-                            aria-label="Increase"
+                            aria-label={t("cart.increase")}
                           >
                             +
                           </button>

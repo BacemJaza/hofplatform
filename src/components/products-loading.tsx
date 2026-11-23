@@ -1,6 +1,13 @@
+import { useT } from "@/hooks/use-language";
+
 export function ProductsLoading() {
+  const t = useT();
   return (
-    <div className="mx-auto max-w-[1600px] px-6 py-32 md:px-10" aria-busy="true" aria-label="Loading products">
+    <div
+      className="mx-auto max-w-[1600px] px-6 py-32 md:px-10"
+      aria-busy="true"
+      aria-label={t("common.loadingProducts")}
+    >
       <div className="mb-20 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
         <div className="space-y-6">
           <div className="h-3 w-28 animate-pulse rounded bg-muted" />

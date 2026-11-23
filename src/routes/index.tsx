@@ -21,29 +21,35 @@ export const Route = createFileRoute("/")({
   },
   head: () => ({
     meta: [
-      { title: "HOUSE OF FLAGS — Drop 001 / Fabric flags made in Tunis" },
+      { title: "HOUSE OF FLAGS — Collection 001 | Fabric Wall Art" },
       {
         name: "description",
         content:
-          "HOUSE OF FLAGS Drop 001 — limited fabric wall flags made in Tunis. Real cotton. Made to say something. Once sold out, never returns.",
+          "Explore Collection 001 by HOUSE OF FLAGS: limited-release fabric wall art designed to bring character to your space.",
       },
-      { property: "og:title", content: "HOUSE OF FLAGS — Drop 001" },
+      { property: "og:title", content: "HOUSE OF FLAGS — Collection 001" },
       {
         property: "og:description",
-        content: "Limited fabric wall flags from Tunis. Something to actually hang.",
+        content: "Discover distinctive fabric wall art from HOUSE OF FLAGS.",
       },
       { property: "og:image", content: heroFlag },
       { property: "twitter:image", content: heroFlag },
     ],
   }),
   pendingComponent: ProductsLoading,
-  errorComponent: ({ error }) => (
+  errorComponent: HomeError,
+  component: Index,
+});
+
+function HomeError({ error }: { error: unknown }) {
+  const t = useT();
+  return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-6 pt-24 text-center">
-      <p className="font-display text-4xl">COULDN&apos;T LOAD DROP</p>
-      <p className="max-w-md text-sm text-muted-foreground">
-        We couldn&apos;t reach the catalog right now. Please refresh and try again.
+      <p className="font-display text-4xl">{t("home.loadErrorTitle")}</p>
+      <p className="max-w-md text-base text-muted-foreground">
+        {t("home.loadErrorBody")}
       </p>
-      {import.meta.env.DEV && error?.message && (
+      {import.meta.env.DEV && error instanceof Error && error.message && (
         <pre className="mt-2 max-h-40 max-w-lg overflow-auto rounded-md bg-muted p-3 text-left font-mono text-xs text-destructive">
           {error.message}
         </pre>
@@ -52,12 +58,11 @@ export const Route = createFileRoute("/")({
         to="/"
         className="mt-2 text-xs uppercase tracking-[0.3em] underline-offset-8 hover:underline"
       >
-        Retry
+        {t("common.retry")}
       </Link>
     </div>
-  ),
-  component: Index,
-});
+  );
+}
 
 type Slide = { src: string; alt: string; labelKey: "hero.slide1" | "hero.slide2" | "hero.slide3" | "hero.slide4" | "hero.slide5" };
 
@@ -101,7 +106,7 @@ function Index() {
         <div className="absolute inset-0 animate-slow-zoom">
           <img
             src={heroFlag}
-            alt="Hanging fabric flag with the words NO RULES in a dark concrete room"
+            alt="Fabric wall art displayed in a contemporary interior"
             width={1920}
             height={1080}
             className="h-full w-full object-[center_35%] sm:object-center"
@@ -111,10 +116,11 @@ function Index() {
 
         <div className="relative z-10 flex w-full flex-1 flex-col items-center justify-center gap-3 px-4 py-8 text-center sm:gap-5 sm:px-6 sm:py-12 md:gap-8 md:py-16">
           <p
-            className="animate-fade-in max-w-[22rem] text-[9px] uppercase tracking-[0.28em] text-white bg-black px-2 py-0.5 sm:max-w-none sm:text-[10px] sm:tracking-[0.5em]"
+            className="animate-fade-in inline-flex max-w-[calc(100vw-2rem)] items-center gap-2 rounded-full border border-ember/50 bg-background/85 px-4 py-2 text-xs font-medium uppercase tracking-[0.16em] text-foreground shadow-sm backdrop-blur-sm sm:max-w-none sm:text-sm sm:tracking-[0.25em]"
             style={{ animationDelay: "200ms" }}
           >
-            {t("hero.tag")}
+            <span aria-hidden="true" className="h-1.5 w-1.5 shrink-0 rounded-full bg-ember" />
+            <span>{t("hero.tag")}</span>
           </p>
           <h1
             className="animate-fade-up max-w-[95vw] px-1 font-display text-[clamp(2.6rem,13vw,10rem)] leading-[0.9] wrap-break-word md:text-[10rem] md:leading-[0.85]"
@@ -123,7 +129,7 @@ function Index() {
             {"HOUSE OF FLAGS"}
           </h1>
           <p
-            className="animate-fade-up max-w-[18rem] text-[11px] uppercase tracking-[0.22em] text-white bg-black px-2 py-0.5 sm:max-w-md sm:text-sm sm:tracking-[0.35em]"
+            className="animate-fade-up max-w-xl text-base font-medium leading-relaxed text-foreground sm:text-lg"
             style={{ animationDelay: "700ms" }}
           >
             {t("hero.sub")}
@@ -132,7 +138,7 @@ function Index() {
           <div className="animate-fade-up pt-1 sm:pt-2 md:pt-4" style={{ animationDelay: "950ms" }}>
             <Link
               to="/drops"
-              className="group inline-flex min-h-11 items-center gap-3 border hairline px-5 py-3 text-[11px] uppercase tracking-[0.28em] transition-all hover:bg-foreground hover:text-background sm:gap-4 sm:px-8 sm:py-4 sm:text-xs sm:tracking-[0.35em]"
+              className="group inline-flex min-h-11 items-center gap-3 bg-foreground px-6 py-3 text-xs font-medium uppercase tracking-[0.2em] text-background shadow-sm transition-opacity hover:opacity-90 sm:gap-4 sm:px-8 sm:py-4 sm:text-sm sm:tracking-[0.25em]"
             >
               <span>{t("hero.cta")}</span>
               <span className="transition-transform group-hover:translate-x-1">→</span>
@@ -144,7 +150,7 @@ function Index() {
       {/* PHILOSOPHY BANNER */}
       <section className="border-b hairline">
         <div className="mx-auto max-w-[1200px] px-6 py-20 text-center md:px-10 md:py-28">
-          <p className="text-[10px] uppercase tracking-[0.5em] ember-text">
+          <p className="text-xs uppercase tracking-[0.35em] ember-text">
             {t("banner.tag")}
           </p>
           <p className="mt-8 font-display text-3xl leading-[1.15] text-balance md:text-5xl">
@@ -157,15 +163,15 @@ function Index() {
 
       {/* DROP 001 — live catalog from Supabase */}
       <section id="drop-001" className="mx-auto max-w-[1600px] px-6 py-32 md:px-10">
-        <div className="mb-20 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
+        <div className="mb-20 flex flex-col items-stretch justify-between gap-6 xl:flex-row xl:items-end">
           <div>
-            <p className="text-[10px] uppercase tracking-[0.5em] text-muted-foreground">
+            <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">
               {t("drop.tag")}
             </p>
-            <h2 className="mt-6 font-display text-6xl md:text-8xl">{t("drop.title")}</h2>
+            <h2 className="mt-6 font-display text-4xl sm:text-6xl md:text-7xl">{t("drop.title")}</h2>
           </div>
           {products.length !== 0 ? (
-          <p className="max-w-sm text-sm leading-relaxed text-muted-foreground">
+          <p className="max-w-md text-base leading-relaxed text-muted-foreground md:text-lg">
           {t("drop.intro")}
           </p>
           ) :(
@@ -174,8 +180,8 @@ function Index() {
         </div>
 
         {products.length === 0 ? (
-          <p className="text-sm text-muted-foreground">
-            The drop is being prepared. Check back soon.
+          <p className="text-base text-muted-foreground">
+            {t("home.empty")}
           </p>
         ) : (
           <div className="space-y-20">
@@ -199,7 +205,7 @@ function Index() {
 
       {/* PHILOSOPHY */}
       <section className="relative mx-auto max-w-[900px] px-6 py-32 text-center md:px-10">
-        <p className="text-[10px] uppercase tracking-[0.5em] text-muted-foreground">
+        <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">
           {t("philosophy.tag")}
         </p>
         <p className="mt-12 font-display text-4xl leading-[1.15] text-balance md:text-6xl">
@@ -210,7 +216,7 @@ function Index() {
           {t("philosophy.h1d")}
         </p>
         <div className="mx-auto mt-16 h-px w-24 bg-foreground/20" />
-        <p className="mt-12 mx-auto max-w-md text-sm leading-relaxed text-muted-foreground">
+        <p className="mt-12 mx-auto max-w-xl text-base leading-relaxed text-muted-foreground md:text-lg">
           {t("philosophy.body")}
         </p>
       </section>
@@ -219,16 +225,16 @@ function Index() {
       <section className="border-y hairline">
         <div className="mx-auto grid max-w-[1600px] grid-cols-1 gap-12 px-6 py-32 md:grid-cols-2 md:px-10">
           <div>
-            <p className="text-[10px] uppercase tracking-[0.5em] text-muted-foreground">
+            <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">
               {t("system.tag")}
             </p>
-            <h2 className="mt-6 font-display text-5xl leading-[0.95] md:text-7xl">
+            <h2 className="mt-6 font-display text-4xl leading-[0.95] sm:text-5xl md:text-7xl">
               {t("system.titleA")}
               <br />
               <span className="ember-text">{t("system.titleB")}</span>
             </h2>
           </div>
-          <div className="flex flex-col justify-center gap-8 text-sm leading-relaxed text-muted-foreground">
+          <div className="flex flex-col justify-center gap-8 text-base leading-relaxed text-muted-foreground md:text-lg">
             <p>{t("system.p1")}</p>
             <p>{t("system.p2")}</p>
           </div>

@@ -52,7 +52,7 @@ export function SiteHeader() {
       }`}
     >
       <div className="mx-auto flex h-16 max-w-[1600px] items-center justify-between px-4 sm:px-6 md:px-10">
-        <Link to="/" aria-label="HOUSE OF FLAGS — home" className="flex items-center">
+        <Link to="/" aria-label={t("header.home")} className="flex items-center">
           <span className="inline-flex h-9 items-center overflow-hidden bg-black px-2 md:h-10 md:px-3">
             <img
               src={houseOfFlagsLogo}
@@ -80,7 +80,7 @@ export function SiteHeader() {
                 key={l}
                 type="button"
                 onClick={() => setLang(l)}
-                aria-label={`Switch language to ${l}`}
+                aria-label={t("header.switchLanguage").replace("{language}", l.toUpperCase())}
                 aria-pressed={lang === l}
                 className={`px-1.5 py-1.5 sm:px-2 uppercase tracking-[0.2em] transition-colors ${
                   lang === l
@@ -96,7 +96,10 @@ export function SiteHeader() {
           <button
             type="button"
             onClick={toggle}
-            aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+            aria-label={t("header.switchTheme").replace(
+              "{theme}",
+              t(theme === "dark" ? "header.themeLight" : "header.themeDark"),
+            )}
             className="inline-flex h-8 w-8 items-center justify-center border hairline transition-colors hover:text-foreground hover:bg-foreground/5"
           >
             {theme === "dark" ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
@@ -105,7 +108,7 @@ export function SiteHeader() {
             type="button"
             onClick={() => setOpen(true)}
             className="group flex items-center gap-2 transition-colors hover:text-foreground"
-            aria-label={`Open cart, ${count} items`}
+            aria-label={t("header.openCart").replace("{count}", String(count))}
           >
             <span className="hidden md:inline">{t("nav.cart")}</span>
             <span
@@ -121,7 +124,7 @@ export function SiteHeader() {
           <button
             type="button"
             onClick={() => setMenuOpen((v) => !v)}
-            aria-label={menuOpen ? "Close menu" : "Open menu"}
+            aria-label={menuOpen ? t("header.closeMenu") : t("header.openMenu")}
             aria-expanded={menuOpen}
             className="inline-flex h-8 w-8 items-center justify-center border hairline transition-colors hover:text-foreground hover:bg-foreground/5 md:hidden"
           >

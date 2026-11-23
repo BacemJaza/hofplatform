@@ -52,15 +52,16 @@ export function ProductCard({
         <div className="absolute duration-700 group-hover:opacity-30" />
 
         {comingSoon && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/40 backdrop-blur-sm">
-            <p className="text-[10px] uppercase tracking-[0.5em] text-muted-foreground">
-              /locked
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/50 px-4 text-center backdrop-blur-sm">
+            <p className="text-xs font-medium uppercase tracking-[0.3em] ember-text">
+              {t("product.preview")}
             </p>
-            <p className="mt-4 font-display text-3xl uppercase tracking-[0.15em] text-foreground">
+            <p className="mt-4 font-display text-2xl uppercase leading-tight tracking-[0.08em] text-foreground sm:text-3xl sm:tracking-[0.1em]">
               {t("drop.comingSoon")}
             </p>
-            <span className="mt-4 inline-block border hairline px-3 py-1 text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
-              ● soon
+            <span className="mt-4 inline-flex items-center gap-2 text-xs uppercase tracking-[0.16em] ember-text">
+              <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-ember" />
+              {t("drops.coming")}
             </span>
           </div>
         )}

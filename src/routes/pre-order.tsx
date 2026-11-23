@@ -14,8 +14,8 @@ export const Route = createFileRoute("/pre-order")({
   }),
   head: () => ({
     meta: [
-      { title: "Pre-Order — HOUSE OF FLAGS" },
-      { name: "description", content: "Pre-order this out-of-stock piece from HOUSE OF FLAGS." },
+      { title: "Pre-order — HOUSE OF FLAGS" },
+      { name: "description", content: "Submit a pre-order request for an unavailable HOUSE OF FLAGS design." },
     ],
   }),
   component: PreOrderPage,
@@ -28,7 +28,7 @@ function PreOrderPage() {
 
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [hasError, setHasError] = useState(false);
 
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -50,20 +50,21 @@ function PreOrderPage() {
     const loadProduct = async () => {
       try {
         if (!slug) {
-          setError("Product slug is required");
+          setHasError(true);
           return;
         }
 
         const productData = await getProductBySlug({ data: slug });
         if (!productData || productData.status !== "active") {
-          setError("Product not found or inactive");
+          setHasError(true);
           return;
         }
 
         setProduct(productData);
-        setError(null);
+        setHasError(false);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load product");
+        console.error("Pre-order product load failed:", err);
+        setHasError(true);
       } finally {
         setLoading(false);
       }
@@ -76,15 +77,15 @@ function PreOrderPage() {
     return <ProductsLoading />;
   }
 
-  if (error || !product) {
+  if (hasError || !product) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-6 text-center">
-        <p className="font-display text-4xl">SOMETHING BROKE</p>
+        <p className="font-display text-4xl">{t("preorder.page.errorTitle")}</p>
         <p className="text-sm text-muted-foreground">
-          {error || "We couldn't load this pre-order form. Please try again."}
+          {t("preorder.page.errorBody")}
         </p>
         <Link to="/drops" className="mt-2 text-xs uppercase tracking-[0.3em] underline-offset-8 hover:underline">
-          Back to drop
+          {t("common.backToCollection")}
         </Link>
       </div>
     );
@@ -119,7 +120,7 @@ function PreOrderPage() {
       });
 
       if (!result.ok) {
-        toast.error(result.error || "Couldn't place your pre-order. Try again in a sec.");
+        toast.error(result.error || t("preorder.page.submittingError"));
         setSubmitting(false);
         return;
       }
@@ -129,7 +130,7 @@ function PreOrderPage() {
       if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err) {
       console.error("Pre-order submission failed:", err);
-      toast.error("Couldn't place your pre-order. Try again in a sec.");
+      toast.error(t("preorder.page.submittingError"));
       setSubmitting(false);
     }
   };
@@ -139,36 +140,32 @@ function PreOrderPage() {
       <article className="pt-32">
         <section className="mx-auto flex max-w-[760px] flex-col items-center px-6 py-24 text-center md:px-10">
           <p className="text-[10px] uppercase tracking-[0.5em] ember-text">
-            Pre-Order Received
+            {t("preorder.page.received")}
           </p>
           <h1 className="mt-8 font-display text-7xl leading-[0.9] md:text-9xl">
-            Thanks
-            <br />
-            for the
-            <br />
-            Commitment
+            {t("preorder.page.thanks")}
           </h1>
           <p className="mt-10 max-w-md text-base leading-relaxed text-muted-foreground">
-            Your pre-order for <strong>{product.name}</strong> has been recorded. We'll notify you when this piece is back in stock.
+            {t("preorder.page.message")} <strong>{product.name}</strong> {t("preorder.page.notified")}
           </p>
 
           <div className="mt-12 w-full max-w-sm border hairline">
             <div className="flex items-center justify-between px-5 py-4 text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
-              <span>Pre-Order Reference</span>
+              <span>{t("preorder.page.ref")}</span>
               <span className="font-display text-base text-foreground">{preOrderRef}</span>
             </div>
           </div>
 
           <div className="mt-16 flex flex-col items-center gap-6">
             <p className="text-[10px] uppercase tracking-[0.4em] text-muted-foreground">
-              Check out more pieces
+              {t("preorder.page.explore")}
             </p>
             <button
               type="button"
               onClick={() => navigate({ to: "/drops" })}
               className="border hairline px-10 py-4 text-xs uppercase tracking-[0.4em] transition-colors hover:bg-foreground hover:text-background"
             >
-              Back to Drop
+              {t("preorder.page.back")}
             </button>
           </div>
         </section>
@@ -185,7 +182,7 @@ function PreOrderPage() {
             params={{ slug: product.slug }}
             className="text-xs uppercase tracking-[0.3em] text-muted-foreground hover:text-foreground"
           >
-            ← Back to product
+            {t("preorder.page.backToProduct")}
           </Link>
         </div>
 
@@ -193,7 +190,7 @@ function PreOrderPage() {
           {/* Product Summary */}
           <div>
             <p className="text-[10px] uppercase tracking-[0.4em] text-muted-foreground">
-              HOUSE OF FLAGS / Drop 001 / {product.label}
+              HOUSE OF FLAGS / Collection 001 / {product.label}
             </p>
             <h1 className="mt-4 font-display text-5xl md:text-6xl">{product.name}</h1>
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{product.story}</p>
@@ -201,7 +198,7 @@ function PreOrderPage() {
             <div className="mt-8 space-y-4 border-t hairline pt-8">
               <div className="flex items-baseline justify-between">
                 <span className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
-                  Base Price
+                  {t("preorder.page.basePrice")}
                 </span>
                 <span className="font-display text-lg">
                   {product.discount_percent > 0 && (
@@ -241,13 +238,13 @@ function PreOrderPage() {
               )}
 
               <div className="border-t hairline pt-4 flex items-baseline justify-between">
-                <span className="font-display text-lg text-foreground">Total (excl. shipping)</span>
+                <span className="font-display text-lg text-foreground">{t("preorder.page.totalExclShipping")}</span>
                 <span className="font-display text-2xl">{formatTND(String(lineTotal))}</span>
               </div>
             </div>
 
             <p className="mt-8 text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
-              ⚠️ This item is currently out of stock. Your pre-order secures one when we restock. Shipping will be calculated at fulfillment.
+              {t("preorder.page.outOfStock")}
             </p>
           </div>
 
@@ -255,7 +252,7 @@ function PreOrderPage() {
           <form onSubmit={onSubmit} className="space-y-6">
             <div>
               <label className="block text-[10px] uppercase tracking-[0.3em] text-muted-foreground mb-2">
-                Quantity
+                {t("preorder.page.quantity")}
               </label>
               <div className="flex items-center border hairline">
                 <button
@@ -330,75 +327,75 @@ function PreOrderPage() {
 
             <fieldset className="space-y-3 border-t hairline pt-6">
               <legend className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
-                Contact Information
+                {t("preorder.page.contact")}
               </legend>
 
               <div>
-                <label className="block text-xs text-muted-foreground mb-1">Name</label>
+                <label className="block text-xs text-muted-foreground mb-1">{t("preorder.page.name")}</label>
                 <input
                   type="text"
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  placeholder="Full name"
+                  placeholder={t("preorder.page.namePlaceholder")}
                   required
                   className="w-full border hairline px-4 py-2 text-sm bg-background placeholder-muted-foreground outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs text-muted-foreground mb-1">Email</label>
+                <label className="block text-xs text-muted-foreground mb-1">{t("preorder.page.email")}</label>
                 <input
                   type="email"
                   value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  placeholder="your@email.com"
+                  placeholder={t("preorder.page.emailPlaceholder")}
                   required
                   className="w-full border hairline px-4 py-2 text-sm bg-background placeholder-muted-foreground outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs text-muted-foreground mb-1">Phone</label>
+                <label className="block text-xs text-muted-foreground mb-1">{t("preorder.page.phone")}</label>
                 <input
                   type="tel"
                   value={form.phone}
                   onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                  placeholder="+216 XX XXX XXXX"
+                  placeholder={t("preorder.page.phonePlaceholder")}
                   required
                   className="w-full border hairline px-4 py-2 text-sm bg-background placeholder-muted-foreground outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs text-muted-foreground mb-1">City</label>
+                <label className="block text-xs text-muted-foreground mb-1">{t("preorder.page.city")}</label>
                 <input
                   type="text"
                   value={form.city}
                   onChange={(e) => setForm({ ...form, city: e.target.value })}
-                  placeholder="Tunis"
+                  placeholder={t("preorder.page.cityPlaceholder")}
                   required
                   className="w-full border hairline px-4 py-2 text-sm bg-background placeholder-muted-foreground outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs text-muted-foreground mb-1">Address</label>
+                <label className="block text-xs text-muted-foreground mb-1">{t("preorder.page.address")}</label>
                 <input
                   type="text"
                   value={form.address}
                   onChange={(e) => setForm({ ...form, address: e.target.value })}
-                  placeholder="Street and number"
+                  placeholder={t("preorder.page.addressPlaceholder")}
                   required
                   className="w-full border hairline px-4 py-2 text-sm bg-background placeholder-muted-foreground outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs text-muted-foreground mb-1">Notes (optional)</label>
+                <label className="block text-xs text-muted-foreground mb-1">{t("preorder.page.notes")}</label>
                 <textarea
                   value={form.notes}
                   onChange={(e) => setForm({ ...form, notes: e.target.value })}
-                  placeholder="Any special requests?"
+                  placeholder={t("preorder.page.notesPlaceholder")}
                   className="w-full border hairline px-4 py-2 text-sm bg-background placeholder-muted-foreground outline-none"
                   rows={3}
                 />
@@ -410,11 +407,11 @@ function PreOrderPage() {
               disabled={submitting}
               className="w-full border hairline py-5 text-xs uppercase tracking-[0.4em] transition-colors hover:bg-foreground hover:text-background disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {submitting ? "Submitting..." : "Confirm Pre-Order"}
+              {submitting ? t("preorder.page.confirming") : t("preorder.page.confirm")}
             </button>
 
             <p className="text-[9px] uppercase tracking-[0.3em] text-muted-foreground">
-              ✓ We will contact you when this item is back in stock.
+              {t("preorder.page.note")}
             </p>
           </form>
         </div>

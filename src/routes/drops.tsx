@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { ProductCard } from "@/components/product-card";
 import { ProductsLoading } from "@/components/products-loading";
+import { useT } from "@/hooks/use-language";
 import type { Product } from "@/lib/products";
 import { getProducts } from "@/lib/products.server";
 
@@ -13,16 +14,16 @@ export const Route = createFileRoute("/drops")({
   pendingComponent: ProductsLoading,
   head: () => ({
     meta: [
-      { title: "Drops — HOUSE OF FLAGS" },
+      { title: "Collections — HOUSE OF FLAGS" },
       {
         name: "description",
         content:
-          "Every HOUSE OF FLAGS drop is limited. Once a piece sells out, it never returns. View past and upcoming drops.",
+          "Explore current and upcoming designs from HOUSE OF FLAGS. View the collection and product availability.",
       },
-      { property: "og:title", content: "Drops — HOUSE OF FLAGS" },
+      { property: "og:title", content: "Collections — HOUSE OF FLAGS" },
       {
         property: "og:description",
-        content: "Limited drops. No restocks. View the archive.",
+        content: "Discover the HOUSE OF FLAGS collection and explore available designs.",
       },
     ],
   }),
@@ -73,6 +74,7 @@ function productMatchesQuery(product: Product, query: string): boolean {
 
 function Drops() {
   const { products } = Route.useLoaderData();
+  const t = useT();
   const [query, setQuery] = useState("");
 
   const filteredProducts = products.filter((product) =>
@@ -84,26 +86,25 @@ function Drops() {
     <div className="pt-32">
       <section className="mx-auto max-w-[1200px] px-6 py-16 md:px-10">
         <p className="text-[10px] uppercase tracking-[0.5em] text-muted-foreground">
-          The archive
+          {t("drops.archive")}
         </p>
         <h1 className="mt-8 font-display text-6xl leading-[0.95] md:text-8xl">
-          Drops
+          {t("drops.title")}
         </h1>
         <p className="mt-8 max-w-md text-sm leading-relaxed text-muted-foreground">
-          Every drop is small. Every drop is final. This is everything we've made and
-          everything we will.
+          {t("drops.intro")}
         </p>
 
         <div className="mt-10 max-w-md">
           <label htmlFor="drops-search" className="sr-only">
-            Search products by name or tags
+            {t("drops.searchLabel")}
           </label>
           <input
             id="drops-search"
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search by name or tags"
+            placeholder={t("drops.searchPlaceholder")}
             className="w-full border hairline bg-transparent px-4 py-3 text-sm tracking-wide text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:ring-1 focus:ring-foreground/30"
           />
         </div>
@@ -114,8 +115,8 @@ function Drops() {
           {drops.length === 0 ? (
             <p className="py-14 text-sm text-muted-foreground">
               {query.trim()
-                ? "No designs match that search."
-                : "No drops yet. Check back soon."}
+                ? t("drops.noResults")
+                : t("drops.empty")}
             </p>
           ) : (
             drops.map((d) => (
@@ -141,7 +142,11 @@ function Drops() {
                             : "text-muted-foreground"
                       }
                     >
-                      ● {d.status}
+                      ● {d.status === "Live"
+                        ? t("drops.live")
+                        : d.status === "Coming"
+                          ? t("drops.coming")
+                          : t("drops.archiveStatus")}
                     </p>
                     {d.date ? (
                       <p className="mt-2 text-muted-foreground">{d.date}</p>
